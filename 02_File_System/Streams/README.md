@@ -1,8 +1,4 @@
-# Streams
-
-Streams are a powerful abstraction in Node.js for handling reading and writing data in a continuous, memory-efficient manner. Instead of loading entire files into memory, streams process data in small chunks, making them ideal for handling large files or real-time data.
-
----
+# Node.js Streams Guide
 
 ## Core Terminology
 
@@ -10,16 +6,17 @@ Streams are a powerful abstraction in Node.js for handling reading and writing d
 
 Streams are objects that let you read data from a source or write data to a destination continuously. They are an EventEmitter-based interface for working with streaming data in Node.js. Streams handle data piece by piece (chunks), without loading the entire content into memory at once.
 
-### What is a Chunk?
+### Key Concepts
 
-A **chunk** is a small piece of data transferred at a time. Instead of loading an entire file (e.g., 1GB) into memory, streams break it down into smaller chunks (typically 16KB by default) and process them sequentially. This approach is memory-efficient and allows your code to start processing data before the entire file is available. Chunks are typically `Buffer` objects (binary data) or strings (if encoding is specified).
+**Chunk**: A small piece of data transferred at a time. Instead of loading an entire file (e.g., 1GB) into memory, streams break it down into smaller chunks (typically 16KB by default) and process them sequentially.
 
-### Benefits of Streams
+**Backpressure**: The mechanism that prevents a fast data source from overwhelming a slow consumer. When the writable stream's buffer is full, it signals the readable stream to pause until space is available.
 
-- **Memory Efficiency**: Process large files without loading them entirely into memory
-- **Time Efficiency**: Start processing data as soon as the first chunk is available
-- **Composability**: Chain multiple operations together using pipes
-- **Backpressure Handling**: Automatically manage data flow speed between producer and consumer
+**Pipe**: A method that connects a readable stream to a writable stream, automatically managing data flow and backpressure.
+
+**Event Emitter**: Streams inherit from EventEmitter, allowing them to emit events like `data`, `end`, `error`, `drain`, etc.
+
+**Buffer**: An internal queue where chunks are temporarily stored before being processed or written.
 
 ### Types of Streams
 
@@ -27,339 +24,578 @@ A **chunk** is a small piece of data transferred at a time. Instead of loading a
 | ------------- | ---------------------------------------------------- | -------------------------------------------- |
 | **Readable**  | Streams you can read from (source of data)           | Reading files, HTTP responses, stdin         |
 | **Writable**  | Streams you can write to (destination for data)      | Writing files, HTTP requests, stdout         |
-| **Duplex**    | Streams that are both Readable and Writable          | TCP sockets, websockets                      |
+| **Duplex**    | Streams that are both Readable and Writable          | TCP sockets, WebSockets                      |
 | **Transform** | Duplex streams that modify data as it passes through | Compression, encryption, data transformation |
+
+### Benefits of Streams
+
+**Memory Efficiency**: Process large files without loading them entirely into memory. A 1GB file can be processed with only 16KB of memory at a time.
+
+**Time Efficiency**: Start processing data as soon as the first chunk is available, rather than waiting for the entire file to load.
+
+**Composability**: Chain multiple operations together using pipes, creating powerful data processing pipelines.
+
+**Backpressure Handling**: Automatically manage data flow speed between producer and consumer, preventing memory overflow.
 
 ### How Streams Work with Buffers
 
-Streams process data in chunks using buffers. This allows you to start working with data before the entire content is available:
-
 ![Streams and Buffers](./public/streams-buffers.png)
 
-_The diagram shows how incoming data (like an HTTP request) flows through a stream in chunks, stored temporarily in a buffer, allowing your code to process data incrementally rather than waiting for the complete payload._
+Streams process data in chunks using buffers. This allows you to start working with data before the entire content is available. The diagram shows how incoming data flows through a stream in chunks, stored temporarily in a buffer, allowing your code to process data incrementally.
 
 ### Stream Modes
 
-Streams operate in two modes:
+**Binary Mode** (default): Data is processed as Buffer objects, suitable for any file type.
 
-- **Binary Mode**: Data is processed as Buffer objects (default)
-- **Object Mode**: Data can be any JavaScript object (set with `objectMode: true`)
-
-**Importing stream modules (ES Modules (Node.js 14+)):**
-
-```typescript
-import { createReadStream, createWriteStream } from "fs";
-import { pipeline } from "stream/promises";
-import { Transform } from "stream";
-```
+**Object Mode**: Data can be any JavaScript object (set with `objectMode: true`), useful for processing structured data.
 
 ---
 
-## Examples and Explanation
+## Common Stream Methods
 
-### Example 1: Readable Stream - Reading a File
+### 1. `createReadStream()`
 
-**Syntax:**
+**Purpose**: Creates a readable stream for reading data from a file in chunks.
 
-`createReadStream(
-  path: string | URL,
-  options?: {
-    encoding?: BufferEncoding;
-    highWaterMark?: number;
-    start?: number;
-    end?: number;
-  }
-): ReadStream`
+![createReadStream syntax](./public/createReadStream.png)
 
-**Input:**
-
-- `path`: The file path (absolute or relative) to read from
-- `options` (optional): Configuration object
-  - `encoding`: Character encoding (e.g., 'utf8'). If not set, chunks are Buffer objects
-  - `highWaterMark`: Internal buffer size in bytes (default: 64KB)
-  - `start`: Starting byte position to read from
-  - `end`: Ending byte position to read to
-
-**Output:**
-
-- Returns a `ReadStream` object (Readable stream)
-- Emits `data` events with chunks of the file
-- Emits `end` event when reading is complete
-- Emits `error` event if an error occurs
-
-**Code Example:**
+#### Example 1: Reading a large log file
 
 ```typescript
 import { createReadStream } from "fs";
 
-async function readStreamExample() {
+async function readLargeLog() {
   try {
-    const readStream = createReadStream("large-file.txt", {
+    const stream = createReadStream("application.log", {
       encoding: "utf8",
       highWaterMark: 16384, // 16KB chunks
     });
 
-    let totalSize = 0;
+    let lineCount = 0;
+    let errorCount = 0;
 
-    readStream.on("data", (chunk) => {
-      totalSize += chunk.length;
-      console.log(`Received ${chunk.length} bytes`);
-      // Process chunk here
+    stream.on("data", (chunk: string) => {
+      const lines = chunk.split("\n");
+      lineCount += lines.length;
+      errorCount += lines.filter((line) => line.includes("ERROR")).length;
     });
 
-    readStream.on("end", () => {
-      console.log(`Finished reading. Total: ${totalSize} bytes`);
+    stream.on("end", () => {
+      console.log(`Processed ${lineCount} lines`);
+      console.log(`Found ${errorCount} errors`);
     });
 
-    readStream.on("error", (error) => {
-      console.error("Error reading stream:", error);
+    stream.on("error", (error) => {
+      console.error("Error reading file:", error);
     });
   } catch (error) {
-    console.error("Error setting up stream:", error);
+    console.error("Failed to create stream:", error);
   }
 }
 
-readStreamExample();
+readLargeLog();
 ```
 
-**Explanation:**
+**Explanation**: Reads a large log file in small chunks without loading the entire file into memory. This allows processing files that are larger than available RAM. Perfect for log analysis or data processing.
 
-- Reads file in chunks rather than loading entire file into memory
-- `data` event fires for each chunk received
-- Memory usage remains constant regardless of file size
-- Ideal for processing large files
+#### Real-world Example: Processing CSV data
 
-### Example 2: Writable Stream - Writing to a File
+```typescript
+import { createReadStream } from "fs";
 
-**Syntax:**
+interface User {
+  id: string;
+  name: string;
+  email: string;
+}
 
-`createWriteStream(
-  path: string | URL,
-  options?: {
-    encoding?: BufferEncoding;
-    flags?: string;
-    mode?: number;
-    highWaterMark?: number;
-  }
-): WriteStream`
+async function processCSV(filePath: string) {
+  const stream = createReadStream(filePath, { encoding: "utf8" });
 
-**Input:**
+  let buffer = "";
+  const users: User[] = [];
 
-- `path`: The file path (absolute or relative) to write to
-- `options` (optional): Configuration object
-  - `encoding`: Character encoding (default: 'utf8')
-  - `flags`: File system flags (default: 'w' for write)
-  - `mode`: File permission mode (default: 0o666)
-  - `highWaterMark`: Buffer size threshold (default: 16KB)
+  stream.on("data", (chunk: string) => {
+    buffer += chunk;
+    const lines = buffer.split("\n");
 
-**Output:**
+    // Keep last incomplete line in buffer
+    buffer = lines.pop() || "";
 
-- Returns a `WriteStream` object (Writable stream)
-- `write()` method returns `true` if buffer is not full, `false` if backpressure should be applied
-- Emits `drain` event when buffer is emptied and ready for more data
-- Emits `finish` event when all data has been written
-- Emits `error` event if an error occurs
+    for (const line of lines) {
+      if (!line.trim()) continue;
 
-**Code Example:**
+      const [id, name, email] = line.split(",");
+      users.push({ id: id.trim(), name: name.trim(), email: email.trim() });
+    }
+  });
+
+  stream.on("end", () => {
+    // Process remaining buffer
+    if (buffer.trim()) {
+      const [id, name, email] = buffer.split(",");
+      users.push({ id: id.trim(), name: name.trim(), email: email.trim() });
+    }
+
+    console.log(`Processed ${users.length} users`);
+    console.log("First 5 users:", users.slice(0, 5));
+  });
+
+  stream.on("error", (error) => {
+    console.error("CSV processing error:", error);
+  });
+}
+
+processCSV("users.csv");
+```
+
+**Explanation**: Processes CSV data line by line, handling incomplete lines that span across chunks. This pattern is essential for parsing large CSV files efficiently without loading everything into memory.
+
+---
+
+### 2. `createWriteStream()`
+
+**Purpose**: Creates a writable stream for writing data to a file in chunks.
+
+![createWriteStream syntax](./public/createWriteStream.png)
+
+#### Example: Writing large dataset
 
 ```typescript
 import { createWriteStream } from "fs";
 
 async function writeStreamExample() {
   try {
-    const writeStream = createWriteStream("output.txt", {
-      encoding: "utf8",
-    });
+    const stream = createWriteStream("output.txt", { encoding: "utf8" });
 
-    // Write multiple chunks
-    for (let i = 0; i < 1000; i++) {
-      const canContinue = writeStream.write(`Line ${i + 1}\n`);
+    for (let i = 0; i < 1000000; i++) {
+      const canContinue = stream.write(`Line ${i + 1}: ${Math.random()}\n`);
 
       // Handle backpressure
       if (!canContinue) {
-        await new Promise((resolve) => writeStream.once("drain", resolve));
+        await new Promise((resolve) => stream.once("drain", resolve));
       }
     }
 
-    // Signal that writing is complete
-    writeStream.end(() => {
+    stream.end(() => {
       console.log("Writing completed");
     });
 
-    writeStream.on("error", (error) => {
-      console.error("Error writing stream:", error);
+    stream.on("error", (error) => {
+      console.error("Error writing:", error);
     });
   } catch (error) {
-    console.error("Error setting up stream:", error);
+    console.error("Failed to create write stream:", error);
   }
 }
 
 writeStreamExample();
 ```
 
-**Explanation:**
+**Explanation**: Writes a large amount of data while respecting backpressure. When `write()` returns `false`, it means the buffer is full, so we wait for the `drain` event before continuing. This prevents memory overflow.
 
-- Writes data in chunks without overwhelming memory
-- Handles backpressure automatically when buffer is full
-- `drain` event indicates buffer is ready for more data
-- Efficient for writing large amounts of data
+#### Real-world Example: Generating reports
 
-### Example 3: Piping Streams - Copy a File
+```typescript
+import { createWriteStream } from "fs";
 
-**Syntax:**
+interface SalesRecord {
+  date: string;
+  product: string;
+  amount: number;
+  quantity: number;
+}
 
-`readableStream.pipe(
-  destination: WritableStream,
-  options?: { end?: boolean }
-): WritableStream`
+async function generateSalesReport(records: SalesRecord[]) {
+  const stream = createWriteStream("sales-report.csv", { encoding: "utf8" });
 
-**Input:**
+  // Write CSV header
+  stream.write("Date,Product,Amount,Quantity\n");
 
-- `destination`: The writable stream to pipe data into
-- `options` (optional): Configuration object
-  - `end`: Whether to end the destination stream when source ends (default: true)
+  for (const record of records) {
+    const line = `${record.date},${record.product},${record.amount},${record.quantity}\n`;
+    const canWrite = stream.write(line);
 
-**Output:**
+    if (!canWrite) {
+      // Wait for drain event if buffer is full
+      await new Promise((resolve) => stream.once("drain", resolve));
+    }
+  }
 
-- Returns the destination stream for chaining
-- Automatically handles data flow and backpressure
-- Pipes all data from readable to writable stream
+  return new Promise<void>((resolve, reject) => {
+    stream.end(() => {
+      console.log("Report generated successfully");
+      resolve();
+    });
 
-**Code Example:**
+    stream.on("error", reject);
+  });
+}
+
+// Usage
+const salesData: SalesRecord[] = [
+  { date: "2024-01-01", product: "Laptop", amount: 999.99, quantity: 5 },
+  { date: "2024-01-02", product: "Mouse", amount: 29.99, quantity: 20 },
+];
+
+generateSalesReport(salesData);
+```
+
+**Explanation**: Generates a CSV report from structured data while handling backpressure. This is common in admin panels or reporting systems where users need to export large datasets.
+
+---
+
+### 3. `pipe()`
+
+**Purpose**: Connects a readable stream to a writable stream, automatically managing data flow and backpressure.
+
+![pipe syntax](./public/pipe.png)
+
+#### Example: Copy file efficiently
 
 ```typescript
 import { createReadStream, createWriteStream } from "fs";
 
-async function pipeExample() {
+async function copyFile(source: string, destination: string) {
   try {
-    const readStream = createReadStream("source.txt");
-    const writeStream = createWriteStream("destination.txt");
+    const readStream = createReadStream(source);
+    const writeStream = createWriteStream(destination);
 
     readStream.pipe(writeStream);
 
-    writeStream.on("finish", () => {
-      console.log("File copied successfully");
-    });
+    return new Promise<void>((resolve, reject) => {
+      writeStream.on("finish", () => {
+        console.log("File copied successfully");
+        resolve();
+      });
 
-    readStream.on("error", (error) => {
-      console.error("Error reading:", error);
-    });
-
-    writeStream.on("error", (error) => {
-      console.error("Error writing:", error);
+      readStream.on("error", reject);
+      writeStream.on("error", reject);
     });
   } catch (error) {
-    console.error("Error setting up pipe:", error);
+    console.error("Copy failed:", error);
+    throw error;
   }
 }
 
-pipeExample();
+copyFile("source.txt", "destination.txt");
 ```
 
-**Explanation:**
+**Explanation**: The simplest way to transfer data between streams. `pipe()` automatically manages backpressure and data flow, making it ideal for file copying operations.
 
-- Simplest way to transfer data between streams
-- Automatically manages backpressure
-- Memory-efficient file copying
-- Handles flow control automatically
+#### Real-world Example: File download with progress
 
-### Example 4: Pipeline - Safe Stream Composition
+```typescript
+import { createReadStream, createWriteStream } from "fs";
+import { stat } from "fs/promises";
 
-**Syntax:**
+async function downloadWithProgress(source: string, destination: string) {
+  try {
+    const stats = await stat(source);
+    const totalSize = stats.size;
+    let downloaded = 0;
 
-`pipeline(
-  ...streams: Array<Readable | Writable | Transform>,
-  callback?: (error?: Error) => void
-): Promise<void>`
+    const readStream = createReadStream(source);
+    const writeStream = createWriteStream(destination);
 
-**Input:**
+    readStream.on("data", (chunk: Buffer) => {
+      downloaded += chunk.length;
+      const progress = ((downloaded / totalSize) * 100).toFixed(2);
+      process.stdout.write(`\rProgress: ${progress}%`);
+    });
 
-- `streams`: One or more streams to connect (readable → transform(s) → writable)
-- `callback` (optional): Error-first callback when pipeline completes or fails
+    readStream.pipe(writeStream);
 
-**Output:**
+    return new Promise<void>((resolve, reject) => {
+      writeStream.on("finish", () => {
+        console.log("\nDownload complete!");
+        resolve();
+      });
 
-- Returns a `Promise` that resolves when pipeline completes
-- Automatically cleans up streams on error
-- Properly destroys all streams if one fails
+      readStream.on("error", reject);
+      writeStream.on("error", reject);
+    });
+  } catch (error) {
+    console.error("Download failed:", error);
+    throw error;
+  }
+}
 
-**Code Example:**
+downloadWithProgress("large-file.zip", "downloaded.zip");
+```
+
+**Explanation**: Shows download progress by tracking bytes transferred. The `data` event allows monitoring progress while `pipe()` handles the actual data transfer efficiently.
+
+---
+
+### 4. `pipeline()`
+
+**Purpose**: Safely composes multiple streams together with proper error handling and cleanup.
+
+![pipeline syntax](./public/pipeline.png)
+
+#### Example: Compress file
 
 ```typescript
 import { createReadStream, createWriteStream } from "fs";
 import { pipeline } from "stream/promises";
 import { createGzip } from "zlib";
 
-async function pipelineExample() {
+async function compressFile(input: string, output: string) {
   try {
     await pipeline(
-      createReadStream("input.txt"),
-      createGzip(), // Transform stream for compression
-      createWriteStream("input.txt.gz")
+      createReadStream(input),
+      createGzip(),
+      createWriteStream(output)
     );
 
     console.log("File compressed successfully");
   } catch (error) {
-    console.error("Pipeline failed:", error);
+    console.error("Compression failed:", error);
+    throw error;
   }
 }
 
-pipelineExample();
+compressFile("large-file.txt", "large-file.txt.gz");
 ```
 
-**Explanation:**
+**Explanation**: Preferred over `.pipe()` for better error handling. `pipeline()` automatically destroys all streams if any stream in the chain fails, preventing memory leaks.
 
-- Preferred over `.pipe()` for better error handling
-- Automatically destroys all streams on error
-- Can chain multiple transform streams
-- Returns a Promise for easier async/await usage
-
----
-
-## Common Use Cases
-
-### Reading Large Files
-
-```typescript
-import { createReadStream } from "fs";
-
-createReadStream("huge-log.txt", { encoding: "utf8" })
-  .on("data", (chunk) => processChunk(chunk))
-  .on("end", () => console.log("Done"))
-  .on("error", (error) => console.error(error));
-```
-
-### HTTP File Upload
-
-```typescript
-import { createWriteStream } from "fs";
-import { pipeline } from "stream/promises";
-
-app.post("/upload", async (req, res) => {
-  try {
-    await pipeline(req, createWriteStream("uploaded-file.dat"));
-    res.send("Upload successful");
-  } catch (error) {
-    res.status(500).send("Upload failed");
-  }
-});
-```
-
-### Data Processing Pipeline
+#### Real-world Example: Image processing pipeline
 
 ```typescript
 import { createReadStream, createWriteStream } from "fs";
+import { pipeline } from "stream/promises";
+import { Transform } from "stream";
 import { createGzip } from "zlib";
+
+// Custom transform stream for image metadata
+class ImageMetadataExtractor extends Transform {
+  constructor() {
+    super();
+  }
+
+  _transform(chunk: Buffer, encoding: string, callback: Function) {
+    // Extract metadata (simplified example)
+    const metadata = {
+      size: chunk.length,
+      timestamp: new Date().toISOString(),
+    };
+
+    // Add metadata as header
+    if (!this.headerWritten) {
+      this.push(`Metadata: ${JSON.stringify(metadata)}\n`);
+      this.headerWritten = true;
+    }
+
+    this.push(chunk);
+    callback();
+  }
+
+  private headerWritten = false;
+}
+
+async function processImage(input: string, output: string) {
+  try {
+    await pipeline(
+      createReadStream(input),
+      new ImageMetadataExtractor(),
+      createGzip(),
+      createWriteStream(output)
+    );
+
+    console.log("Image processed and compressed");
+  } catch (error) {
+    console.error("Processing failed:", error);
+  }
+}
+
+processImage("photo.jpg", "photo.processed.gz");
+```
+
+**Explanation**: Chains multiple transformations together. The pipeline reads the image, extracts metadata, compresses it, and writes to disk—all while using minimal memory through streaming.
+
+---
+
+### 5. `Transform Stream`
+
+**Purpose**: Creates a custom stream that can modify data as it passes through.
+
+**Syntax:**
+
+```typescript
+class CustomTransform extends Transform {
+  _transform(chunk: Buffer, encoding: string, callback: Function): void {
+    // Process chunk
+    this.push(modifiedChunk);
+    callback();
+  }
+}
+```
+
+**Input:**
+
+- `chunk`: Data chunk to transform
+- `encoding`: Character encoding
+- `callback`: Function to call when done
+
+**Output:**
+
+- Use `this.push()` to send transformed data
+- Call `callback()` when processing is complete
+
+#### Example: Uppercase transform
+
+```typescript
+import { Transform } from "stream";
+import { createReadStream, createWriteStream } from "fs";
 import { pipeline } from "stream/promises";
 
-await pipeline(
-  createReadStream("data.json"),
-  parseJSON, // Transform
-  filterData, // Transform
-  formatOutput, // Transform
-  createGzip(),
-  createWriteStream("output.json.gz")
-);
+class UppercaseTransform extends Transform {
+  _transform(chunk: Buffer, encoding: string, callback: Function) {
+    const uppercased = chunk.toString().toUpperCase();
+    this.push(uppercased);
+    callback();
+  }
+}
+
+async function convertToUppercase(input: string, output: string) {
+  try {
+    await pipeline(
+      createReadStream(input, { encoding: "utf8" }),
+      new UppercaseTransform(),
+      createWriteStream(output)
+    );
+
+    console.log("File converted to uppercase");
+  } catch (error) {
+    console.error("Conversion failed:", error);
+  }
+}
+
+convertToUppercase("input.txt", "output.txt");
+```
+
+**Explanation**: Creates a custom transformation that converts all text to uppercase. Transform streams are perfect for data manipulation, filtering, or formatting.
+
+#### Real-world Example: Data sanitization stream
+
+```typescript
+import { Transform } from "stream";
+import { createReadStream, createWriteStream } from "fs";
+import { pipeline } from "stream/promises";
+
+class SanitizeTransform extends Transform {
+  _transform(chunk: Buffer, encoding: string, callback: Function) {
+    let text = chunk.toString();
+
+    // Remove sensitive data patterns
+    text = text.replace(/\b\d{3}-\d{2}-\d{4}\b/g, "XXX-XX-XXXX"); // SSN
+    text = text.replace(/\b\d{16}\b/g, "XXXX-XXXX-XXXX-XXXX"); // Credit card
+    text = text.replace(
+      /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g,
+      "[EMAIL]"
+    ); // Email
+
+    this.push(text);
+    callback();
+  }
+}
+
+async function sanitizeLogFile(input: string, output: string) {
+  try {
+    await pipeline(
+      createReadStream(input, { encoding: "utf8" }),
+      new SanitizeTransform(),
+      createWriteStream(output)
+    );
+
+    console.log("Log file sanitized");
+  } catch (error) {
+    console.error("Sanitization failed:", error);
+  }
+}
+
+sanitizeLogFile("application.log", "sanitized.log");
+```
+
+**Explanation**: Removes sensitive information from log files before sharing or archiving. Transform streams are ideal for this because they process data in chunks without loading the entire file.
+
+---
+
+## Best Practices
+
+1. **Always use pipeline() instead of pipe() for production code**: Better error handling and automatic cleanup.
+
+```typescript
+// ❌ Bad - No automatic cleanup on error
+readStream.pipe(transformStream).pipe(writeStream);
+
+// ✅ Good - Automatic cleanup and error handling
+import { pipeline } from "stream/promises";
+await pipeline(readStream, transformStream, writeStream);
+```
+
+2. **Handle backpressure properly**: Check the return value of `write()` and wait for `drain`.
+
+```typescript
+// ✅ Good
+for (const item of largeDataset) {
+  const canContinue = stream.write(item);
+  if (!canContinue) {
+    await new Promise((resolve) => stream.once("drain", resolve));
+  }
+}
+```
+
+3. **Always handle errors**: Streams can fail at any point.
+
+```typescript
+// ✅ Good
+stream.on("error", (error) => {
+  console.error("Stream error:", error);
+  // Handle error appropriately
+});
+```
+
+4. **Destroy streams when done or on error**: Prevent memory leaks.
+
+```typescript
+try {
+  await pipeline(readStream, writeStream);
+} catch (error) {
+  // Streams are automatically destroyed by pipeline
+  console.error("Pipeline failed:", error);
+}
+```
+
+5. **Use appropriate highWaterMark**: Adjust buffer size based on your use case.
+
+```typescript
+// For large files, use larger chunks
+const stream = createReadStream("large.file", {
+  highWaterMark: 64 * 1024, // 64KB
+});
+
+// For real-time data, use smaller chunks
+const realtimeStream = createReadStream("live.log", {
+  highWaterMark: 1024, // 1KB for faster response
+});
+```
+
+6. **Pause and resume streams when needed**: Control data flow.
+
+```typescript
+const stream = createReadStream("data.txt");
+
+stream.on("data", (chunk) => {
+  if (needToSlowDown) {
+    stream.pause();
+
+    // Resume after processing
+    setTimeout(() => stream.resume(), 1000);
+  }
+});
 ```
 
 ---
@@ -367,6 +603,6 @@ await pipeline(
 ## References
 
 - [Node.js Stream Documentation](https://nodejs.org/api/stream.html)
+- [Node.js Pipeline API](https://nodejs.org/api/stream.html#stream_stream_pipeline_streams_callback)
 - [Stream Handbook](https://github.com/substack/stream-handbook)
 - [Streams Best Practices](https://nodejs.org/en/docs/guides/backpressuring-in-streams/)
-- [Node.js Pipeline API](https://nodejs.org/api/stream.html#stream_stream_pipeline_streams_callback)

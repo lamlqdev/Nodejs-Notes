@@ -1,582 +1,525 @@
-# Path Manipulation
-
-The `path` module in Node.js provides utilities for working with file and directory paths. It handles the differences between path formats across different operating systems (Windows vs Unix-like systems) and provides methods to parse, join, and manipulate file paths safely and consistently.
-
----
+# Node.js Path Manipulation Guide
 
 ## Core Terminology
 
-### What is the path Module?
+### What is Path Manipulation?
 
-The `path` module is a built-in Node.js module that provides utilities for handling file and directory path operations. It helps normalize paths, resolve relative paths to absolute paths, extract components of a path, and safely join path segments in a cross-platform manner.
+Path manipulation refers to the process of working with file and directory paths in a programmatic way. The Node.js `path` module provides utilities for handling and transforming file paths across different operating systems.
 
-### Why Use the path Module?
+### Key Concepts
 
-- **Cross-Platform Compatibility**: Handles differences between Windows (`\`) and Unix-like systems (`/`) path separators
-- **Safe Path Joining**: Prevents path traversal bugs by properly joining path segments
-- **Path Parsing**: Extract components like directory, filename, and extension
-- **Path Resolution**: Convert relative paths to absolute paths based on the current working directory
-- **No File I/O**: All operations are synchronous string manipulations (no filesystem access)
+**Absolute Path**: A complete path from the root directory to a specific file or folder.
 
-### Path Components
+- Example (POSIX): `/home/user/project/src/index.ts`
+- Example (Windows): `C:\Users\user\project\src\index.ts`
 
-A file path consists of several components:
+**Relative Path**: A path relative to the current working directory.
 
-```
-/home/user/documents/file.txt
-│     │    │         │    │
-│     │    │         │    └─ basename (file.txt)
-│     │    │         └─────── filename (file)
-│     │    │                 extension (.txt)
-│     │    └───────────────── dirname (/home/user/documents)
-│     └──────────────────────── root (/)
-└──────────────────────────────── dir (/home/user/documents)
-```
+- Example: `./src/index.ts` or `../config/settings.json`
 
-**Importing the path module (ES Modules (Node.js 14+)):**
+**Path Segment**: Individual parts of a path separated by delimiters.
 
-```typescript
-import * as path from "path";
-// Or import specific methods:
-import {
-  join,
-  resolve,
-  basename,
-  dirname,
-  extname,
-  parse,
-  isAbsolute,
-} from "path";
-```
+- Example: In `/home/user/docs`, the segments are `home`, `user`, and `docs`
+
+**Path Delimiter**: The character used to separate path segments.
+
+**Path Separator**: The character used to separate multiple paths in environment variables.
+
+### Platform Differences
+
+| Feature          | POSIX (Linux/Mac)     | Windows                  |
+| ---------------- | --------------------- | ------------------------ |
+| Path Delimiter   | `/`                   | `\`                      |
+| Path Separator   | `:`                   | `;`                      |
+| Root             | `/`                   | `C:\`, `D:\`, etc.       |
+| Case Sensitivity | Yes                   | No                       |
+| Example Path     | `/home/user/file.txt` | `C:\Users\user\file.txt` |
 
 ---
 
-## Examples and Explanation
+## Common Path Methods
 
-### Example 1: Join Path Segments
+### 1. `path.join()`
 
-**Syntax:**
+**Purpose**: Joins multiple path segments into a single path, normalizing the result.
 
-`path.join(
-  ...paths: string[]
-): string`
+![join syntax](./public/join.png)
 
-**Input:**
-
-- `paths`: One or more path segments to join
-  - Can be relative or absolute paths
-  - Can include `..` and `.` for parent and current directory references
-
-**Output:**
-
-- Returns a `string` containing the normalized joined path
-- Automatically normalizes the result (removes redundant separators and references)
-- Uses the correct separator for the operating system
-
-**Code Example:**
+#### Example 1: Building a file path
 
 ```typescript
 import { join } from "path";
 
-async function joinPathExample() {
-  try {
-    // Join multiple path segments
-    const filePath = join("/home/user", "documents", "file.txt");
-    console.log("Joined path:", filePath);
-    // Output: /home/user/documents/file.txt
+const projectRoot = "/home/user/myapp";
+const configFile = join(projectRoot, "config", "database.json");
 
-    // Join with relative references
-    const resolvedPath = join("/app/src", "..", "config", "app.json");
-    console.log("With parent ref:", resolvedPath);
-    // Output: /app/config/app.json
-
-    // Cross-platform path joining
-    const uploadPath = join("uploads", "images", "profile.jpg");
-    console.log("Relative path:", uploadPath);
-    // Output: uploads/images/profile.jpg (or uploads\images\profile.jpg on Windows)
-  } catch (error) {
-    console.error("Error joining paths:", error);
-  }
-}
-
-joinPathExample();
+console.log(configFile);
+// Output: /home/user/myapp/config/database.json
 ```
 
-**Explanation:**
+**Explanation**: `join()` combines the segments and handles the correct path delimiters. It's perfect for building paths dynamically without worrying about trailing or leading slashes.
 
-- Simplest way to combine path segments
-- Handles `..` and `.` references automatically
-- Cross-platform safe - uses correct separator for OS
-- Removes duplicate slashes
+#### Example 2: Navigating up directories
 
-### Example 2: Resolve to Absolute Path
+```typescript
+import { join } from "path";
 
-**Syntax:**
+const currentFile = "/home/user/myapp/src/controllers/user.controller.ts";
+const utilsPath = join(currentFile, "..", "..", "utils", "validation.ts");
 
-`path.resolve(
-  ...paths: string[]
-): string`
+console.log(utilsPath);
+// Output: /home/user/myapp/src/utils/validation.ts
+```
 
-**Input:**
+**Explanation**: The `..` segments move up the directory tree. `join()` automatically normalizes the path, removing unnecessary segments.
 
-- `paths`: One or more path segments to resolve
-  - If the last segment is relative, resolution starts from the left
-  - Empty string or no arguments uses the current working directory
+---
 
-**Output:**
+### 2. `path.resolve()`
 
-- Returns a `string` containing the absolute path
-- Resolves all relative references (`..` and `.`)
-- Uses the current working directory as the starting point if needed
+**Purpose**: Resolves a sequence of paths into an absolute path, treating each segment as a navigation instruction.
 
-**Code Example:**
+![resolve syntax](./public/resolve.png)
+
+#### Example 1: Getting absolute path from relative
 
 ```typescript
 import { resolve } from "path";
 
-async function resolvePathExample() {
-  try {
-    // Resolve relative to current working directory
-    const absolutePath = resolve("uploads/images/photo.jpg");
-    console.log("Absolute path:", absolutePath);
-    // Output: /Users/username/project/uploads/images/photo.jpg
+// Assume current working directory is: /home/user/myapp
+const absolutePath = resolve("src", "models", "user.model.ts");
 
-    // Resolve with multiple segments
-    const configPath = resolve(__dirname, "..", "config", "app.json");
-    console.log("Config path:", configPath);
-
-    // Resolve with parent directory references
-    const parentPath = resolve("/app/src/utils", "..", "..", "config");
-    console.log("Parent path:", parentPath);
-    // Output: /app/config
-
-    // Get current working directory
-    const cwd = resolve();
-    console.log("Current working directory:", cwd);
-  } catch (error) {
-    console.error("Error resolving path:", error);
-  }
-}
-
-resolvePathExample();
+console.log(absolutePath);
+// Output: /home/user/myapp/src/models/user.model.ts
 ```
 
-**Explanation:**
+**Explanation**: `resolve()` starts from the current working directory and builds an absolute path. This is useful when you need to ensure you're working with absolute paths.
 
-- Converts relative paths to absolute paths
-- Resolves all `..` and `.` references
-- Essential for file operations that need absolute paths
-- Useful for getting the correct path regardless of where the script runs
+#### Example 2: Using \_\_dirname equivalent in ES modules
 
-### Example 3: Extract Filename
+```typescript
+import { resolve, dirname } from "path";
+import { fileURLToPath } from "url";
 
-**Syntax:**
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
-`path.basename(
-  path: string,
-  suffix?: string
-): string`
+const configPath = resolve(__dirname, "../config/app.config.ts");
 
-**Input:**
+console.log(configPath);
+// Output: /home/user/myapp/config/app.config.ts (assuming __dirname is /home/user/myapp/src)
+```
 
-- `path`: The file path to extract the filename from
-- `suffix` (optional): File extension to remove from the result
-  - If provided, removes the suffix from the returned basename
+**Explanation**: In ES modules, `__dirname` isn't available by default. This pattern converts the module URL to a file path, then uses `resolve()` to navigate to other files relative to the current module.
 
-**Output:**
+---
 
-- Returns a `string` containing just the filename (with or without extension)
-- Removes the directory path
-- Optionally removes the specified suffix
+### 3. `path.basename()`
 
-**Code Example:**
+**Purpose**: Returns the last portion of a path (the file or directory name).
+
+![basename syntax](./public/basename.png)
+
+#### Example 1: Getting filename
 
 ```typescript
 import { basename } from "path";
 
-async function basenameExample() {
-  try {
-    // Get filename with extension
-    const fullName = basename("/home/user/documents/file.txt");
-    console.log("Full basename:", fullName);
-    // Output: file.txt
+const filePath = "/home/user/documents/report.pdf";
+const fileName = basename(filePath);
 
-    // Get filename without extension
-    const nameOnly = basename("/path/to/image.png", ".png");
-    console.log("Name without ext:", nameOnly);
-    // Output: image
-
-    // Works with different path formats
-    const windowsPath = basename("C:\\Users\\Documents\\report.pdf");
-    console.log("From Windows path:", windowsPath);
-    // Output: report.pdf
-
-    // Works with relative paths
-    const relativePath = basename("src/components/Button.jsx", ".jsx");
-    console.log("Component name:", relativePath);
-    // Output: Button
-  } catch (error) {
-    console.error("Error getting basename:", error);
-  }
-}
-
-basenameExample();
+console.log(fileName);
+// Output: report.pdf
 ```
 
-**Explanation:**
+**Explanation**: Extracts just the filename from a full path. Useful for logging or displaying file names to users.
 
-- Extracts just the filename from a full path
-- Useful for getting file names from paths
-- Can remove extension with the suffix parameter
-- Works with both absolute and relative paths
+#### Example 2: Getting filename without extension
 
-### Example 4: Extract Directory Path
+```typescript
+import { basename } from "path";
 
-**Syntax:**
+const filePath = "/home/user/documents/report.pdf";
+const fileNameNoExt = basename(filePath, ".pdf");
 
-`path.dirname(
-  path: string
-): string`
+console.log(fileNameNoExt);
+// Output: report
+```
 
-**Input:**
+**Explanation**: By providing the extension as the second argument, you get the filename without its extension. This is helpful for renaming files or creating related files.
 
-- `path`: The file path to extract the directory from
+---
 
-**Output:**
+### 4. `path.dirname()`
 
-- Returns a `string` containing the directory path
-- Removes the filename from the path
-- Returns `.` if path has no directory component
+**Purpose**: Returns the directory name of a path (everything except the last segment).
 
-**Code Example:**
+![dirname syntax](./public/dirname.png)
+
+#### Example: Getting parent directory
 
 ```typescript
 import { dirname } from "path";
 
-async function dirnameExample() {
-  try {
-    // Get directory from absolute path
-    const dir = dirname("/home/user/documents/file.txt");
-    console.log("Directory:", dir);
-    // Output: /home/user/documents
+const filePath = "/home/user/myapp/src/controllers/user.controller.ts";
+const directory = dirname(filePath);
 
-    // Get directory from relative path
-    const relativeDir = dirname("src/components/Button.jsx");
-    console.log("Relative directory:", relativeDir);
-    // Output: src/components
-
-    // Works with different path separators
-    const windowsDir = dirname("C:\\Users\\Documents\\report.pdf");
-    console.log("Windows directory:", windowsDir);
-    // Output: C:\Users\Documents
-
-    // Filename only returns current directory
-    const currentDir = dirname("file.txt");
-    console.log("Current directory:", currentDir);
-    // Output: .
-  } catch (error) {
-    console.error("Error getting dirname:", error);
-  }
-}
-
-dirnameExample();
+console.log(directory);
+// Output: /home/user/myapp/src/controllers
 ```
 
-**Explanation:**
+**Explanation**: Returns the containing directory of a file or folder. Essential when you need to work with files in the same directory or navigate to parent directories.
 
-- Extracts directory path from a full file path
-- Opposite of `basename()`
-- Useful for operations on parent directories
-- Cross-platform compatible
+#### Real-world Example: Creating a log file in the same directory
 
-### Example 5: Extract File Extension
+```typescript
+import { dirname, basename, join } from "path";
+import { writeFile } from "fs/promises";
 
-**Syntax:**
+async function createLogFile(sourceFile: string, logMessage: string) {
+  const directory = dirname(sourceFile);
+  const logFileName = basename(sourceFile, ".ts") + ".log";
+  const logPath = join(directory, logFileName);
 
-`path.extname(
-  path: string
-): string`
+  await writeFile(logPath, logMessage);
+  console.log(`Log created at: ${logPath}`);
+}
 
-**Input:**
+// Usage
+await createLogFile("/home/user/myapp/src/app.ts", "Application started");
+// Creates: /home/user/myapp/src/app.log
+```
 
-- `path`: The file path to extract the extension from
+**Explanation**: This example combines multiple path methods to create a log file in the same directory as the source file, with a related name.
 
-**Output:**
+---
 
-- Returns a `string` containing the file extension (including the dot)
-- Returns empty string if there is no extension
-- Returns the last dot and everything after it
+### 5. `path.extname()`
 
-**Code Example:**
+**Purpose**: Returns the file extension of a path.
+
+![extname syntax](./public/extname.png)
+
+#### Example 1: Getting file extension
 
 ```typescript
 import { extname } from "path";
 
-async function extnameExample() {
-  try {
-    // Get file extension
-    const ext = extname("document.pdf");
-    console.log("Extension:", ext);
-    // Output: .pdf
+const filePath = "/home/user/documents/report.pdf";
+const extension = extname(filePath);
 
-    // Works with full paths
-    const pathExt = extname("/home/user/downloads/image.jpg");
-    console.log("Path extension:", pathExt);
-    // Output: .jpg
-
-    // No extension returns empty string
-    const noExt = extname("README");
-    console.log("No extension:", noExt);
-    // Output: (empty string)
-
-    // Handles multiple dots
-    const compressedExt = extname("archive.tar.gz");
-    console.log("Compressed extension:", compressedExt);
-    // Output: .gz
-
-    // Useful for file type checking
-    const file = "image.png";
-    if (extname(file) === ".png") {
-      console.log("File is a PNG image");
-    }
-  } catch (error) {
-    console.error("Error getting extension:", error);
-  }
-}
-
-extnameExample();
+console.log(extension);
+// Output: .pdf
 ```
 
-**Explanation:**
+**Explanation**: Extracts the file extension including the dot. Returns an empty string if there's no extension.
 
-- Extracts file extension including the dot
-- Useful for file type validation
-- Returns only the last extension if multiple dots exist
-- Provides an empty string if no extension
-
-### Example 6: Parse Path into Components
-
-**Syntax:**
-
-`path.parse(
-  path: string
-): PathObject`
-
-**Input:**
-
-- `path`: The file path to parse into components
-
-**Output:**
-
-- Returns a `PathObject` containing:
-  - `root`: The root of the path (e.g., `/` or `C:\`)
-  - `dir`: The directory path
-  - `base`: The filename with extension
-  - `name`: The filename without extension
-  - `ext`: The file extension with dot
-
-**Code Example:**
-
-```typescript
-import { parse } from "path";
-
-async function parsePathExample() {
-  try {
-    // Parse absolute path
-    const parsed = parse("/home/user/documents/file.txt");
-    console.log("Parsed path:", parsed);
-    // Output: {
-    //   root: '/',
-    //   dir: '/home/user/documents',
-    //   base: 'file.txt',
-    //   name: 'file',
-    //   ext: '.txt'
-    // }
-
-    // Parse relative path
-    const relativeParsed = parse("src/components/Button.jsx");
-    console.log("Relative parsed:", relativeParsed);
-    // Output: {
-    //   root: '',
-    //   dir: 'src/components',
-    //   base: 'Button.jsx',
-    //   name: 'Button',
-    //   ext: '.jsx'
-    // }
-
-    // Access specific components
-    const filePath = "downloads/image.png";
-    const pathObj = parse(filePath);
-    console.log("Filename:", pathObj.name); // Output: image
-    console.log("Directory:", pathObj.dir); // Output: downloads
-    console.log("Extension:", pathObj.ext); // Output: .png
-  } catch (error) {
-    console.error("Error parsing path:", error);
-  }
-}
-
-parsePathExample();
-```
-
-**Explanation:**
-
-- Breaks down a path into all its components
-- Useful for comprehensive path manipulation
-- Returns an object with all path parts
-- More complete than individual methods
-
-### Example 7: Check if Path is Absolute
-
-**Syntax:**
-
-`path.isAbsolute(
-  path: string
-): boolean`
-
-**Input:**
-
-- `path`: The path string to check
-
-**Output:**
-
-- Returns a `boolean`:
-  - `true` if the path is absolute
-  - `false` if the path is relative
-
-**Code Example:**
-
-```typescript
-import { isAbsolute } from "path";
-
-async function isAbsoluteExample() {
-  try {
-    // Check absolute paths
-    const absPath = "/home/user/documents";
-    if (isAbsolute(absPath)) {
-      console.log("Absolute path detected");
-    }
-    // Output: Absolute path detected
-
-    // Check relative paths
-    const relPath = "src/components";
-    if (!isAbsolute(relPath)) {
-      console.log("Relative path detected");
-    }
-    // Output: Relative path detected
-
-    // Windows absolute paths
-    const windowsPath = "C:\\Users\\Documents";
-    const isWindowsAbsolute = isAbsolute(windowsPath);
-    console.log("Is Windows absolute:", isWindowsAbsolute);
-    // Output: true (on Windows), false (on Unix)
-
-    // Useful for validation
-    function processPath(filePath: string): void {
-      const absolutePath = isAbsolute(filePath) ? filePath : resolve(filePath);
-      console.log("Processing absolute path:", absolutePath);
-    }
-
-    processPath("./config.json");
-    processPath("/etc/config.json");
-  } catch (error) {
-    console.error("Error checking path:", error);
-  }
-}
-
-isAbsoluteExample();
-```
-
-**Explanation:**
-
-- Determines if a path is absolute or relative
-- Useful for path validation
-- Platform-aware (considers Windows and Unix conventions)
-- Essential for conditional path processing
-
----
-
-## Common Use Cases
-
-### Validate File Type by Extension
+#### Real-world Example: File type validation
 
 ```typescript
 import { extname } from "path";
 
 function isImageFile(filePath: string): boolean {
-  const imageExtensions = [".jpg", ".jpeg", ".png", ".gif"];
-  return imageExtensions.includes(extname(filePath).toLowerCase());
+  const validExtensions = [".jpg", ".jpeg", ".png", ".gif", ".webp"];
+  const ext = extname(filePath).toLowerCase();
+  return validExtensions.includes(ext);
 }
 
-console.log(isImageFile("photo.jpg")); // true
-console.log(isImageFile("document.pdf")); // false
+console.log(isImageFile("/uploads/avatar.png")); // Output: true
+console.log(isImageFile("/uploads/document.pdf")); // Output: false
 ```
 
-### Construct File Paths Safely
+**Explanation**: Useful for validating file types before processing uploads or determining how to handle different file types.
+
+---
+
+### 6. `path.parse()`
+
+**Purpose**: Returns an object with all the components of a path.
+
+![parse syntax](./public/parse.png)
+
+#### Example: Parsing a complete path
 
 ```typescript
-import { join, resolve } from "path";
+import { parse } from "path";
 
-function getUploadPath(filename: string): string {
-  return join(__dirname, "..", "uploads", filename);
+const filePath = "/home/user/myapp/src/models/user.model.ts";
+const parsed = parse(filePath);
+
+console.log(parsed);
+/* Output:
+{
+  root: '/',
+  dir: '/home/user/myapp/src/models',
+  base: 'user.model.ts',
+  ext: '.ts',
+  name: 'user.model'
+}
+*/
+```
+
+**Explanation**: Breaks down a path into all its components. This is invaluable when you need to manipulate multiple parts of a path or understand its structure.
+
+#### Real-world Example: Creating backup files
+
+```typescript
+import { parse, join } from "path";
+import { copyFile } from "fs/promises";
+
+async function createBackup(originalPath: string) {
+  const parsed = parse(originalPath);
+  const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
+  const backupName = `${parsed.name}_backup_${timestamp}${parsed.ext}`;
+  const backupPath = join(parsed.dir, backupName);
+
+  await copyFile(originalPath, backupPath);
+  console.log(`Backup created: ${backupPath}`);
+  return backupPath;
 }
 
-// Safe across all operating systems
-const uploadPath = getUploadPath("profile.jpg");
+// Usage
+await createBackup("/home/user/data/config.json");
+// Creates: /home/user/data/config_backup_2024-01-04T10-30-00-000Z.json
 ```
 
-### Get File Information
+**Explanation**: Uses `parse()` to deconstruct the original path, then rebuilds a new path with a timestamp for the backup file.
+
+---
+
+### 7. `path.format()`
+
+**Purpose**: Returns a path string from an object (opposite of `path.parse()`).
+
+![format syntax](./public/format.png)
+
+#### Example: Building a path from components
 
 ```typescript
-import { parse, basename, extname } from "path";
+import { format } from "path";
 
-function getFileInfo(filePath: string): object {
-  const parsed = parse(filePath);
-  return {
-    filename: basename(filePath),
-    directory: parsed.dir,
-    name: parsed.name,
-    extension: extname(filePath),
-    isAbsolute: path.isAbsolute(filePath),
+const pathObject = {
+  dir: "/home/user/myapp/src",
+  name: "database",
+  ext: ".config.ts",
+};
+
+const fullPath = format(pathObject);
+
+console.log(fullPath);
+// Output: /home/user/myapp/src/database.config.ts
+```
+
+**Explanation**: Constructs a path from an object. Note that `base` takes precedence over `name` + `ext` if both are provided.
+
+#### Real-world Example: Generating file variations
+
+```typescript
+import { parse, format } from "path";
+
+function generateFileVariations(originalPath: string) {
+  const parsed = parse(originalPath);
+
+  const variations = {
+    minified: format({
+      dir: parsed.dir,
+      name: parsed.name + ".min",
+      ext: parsed.ext,
+    }),
+    sourcemap: format({
+      dir: parsed.dir,
+      name: parsed.name,
+      ext: parsed.ext + ".map",
+    }),
+    compiled: format({
+      dir: parsed.dir,
+      name: parsed.name,
+      ext: ".js",
+    }),
   };
+
+  return variations;
 }
 
-console.log(getFileInfo("/home/user/downloads/image.png"));
-// Output: {
-//   filename: 'image.png',
-//   directory: '/home/user/downloads',
-//   name: 'image',
-//   extension: '.png',
-//   isAbsolute: true
-// }
+const variations = generateFileVariations("/src/app.ts");
+console.log(variations);
+/* Output:
+{
+  minified: '/src/app.min.ts',
+  sourcemap: '/src/app.ts.map',
+  compiled: '/src/app.js'
+}
+*/
 ```
 
-### Process Files in a Directory
+**Explanation**: Demonstrates how to create related file paths by parsing, modifying, and formatting paths. Useful in build tools or bundlers.
+
+---
+
+### 8. `path.isAbsolute()`
+
+**Purpose**: Determines whether a path is an absolute path.
+
+![isAbsolute syntax](./public/isAbsolute.png)
+
+#### Example: Checking path types
 
 ```typescript
-import { join, extname } from "path";
-import { readdir } from "fs/promises";
+import { isAbsolute } from "path";
 
-async function processImages(dirPath: string): Promise<void> {
-  try {
-    const files = await readdir(dirPath);
+console.log(isAbsolute("/home/user/file.txt")); // Output: true
+console.log(isAbsolute("./src/index.ts")); // Output: false
+console.log(isAbsolute("../config/app.json")); // Output: false
+console.log(isAbsolute("C:\\Users\\file.txt")); // Output: true (on Windows)
+```
 
-    for (const file of files) {
-      if (extname(file) === ".jpg") {
-        const fullPath = join(dirPath, file);
-        console.log("Processing image:", fullPath);
-        // Process image
-      }
-    }
-  } catch (error) {
-    console.error("Error processing images:", error);
+**Explanation**: Helps validate paths before operations that require absolute paths, preventing errors from relative path usage.
+
+#### Real-world Example: Path validation in configuration
+
+```typescript
+import { isAbsolute } from "path";
+
+interface AppConfig {
+  logDirectory: string;
+  dataDirectory: string;
+}
+
+function validateConfig(config: AppConfig): void {
+  const errors: string[] = [];
+
+  if (!isAbsolute(config.logDirectory)) {
+    errors.push("logDirectory must be an absolute path");
+  }
+
+  if (!isAbsolute(config.dataDirectory)) {
+    errors.push("dataDirectory must be an absolute path");
+  }
+
+  if (errors.length > 0) {
+    throw new Error(`Configuration errors:\n${errors.join("\n")}`);
   }
 }
+
+// Usage
+const config = {
+  logDirectory: "./logs", // This will cause an error
+  dataDirectory: "/var/data",
+};
+
+try {
+  validateConfig(config);
+} catch (error) {
+  console.error(error.message);
+  // Output: Configuration errors:
+  // logDirectory must be an absolute path
+}
 ```
+
+**Explanation**: Ensures critical configuration paths are absolute to prevent issues when the working directory changes.
+
+---
+
+### 9. `path.relative()`
+
+**Purpose**: Returns the relative path from one location to another.
+
+![relative syntax](./public/relative.png)
+
+#### Example: Finding relative path
+
+```typescript
+import { relative } from "path";
+
+const from = "/home/user/myapp/src/controllers";
+const to = "/home/user/myapp/src/models/user.model.ts";
+
+const relativePath = relative(from, to);
+
+console.log(relativePath);
+// Output: ../models/user.model.ts
+```
+
+**Explanation**: Calculates how to navigate from one path to another using relative references. Essential for creating portable path references.
+
+#### Real-world Example: Generating import statements
+
+```typescript
+import { relative, dirname } from "path";
+
+function generateImportPath(fromFile: string, toFile: string): string {
+  const fromDir = dirname(fromFile);
+  const relativePath = relative(fromDir, toFile);
+
+  // Remove .ts extension and ensure it starts with ./
+  const importPath = relativePath.replace(/\.ts$/, "");
+  const normalizedPath = importPath.startsWith(".")
+    ? importPath
+    : `./${importPath}`;
+
+  return normalizedPath;
+}
+
+const currentFile = "/home/user/myapp/src/controllers/user.controller.ts";
+const targetFile = "/home/user/myapp/src/services/user.service.ts";
+
+const importStatement = generateImportPath(currentFile, targetFile);
+console.log(`import { UserService } from '${importStatement}';`);
+// Output: import { UserService } from '../services/user.service';
+```
+
+**Explanation**: Generates correct relative import paths for TypeScript modules. This is particularly useful in code generation tools or refactoring scripts.
+
+---
+
+## Best Practices
+
+1. **Always use path methods instead of string concatenation**: Different operating systems use different path delimiters.
+
+```typescript
+// ❌ Bad
+const filePath = baseDir + "/" + filename;
+
+// ✅ Good
+import { join } from "path";
+const filePath = join(baseDir, filename);
+```
+
+2. **Use `resolve()` for absolute paths**: When you need to ensure a path is absolute.
+
+```typescript
+// ✅ Good
+import { resolve } from "path";
+const configPath = resolve(process.cwd(), "config", "app.json");
+```
+
+3. **Normalize user input paths**: Always normalize paths from user input to prevent directory traversal attacks.
+
+```typescript
+import { normalize, resolve } from "path";
+
+function sanitizePath(userPath: string, baseDir: string): string {
+  const normalized = normalize(userPath);
+  const resolved = resolve(baseDir, normalized);
+
+  // Ensure the resolved path is within baseDir
+  if (!resolved.startsWith(baseDir)) {
+    throw new Error("Invalid path: outside allowed directory");
+  }
+
+  return resolved;
+}
+```
+
+4. **Use `parse()` for complex path manipulation**: When you need to work with multiple path components.
+
+5. **Check if paths are absolute before operations**: Use `isAbsolute()` to validate paths in configuration or user input.
 
 ---
 
 ## References
 
-- [Node.js path Module Documentation](https://nodejs.org/api/path.html)
-- [Node.js File System Best Practices](https://nodejs.org/en/docs/guides/working-with-different-filesystems/)
-- [Path Manipulation Examples](https://nodejs.org/en/knowledge/file-system/security/introduction/)
+- [Node.js Official Documentation - Path Module](https://nodejs.org/api/path.html)
+- [MDN Web Docs - File and Directory Paths](https://developer.mozilla.org/en-US/docs/Learn/Server-side/Node_server_without_framework)
+- [Node.js Best Practices - File System](https://github.com/goldbergyoni/nodebestpractices#2-error-handling-practices)
+- [TypeScript Node.js Starter](https://github.com/microsoft/TypeScript-Node-Starter)
