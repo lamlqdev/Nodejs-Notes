@@ -14,13 +14,6 @@ A **module** is a self-contained piece of code that can be exported and imported
 
 **CommonJS** is the original module system in Node.js. It uses `require()` to import modules and `module.exports` or `exports` to export functionality.
 
-**Key characteristics:**
-
-- Synchronous loading
-- Runtime resolution
-- Default module system in Node.js
-- File extension: `.js` (or `.cjs` for explicit CommonJS)
-
 **Export syntax:**
 
 ```javascript
@@ -61,13 +54,6 @@ const { function1, function2 } = require("./module");
 ### ES Modules (ESM)
 
 **ES Modules** is the modern JavaScript standard for modules, originally designed for browsers but now supported in Node.js.
-
-**Key characteristics:**
-
-- Asynchronous loading
-- Static analysis (resolved at compile time)
-- Tree-shaking support
-- File extension: `.mjs` or set `"type": "module"` in `package.json`
 
 **Export syntax:**
 

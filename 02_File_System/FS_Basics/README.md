@@ -6,9 +6,9 @@
 
 The `fs` (file system) module is a built-in Node.js module that provides both **synchronous** and **asynchronous** methods for file system operations. It enables your Node.js application to interact with files and directories on your computer.
 
-### Key Concepts
+![File System Operations](./public/file-system-operations.png)
 
-**File System Operations**: Actions performed on files and directories such as reading, writing, creating, deleting, and modifying.
+### Key Concepts
 
 **Buffer**: A temporary storage area for binary data. When reading files without specifying an encoding, Node.js returns a Buffer object.
 
@@ -218,7 +218,7 @@ log({
 
 ![readdir syntax](./public/readdir.png)
 
-#### Example 1: List directory contents
+#### Example: List directory contents
 
 ```typescript
 import { readdir } from "fs/promises";
@@ -236,53 +236,6 @@ listFiles();
 ```
 
 **Explanation**: Returns an array of file and folder names in the specified directory. This is non-recursive, meaning it only shows direct children, not nested contents.
-
-#### Real-world Example: File organization by type
-
-```typescript
-import { readdir } from "fs/promises";
-import { extname } from "path";
-
-async function organizeFilesByType(directory: string) {
-  try {
-    const entries = await readdir(directory, { withFileTypes: true });
-
-    const organized = {
-      images: [] as string[],
-      documents: [] as string[],
-      videos: [] as string[],
-      others: [] as string[],
-    };
-
-    for (const entry of entries) {
-      if (!entry.isFile()) continue;
-
-      const ext = extname(entry.name).toLowerCase();
-
-      if ([".jpg", ".jpeg", ".png", ".gif"].includes(ext)) {
-        organized.images.push(entry.name);
-      } else if ([".pdf", ".doc", ".docx", ".txt"].includes(ext)) {
-        organized.documents.push(entry.name);
-      } else if ([".mp4", ".avi", ".mov"].includes(ext)) {
-        organized.videos.push(entry.name);
-      } else {
-        organized.others.push(entry.name);
-      }
-    }
-
-    console.log("Organized files:", organized);
-    return organized;
-  } catch (error) {
-    console.error("Error organizing files:", error);
-  }
-}
-
-organizeFilesByType("./uploads");
-```
-
-**Explanation**: Uses `withFileTypes: true` to get `Dirent` objects, which provide `isFile()` and `isDirectory()` methods without additional `stat` calls. This is more efficient than checking each entry separately.
-
----
 
 ### 5. `mkdir()`
 
@@ -456,44 +409,6 @@ console.log("Config exists:", exists);
 
 **Explanation**: Attempts to access the file. If successful, the file exists and is accessible. If it throws an error, the file doesn't exist or isn't accessible.
 
-#### Real-world Example: Safe file operations
-
-```typescript
-import { access, readFile, writeFile } from "fs/promises";
-
-async function updateConfigSafely(newConfig: object) {
-  const configPath = "config.json";
-  const backupPath = "config.backup.json";
-
-  try {
-    // Check if config exists
-    const exists = await access(configPath)
-      .then(() => true)
-      .catch(() => false);
-
-    if (exists) {
-      // Backup existing config
-      const currentConfig = await readFile(configPath, "utf8");
-      await writeFile(backupPath, currentConfig, "utf8");
-      console.log("Backup created");
-    }
-
-    // Write new config
-    await writeFile(configPath, JSON.stringify(newConfig, null, 2), "utf8");
-    console.log("Config updated successfully");
-  } catch (error) {
-    console.error("Error updating config:", error);
-    throw error;
-  }
-}
-
-updateConfigSafely({ apiUrl: "https://api.example.com", timeout: 5000 });
-```
-
-**Explanation**: Creates a backup before modifying important files. Using `access()` to check existence prevents errors and allows graceful handling of missing files.
-
----
-
 ### 10. `copyFile()`
 
 **Purpose**: Copies a file from one location to another.
@@ -518,40 +433,6 @@ backupFile();
 ```
 
 **Explanation**: Creates a copy of the file at the destination. Overwrites the destination if it already exists.
-
-#### Real-world Example: Backup system
-
-```typescript
-import { copyFile, mkdir } from "fs/promises";
-import { basename, join } from "path";
-
-async function createBackup(filePath: string): Promise<string> {
-  try {
-    const backupDir = join("backups", new Date().toISOString().split("T")[0]);
-    await mkdir(backupDir, { recursive: true });
-
-    const filename = basename(filePath);
-    const timestamp = Date.now();
-    const backupName = `${timestamp}_${filename}`;
-    const backupPath = join(backupDir, backupName);
-
-    await copyFile(filePath, backupPath);
-    console.log(`Backup created: ${backupPath}`);
-    return backupPath;
-  } catch (error) {
-    console.error("Backup failed:", error);
-    throw error;
-  }
-}
-
-// Usage
-createBackup("database.json");
-// Creates: backups/2024-01-04/1704380400000_database.json
-```
-
-**Explanation**: Creates dated backups with timestamps to prevent overwrites. This pattern is useful for versioning important files or implementing backup rotations.
-
----
 
 ## Best Practices
 

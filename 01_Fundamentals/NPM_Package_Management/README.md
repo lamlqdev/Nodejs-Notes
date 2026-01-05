@@ -45,8 +45,6 @@ The npm repository contains millions of packages ranging from small to large sca
 
 - **Tools**: Like `webpack`, `vite` - build and bundling tools
 
-Each package has its own purpose and helps solve specific problems in the software development process.
-
 ### Installing Packages: Local vs Global
 
 **Local Installation** (default):
@@ -57,11 +55,6 @@ npm install express
 npm install express --save
 ```
 
-- Installs package in `node_modules` folder of your current project
-- Package is only available within that specific project
-- Added to `dependencies` or `devDependencies` in `package.json`
-- Use when: Package is needed for your application to run
-
 **Global Installation**:
 
 ```bash
@@ -69,11 +62,6 @@ npm install -g nodemon
 # or
 npm install --global nodemon
 ```
-
-- Installs package globally on your system
-- Package is available from any directory via command line
-- Typically used for CLI tools and development utilities
-- Use when: You want to use a tool from command line across multiple projects
 
 ![Global and Local Installation](./public/global-local-install.png)
 
@@ -146,8 +134,6 @@ When you install a package, npm also installs all of its dependencies, and those
 **The "node_modules black hole" meme:**
 
 ![node_modules black hole](./public/node_modules_black_hole.png)
-
-The popular meme comparing `node_modules` to a black hole originated from developers' frustration with the massive size of the `node_modules` folder. Even a simple project can have hundreds or thousands of dependencies due to the nested dependency tree. This meme humorously suggests that `node_modules` consumes more disk space than even a black hole consumes spacetime, highlighting how quickly the folder can grow and how it seems to "suck in" disk space.
 
 **Why node_modules gets so large:**
 

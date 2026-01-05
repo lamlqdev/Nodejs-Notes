@@ -22,16 +22,6 @@ Node.js was created by **Ryan Dahl** in 2009. Dahl was frustrated with the limit
 - Provide a simple way to build scalable network applications
 - Leverage the asynchronous nature of JavaScript for I/O operations
 
-### How Node.js Works
-
-![How Node.js Works](./public/how-nodejs-work.png)
-
-As shown in the diagram:
-
-- **V8 Engine** is written in **C++** and compiles **JavaScript** code into **Machine Code**
-- **Node.js** uses the **V8 Engine** to execute JavaScript
-- **Node.js** is built with **C++**, which adds new features to JavaScript (like file system access, networking, etc.) that aren't available in browser JavaScript, enabling server-side functionality
-
 ### JavaScript on the Server
 
 ![JavaScript on the Server](./public/nodejs-on-the-server.png)
@@ -50,7 +40,27 @@ As shown in the diagram:
 
 > **Note:** The diagram shows "Response 'HTML Page'" which reflects older web architecture. Modern Node.js backends typically return JSON data (or other data formats) rather than HTML pages. The client-side JavaScript then handles rendering the UI based on this data.
 
-### Side Note: You're not limited to the Server
+### Node.js' Role (in Web Development)
+
+![Node.js Role in Web Development](./public/nodejs-role-in-web-development.png)
+
+- **Run Server**: creates a server and listens to incoming requests. This involves setting up an HTTP server that can accept connections from clients and wait for requests to be sent.
+
+- **Business Logic**: handles requests by processing them according to your application's business logic. This includes validating input data to ensure it meets requirements, and connecting to databases to retrieve or store data as needed.
+
+- **Responses**: returns responses to clients, which can be in various formats such as rendered HTML pages, JSON data, or other data formats depending on the application's needs.
+
+### How Node.js Works
+
+![How Node.js Works](./public/how-nodejs-work.png)
+
+As shown in the diagram:
+
+- **V8 Engine** is written in **C++** and compiles **JavaScript** code into **Machine Code**
+- **Node.js** uses the **V8 Engine** to execute JavaScript
+- **Node.js** is built with **C++**, which adds new features to JavaScript (like file system access, networking, etc.) that aren't available in browser JavaScript, enabling server-side functionality
+
+### Nodejs is not limited to the Server
 
 ![Other Roles of Node.js](./public/other-roles-of-nodejs.png)
 
@@ -61,16 +71,6 @@ As shown in the diagram:
 - **CLI Tools** - Command-line applications and developer tools
 - **Desktop Applications** - Using frameworks like Electron
 - **IoT Applications** - Internet of Things device programming
-
-### Node.js' Role (in Web Development)
-
-![Node.js Role in Web Development](./public/nodejs-role-in-web-development.png)
-
-**Run Server**: creates a server and listens to incoming requests. This involves setting up an HTTP server that can accept connections from clients and wait for requests to be sent.
-
-**Business Logic**: handles requests by processing them according to your application's business logic. This includes validating input data to ensure it meets requirements, and connecting to databases to retrieve or store data as needed.
-
-**Responses**: returns responses to clients, which can be in various formats such as rendered HTML pages, JSON data, or other data formats depending on the application's needs.
 
 ### Core Modules
 
@@ -96,23 +96,19 @@ Every Node.js application follows a specific lifecycle from startup to terminati
 
 Node.js uses a **Single JavaScript Thread** to execute your application code. When **Incoming Requests** arrive, they are processed through this single thread. The **Event Loop** handles event callbacks and manages asynchronous operations.
 
-When your code encounters blocking operations (like file system operations with `fs`), Node.js doesn't wait for these operations to complete before executing other code. Instead, Node.js treats these blocking operations as **asynchronous code** and immediately sends them to a **Worker Pool** that performs the heavy lifting on **Different Thread(s)**. The main JavaScript thread continues executing other code without waiting. Once the blocking operation completes in the Worker Pool, it triggers a callback that returns to the Event Loop, which then handles the callback on the Single JavaScript Thread.
-
-This architecture allows Node.js to handle many concurrent requests efficiently without blocking the main thread, even though JavaScript execution happens on a single thread.
-
-### Asynchronous Code
+When your code encounters blocking operations (like file system operations with `fs`), Node.js doesn't wait for these operations to complete before executing other code. Instead, Node.js treats these blocking operations as **asynchronous code** and immediately sends them to a **Worker Pool** that performs the heavy lifting on **Different Thread(s)**.
 
 ![Asynchronous Code](./public/asynchronous-code.png)
-
-**Synchronous Code**: In synchronous execution, code blocks execute one after another in a strict sequence. Each `<Code>` block must complete before the next one begins. If a long-running operation occurs, it blocks all subsequent code from executing until it finishes.
-
-**Asynchronous Code**: JavaScript & Node.js is non-blocking. When Node.js encounters blocking operations (which are handled as asynchronous code), it doesn't wait for them to complete. Instead, Node.js immediately delegates these operations to the Worker Pool and continues executing subsequent code. The long-running operation is processed in the background on different threads, allowing other code to continue running. This is how Node.js achieves non-blocking behavior - by treating potentially blocking operations as asynchronous and offloading them to the Worker Pool.
 
 **Asynchronous Patterns**: Node.js provides several patterns to handle asynchronous operations:
 
 - **Callbacks** - Functions passed as arguments to be executed after an operation completes
 - **Promises** - Objects representing the eventual completion or failure of an asynchronous operation
 - **async / await** - Syntactic sugar built on Promises that makes asynchronous code look and behave more like synchronous code
+
+The main JavaScript thread continues executing other code without waiting. Once the blocking operation completes in the Worker Pool, it triggers a callback that returns to the Event Loop, which then handles the callback on the Single JavaScript Thread.
+
+This architecture allows Node.js to handle many concurrent requests efficiently without blocking the main thread, even though JavaScript execution happens on a single thread.
 
 ### The Event Loop
 
@@ -126,12 +122,11 @@ The Event Loop is Node.js's core mechanism for handling asynchronous operations.
 
 2. **Microtask Queue** (higher priority): Contains callbacks that need to be executed immediately after the current operation completes:
 
-   - `process.nextTick()` callbacks (highest priority)
+   - `process.nextTick()` callbacks
    - Promise callbacks (`.then()`, `.catch()`, `.finally()`)
 
-   The Event Loop processes **all** microtasks before moving to macrotasks.
-
 3. **Macrotask Queue** (lower priority): Contains callbacks that are executed after microtasks:
+
    - **Timers**: `setTimeout()` and `setInterval()` callbacks
    - **I/O Callbacks**: File system, network operations
    - **setImmediate()**: Callbacks scheduled with `setImmediate()`
@@ -146,8 +141,6 @@ The Event Loop is Node.js's core mechanism for handling asynchronous operations.
 5. Repeat from step 2
 
 > **Note:** Within each queue (microtask or macrotask), callbacks are executed in the order they were added (FIFO - First In First Out). There is no priority system within the same queue - the execution order depends solely on which callback entered the queue first. Priority only exists between different queue types (microtasks are processed before macrotasks).
-
-**Process Termination**: The Event Loop continues running as long as there are active references (pending timers, I/O operations, or other active handles). When `refs == 0` (no more active references), the process exits.
 
 ---
 
