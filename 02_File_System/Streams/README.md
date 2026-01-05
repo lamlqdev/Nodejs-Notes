@@ -4,50 +4,44 @@
 
 ### What are Streams?
 
-Streams are objects that let you read data from a source or write data to a destination continuously. They are an EventEmitter-based interface for working with streaming data in Node.js. Streams handle data piece by piece (chunks), without loading the entire content into memory at once.
-
-### Key Concepts
-
-**Chunk**: A small piece of data transferred at a time. Instead of loading an entire file (e.g., 1GB) into memory, streams break it down into smaller chunks (typically 16KB by default) and process them sequentially.
-
-**Backpressure**: The mechanism that prevents a fast data source from overwhelming a slow consumer. When the writable stream's buffer is full, it signals the readable stream to pause until space is available.
-
-**Pipe**: A method that connects a readable stream to a writable stream, automatically managing data flow and backpressure.
-
-**Event Emitter**: Streams inherit from EventEmitter, allowing them to emit events like `data`, `end`, `error`, `drain`, etc.
-
-**Buffer**: An internal queue where chunks are temporarily stored before being processed or written.
-
-### Types of Streams
-
-| Type          | Description                                          | Common Use Cases                             |
-| ------------- | ---------------------------------------------------- | -------------------------------------------- |
-| **Readable**  | Streams you can read from (source of data)           | Reading files, HTTP responses, stdin         |
-| **Writable**  | Streams you can write to (destination for data)      | Writing files, HTTP requests, stdout         |
-| **Duplex**    | Streams that are both Readable and Writable          | TCP sockets, WebSockets                      |
-| **Transform** | Duplex streams that modify data as it passes through | Compression, encryption, data transformation |
-
-### Benefits of Streams
-
-**Memory Efficiency**: Process large files without loading them entirely into memory. A 1GB file can be processed with only 16KB of memory at a time.
-
-**Time Efficiency**: Start processing data as soon as the first chunk is available, rather than waiting for the entire file to load.
-
-**Composability**: Chain multiple operations together using pipes, creating powerful data processing pipelines.
-
-**Backpressure Handling**: Automatically manage data flow speed between producer and consumer, preventing memory overflow.
-
-### How Streams Work with Buffers
+Streams are collections of data that might not be available all at once and don't have to fit in memory. Think of them like a conveyor belt where data arrives and is processed piece by piece, rather than as a whole batch.
 
 ![Streams and Buffers](./public/streams-buffers.png)
 
-Streams process data in chunks using buffers. This allows you to start working with data before the entire content is available. The diagram shows how incoming data flows through a stream in chunks, stored temporarily in a buffer, allowing your code to process data incrementally.
+In Node.js, streams are instances of EventEmitter, which means they emit events that can be used to read and write data. There are four fundamental stream types in Node.js:
 
-### Stream Modes
+- Readable - streams from which data can be read (e.g., reading a file, HTTP response, stdin)
+- Writable - streams to which data can be written (e.g., writing to a file, HTTP request, stdout)
+- Duplex - streams that are both Readable and Writable (e.g., TCP sockets, WebSockets)
+- Transform - Duplex streams that can modify or transform data as it's written or read (e.g., compression, encryption, data transformation)
 
-**Binary Mode** (default): Data is processed as Buffer objects, suitable for any file type.
+Stream Modes:
 
-**Object Mode**: Data can be any JavaScript object (set with `objectMode: true`), useful for processing structured data.
+- Binary Mode (default): Data is processed as Buffer objects, suitable for any file type.
+
+- Object Mode: Data can be any JavaScript object (set with objectMode: true), useful for processing structured data.
+
+### Key Concepts
+
+- **Chunk**: A small piece of data transferred at a time. Instead of loading an entire file (e.g., 1GB) into memory, streams break it down into smaller chunks (typically 16KB by default) and process them sequentially.
+
+- **Backpressure**: The mechanism that prevents a fast data source from overwhelming a slow consumer. When the writable stream's buffer is full, it signals the readable stream to pause until space is available.
+
+- **Pipe**: A method that connects a readable stream to a writable stream, automatically managing data flow and backpressure.
+
+- **Event Emitter**: Streams inherit from EventEmitter, allowing them to emit events like `data`, `end`, `error`, `drain`, etc.
+
+- **Buffer**: An internal queue where chunks are temporarily stored before being processed or written.
+
+### Benefits of Streams
+
+- **Memory Efficiency**: Process large files without loading them entirely into memory. A 1GB file can be processed with only 16KB of memory at a time.
+
+- **Time Efficiency**: Start processing data as soon as the first chunk is available, rather than waiting for the entire file to load.
+
+- **Composability**: Chain multiple operations together using pipes, creating powerful data processing pipelines.
+
+- **Backpressure Handling**: Automatically manage data flow speed between producer and consumer, preventing memory overflow.
 
 ---
 
