@@ -18,11 +18,9 @@ A comprehensive collection of Node.js learning materials and practical examples 
 - **[Streams](./02_File_System/Streams/README.md)** - Readable, Writable, Transform, Duplex streams
 - **[Path Manipulation](./02_File_System/Path_Manipulation/README.md)** - path module, file operations, directory handling
 
-### 3. HTTP & Web Servers
+### 3. Web Basics
 
-- **[Native HTTP Server](./03_HTTP_Server/Native_HTTP_Server/README.md)** - http module, createServer, request/response handling
-- **[URL & Routing](./03_HTTP_Server/URL_Routing/README.md)** - URL parsing, query strings, basic routing logic
-- **[Middleware Concepts](./03_HTTP_Server/Middleware_Concepts/README.md)** - Request/Response middleware pattern
+- **[Web basics](./03_Web_Basic/README.md)** - http module, createServer, request/response, url.
 
 ### 4. Express.js Framework
 
