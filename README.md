@@ -8,15 +8,15 @@ A comprehensive collection of Node.js learning materials and practical examples 
 
 ### 1. Fundamentals
 
-- **[Node.js Core Concepts](./01_Fundamentals/Node_Core_Concepts/README.md)** - Event Loop, V8 Engine, Node.js Architecture
-- **[NPM & Package Management](./01_Fundamentals/NPM_Package_Management/README.md)** - package.json, npm scripts, dependencies, semantic versioning
-- **[Module Systems](./01_Fundamentals/Module_Systems/README.md)** - CommonJS vs ES Modules, require vs import
+- **[Node.js Core Concepts](./01_Fundamentals/Node_Core_Concepts/README.md)** - Event Loop, V8 Engine, Node.js Architecture.
+- **[NPM & Package Management](./01_Fundamentals/NPM_Package_Management/README.md)** - package.json, npm scripts, dependencies, semantic versioning.
+- **[Module Systems](./01_Fundamentals/Module_Systems/README.md)** - CommonJS vs ES Modules, require vs import.
 
 ### 2. File System & Streams
 
-- **[File System Basics](./02_File_System/FS_Basics/README.md)** - readFile, writeFile, sync vs async operations
-- **[Streams](./02_File_System/Streams/README.md)** - Readable, Writable, Transform, Duplex streams
-- **[Path Manipulation](./02_File_System/Path_Manipulation/README.md)** - path module, file operations, directory handling
+- **[File System Basics](./02_File_System/FS_Basics/README.md)** - readFile, writeFile, sync vs async operations.
+- **[Streams](./02_File_System/Streams/README.md)** - Readable, Writable, Transform, Duplex streams.
+- **[Path Manipulation](./02_File_System/Path_Manipulation/README.md)** - path module, file operations, directory handling.
 
 ### 3. Web Basics
 
@@ -24,12 +24,13 @@ A comprehensive collection of Node.js learning materials and practical examples 
 
 ### 4. Express.js Framework
 
-- **[Working with Express.js](./04_Working_with_Express/README.md)** - Setup, routing, middleware, custom middleware, project structure, error handling
+- **[Working with Express.js](./04_Working_with_Express/README.md)** - Routing, middleware, custom middleware, project structure, error handling.
+- **[Express.js Setup](./04_Working_with_Express/SETUP.md)** - Setup TypeScript with Node.js and Express.
 
 ### 5. Databases
 
 - **[MongoDB & Mongoose](./06_Databases/MongoDB_Mongoose/README.md)** - Mongoose ODM, schemas, models, queries
-- **[PostgreSQL & Sequelize](./06_Databases/PostgreSQL_Sequelize/README.md)** - Sequelize ORM, migrations, associations
+- **[PostgreSQL & Prisma](./06_Databases/PostgreSQL_Sequelize/README.md)** - Prisma ORM, migrations, associations
 - **[Database Design](./06_Databases/Database_Design/README.md)** - Relationships, indexing, normalization
 - **[Query Optimization](./06_Databases/Query_Optimization/README.md)** - Performance, indexing strategies, query analysis
 
