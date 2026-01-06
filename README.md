@@ -24,25 +24,16 @@ A comprehensive collection of Node.js learning materials and practical examples 
 
 ### 4. Express.js Framework
 
-- **[Express Basics](./04_Express_Framework/Express_Basics/README.md)** - Setup, routing, middleware, static files
-- **[Express Advanced](./04_Express_Framework/Express_Advanced/README.md)** - Error handling, custom middleware, app structure
-- **[Express Best Practices](./04_Express_Framework/Express_Best_Practices/README.md)** - Project structure, patterns, conventions
+- **[Working with Express.js](./04_Working_with_Express/README.md)** - Setup, routing, middleware, custom middleware, project structure, error handling
 
-### 5. Async Programming
-
-- **[Callbacks](./05_Async_Programming/Callbacks/README.md)** - Callback patterns, callback hell, error handling
-- **[Promises](./05_Async_Programming/Promises/README.md)** - Promise chains, Promise.all, Promise.race
-- **[Async/Await](./05_Async_Programming/Async_Await/README.md)** - Async/await patterns, error handling, best practices
-- **[Event Loop Deep Dive](./05_Async_Programming/Event_Loop/README.md)** - How Node.js event loop works, phases, timers
-
-### 6. Databases
+### 5. Databases
 
 - **[MongoDB & Mongoose](./06_Databases/MongoDB_Mongoose/README.md)** - Mongoose ODM, schemas, models, queries
 - **[PostgreSQL & Sequelize](./06_Databases/PostgreSQL_Sequelize/README.md)** - Sequelize ORM, migrations, associations
 - **[Database Design](./06_Databases/Database_Design/README.md)** - Relationships, indexing, normalization
 - **[Query Optimization](./06_Databases/Query_Optimization/README.md)** - Performance, indexing strategies, query analysis
 
-### 7. Authentication & Security
+### 6. Authentication & Security
 
 - **[JWT Authentication](./07_Authentication_Security/JWT_Authentication/README.md)** - Token-based auth, access/refresh tokens
 - **[Session Management](./07_Authentication_Security/Session_Management/README.md)** - Express-session, cookies, session storage
