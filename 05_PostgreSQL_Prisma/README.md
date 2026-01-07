@@ -1,8 +1,12 @@
-# SQL Fundamentals
+# SQL Database
 
 ## Table, columns and constraints
 
-A table is a named structure with columns (name, type, constraints) and rows (data). Each column has a data type that controls what values are valid and how they are stored. There are common data types:
+A table is a named structure with columns (name, type, constraints) and rows (data).
+
+![SQL Table](./public/what-is-sql.png)
+
+Each column has a data type that controls what values are valid and how they are stored. There are common data types:
 
 - **Integer-like**: INT, BIGINT, SERIAL/BIGSERIAL for ids, counts.
 - **Text**: VARCHAR(n) for bounded strings, TEXT for long free text.
@@ -48,17 +52,15 @@ CREATE TABLE matches (
 );
 ```
 
-Here `matches.user_id` is a foreign key pointing to `users.id`, creating a one-to-many relationship: **one user → many matches**.
-
-![SQL Table](../public/what-is-sql.png)
+Here `matches.user_id` is a foreign key pointing to `users.id`, creating a **one-to-many** relationship: one user can play multiple matches.
 
 Main relationship types:
 
-- **One-to-one**: Rare; one row in A corresponds to at most one row in B, often via a unique foreign key or shared primary key.
-- **One-to-many**: The most common; parent table (users) has many child rows (matches, orders, comments), implemented via foreign key in the **many** table.
-- **Many-to-many**: Implemented with a join table that holds two foreign keys and often a composite primary key, e.g. users ↔ tournaments.
+- **One-to-one**: **Rare**; Each record in Table A is associated with one and only one record in Table B, and vice versa. **Setup**: include a foreign key in one of the tables that references the primary key of the other table.
+- **One-to-many**: **The most common**; Each record in Table A can be associated with multiple records in Table B, but each record in Table B is associated with only one record in Table A. **Setup**: Include a foreign key in the "many" side table (Table B) that references the primary key of the "one" side table (Table A).
+- **Many-to-many**: Each record in Table A can be associated with multiple records in Table B, and vice versa. **Setup**: Create an intermediate table (also known as a junction or linking table) that contains foreign keys referencing both related tables.
 
-Example of a many-to-many relationship:
+Example of a **many-to-many** relationship: One user can participate in many tournaments, and one tournament can have many users:
 
 ```sql
 CREATE TABLE tournaments (
@@ -73,7 +75,7 @@ CREATE TABLE user_tournaments (
 );
 ```
 
-The `user_tournaments` table connects users and tournaments and the composite primary key prevents duplicate pairs.
+The `user_tournaments` is intermediate table that connects `users` and `tournaments` and the composite primary key prevents duplicate pairs.
 
 ## Core querying
 
@@ -86,17 +88,53 @@ The `user_tournaments` table connects users and tournaments and the composite pr
 
 ## Indexes and performance
 
-An index is a separate data structure stored by the database that lets it find rows much faster without scanning the entire table. You can think of it like a book index: instead of reading every page to find a topic, you jump directly to pages listed in the index.
+Indexes in SQL are special database structures that speed up data retrieval by allowing quick access to records instead of scanning the entire table. They act like a lookup system and play an important role in improving query performance and database efficiency.
 
-- **Speed up reads**: Especially for queries using WHERE, JOIN, ORDER BY, GROUP BY on large tables.
-- **Cost writes**: Every INSERT/UPDATE/DELETE must also update indexes, so too many indexes slow down write-heavy workloads.
-- **Use space**: Indexes consume additional disk and memory.
+- Speed up queries (SELECT, JOIN, WHERE, ORDER BY).
+- Reduce disk I/O and improve efficiency in large tables.
+- Ensure data integrity with unique indexes.
+
+> **Note:** Primary Key and Unique constraints automatically create indexes.
 
 There are some types of indexes:
 
-- **Single-column index**: Index on one column, e.g. `CREATE INDEX idx_users_username ON users(username);`.
-- **Composite index**: Index on multiple columns (order matters), e.g. `CREATE INDEX idx_matches_user_hero ON matches(user_id, hero_name);`.
-- **Unique index**: Enforces uniqueness and also accelerates lookups, usually created via `UNIQUE` constraint or `PRIMARY KEY`.
+### 1. Single-column index
+
+A single-column index is created on just one column. It’s the most basic type of index and helps speed up queries when you frequently search, filter or sort by that column. Syntax:
+
+```sql
+CREATE INDEX index_name ON TABLE column;
+```
+
+### 2. Multi-column index
+
+A multi-column index is created on two or more columns. It improves performance when queries filter or join based on multiple columns together. Syntax:
+
+```sql
+CREATE INDEX index_name ON TABLE (column1, column2,.....);
+```
+
+### 3. Unique index
+
+A unique index ensures that all values in a column (or combination of columns) are unique preventing duplicates and maintaining data integrity. Syntax:
+
+```sql
+CREATE UNIQUE INDEX index_name ON table_name (column_name);
+```
+
+### Index Mechanism
+
+When an index is created on a column (for example, email), the database builds a separate data structure—most commonly a B-tree. The index contains the values of the column and a pointer (reference) to the rows in the table that have those values. Let see how query uses the index:
+
+```sql
+SELECT name FROM users WHERE email = 'a@gmail.com';
+```
+
+1. **Index lookup**: The database searches the B-tree to locate `a@gmail.com`. This operation is logarithmic time (O(log n)).
+2. **Row lookup**: Using the pointer found in the index, the database jumps directly to the corresponding row in the table.
+3. **Return result**: The database reads the required columns (name) from that row and returns the result.
+
+> **Notes**: Indexes are used automatically, an index is a separate data structure that the database uses to speed up queries (not part of the table) and indexes have trade-offs (slow down write operations).
 
 | When to Create Indexes                                                                        | When to Avoid or Be Careful with Indexes                                       |
 | --------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------ |
@@ -106,8 +144,35 @@ There are some types of indexes:
 
 ## Prisma ORM
 
+**Prisma** is a database toolkit for Node.js and TypeScript that provides a type-safe way for server code to read and write data. It sits between application and the database, translating high-level queries into SQL and mapping results back into strongly typed JavaScript/TypeScript objects.
+
+![Prisma ORM](./public/what-is-prisma.png)
+
 ### Setup Project
 
-**[Quickstart with Prisma ORM and Prisma Postgres](https://www.prisma.io/docs/getting-started/prisma-orm/quickstart/postgresql)**
+- **[Quickstart with Prisma ORM and Prisma Postgres](https://www.prisma.io/docs/getting-started/prisma-orm/quickstart/postgresql)**
 
-**[Add Prisma ORM to an existing PostgreSQL project](https://www.prisma.io/docs/getting-started/prisma-orm/add-to-existing-project/postgresql)**
+- **[Add Prisma ORM to an existing PostgreSQL project](https://www.prisma.io/docs/getting-started/prisma-orm/add-to-existing-project/postgresql)**
+
+### Overview of Prisma Schema
+
+The Prisma Schema ([prisma/schema.prisma](./dvd_rental_prisma/prisma/schema.prisma)) is the main method of configuration for your Prisma ORM setup. It consists of the following parts:
+
+- Data sources: Specify the details of the data sources Prisma ORM should connect to (e.g. PostgreSQL, MySQL, SQLite, etc.)
+- Generators: Specifies what clients should be generated based on the data model (e.g. Prisma Client, Prisma Client JS, etc.)
+- Data model definition: Specifies application models (the shape of the data) and their relations (1-1, 1-many, many-many).
+
+### Data model
+
+- **[Prisma Models](https://www.prisma.io/docs/orm/prisma-schema/data-model/models)**
+- **[One-to-many relationships](https://www.prisma.io/docs/orm/prisma-schema/data-model/relations/one-to-many-relations)**
+- **[Many-to-many relationships](https://www.prisma.io/docs/orm/prisma-schema/data-model/relations/many-to-many-relations)**
+
+### Prisma Client
+
+- **[Queries](https://www.prisma.io/docs/orm/prisma-client/queries)**
+- **[Observability and logging](https://www.prisma.io/docs/orm/prisma-client/observability-and-logging)**
+
+### Prisma Migrate
+
+- **[Understanding Prisma Migrate](https://www.prisma.io/docs/orm/prisma-migrate/understanding-prisma-migrate)**
