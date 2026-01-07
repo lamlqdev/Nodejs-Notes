@@ -28,7 +28,7 @@ TypeScript is a great companion for Express because it provides static typing, w
 Start with the following:
 
 ```bash
-mkdir ts-node-express && cd ts-node-express
+cd to your project directory
 npm init -y
 ```
 
@@ -50,23 +50,6 @@ The `-D`, or `--dev`, flag directs the package manager to install these librarie
 - `eslint` — Lints the code to catch errors and enforce coding standards
 - **`prettier`** — Formats the code to ensure consistent style across the project
 
-Installing these packages will add a new `devDependencies` object to the `package.json` file, featuring version details for each package, as shown below:
-
-```json
-{
-...
-   "devDependencies": {
-    "@types/express": "^5.0.1",
-    "@types/node": "^22.13.11",
-    "eslint": "^9.22.0",
-    "nodemon": "^3.1.9",
-    "prettier": "^3.5.3",
-    "tsx": "^4.0.0",
-    "typescript": "^5.8.2"
-  }
-}
-```
-
 ## 2. Configure TypeScript
 
 Every TypeScript project utilizes a configuration file to manage various project settings. The `tsconfig.json` file, which serves as the TypeScript configuration file, outlines these default options and offers the flexibility to modify or customize compiler settings to suit your needs.
@@ -84,19 +67,18 @@ Once you execute this command, you'll notice the tsconfig.json file is created a
 ```json
 {
   "compilerOptions": {
-    "module": "esnext",
-    "moduleResolution": "bundler",
-    "target": "esnext"
-    // ... other options
-  }
-}
-```
-
-Also, ensure your `package.json` includes:
-
-```json
-{
-  "type": "module"
+    "target": "ES2022",
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules"]
 }
 ```
 
@@ -120,6 +102,22 @@ ts-node-express/
 ├── .eslintrc.js             // ESLint configuration
 └── .prettierrc              // Prettier configuration
 ```
+
+### Why don't we need `"type": "module"` in package.json?
+
+You may notice that in the TypeScript code, we use ES module syntax (`import`/`export`), but there's no `"type": "module"` in `package.json`. This works because:
+
+1. **When running development (`npm run dev`):**
+   - The script uses `tsx` to run TypeScript directly
+   - `tsx` handles `import`/`export` syntax in TypeScript without needing to compile first
+   - Therefore, `"type": "module"` is not required in `package.json`
+
+2. **When building and running production (`npm run build` + `npm start`):**
+   - The TypeScript compiler (`tsc`) compiles TypeScript code to JavaScript
+   - With the `"module": "commonjs"` configuration in `tsconfig.json`, TypeScript converts `import`/`export` to `require()`/`module.exports` (CommonJS)
+   - The compiled JavaScript files use CommonJS, so `"type": "module"` is not needed
+
+**In summary:** You can write TypeScript code using ES module syntax (`import`/`export`), but when running in production, Node.js will execute the compiled CommonJS code. This is a common approach when working with TypeScript and Node.js.
 
 ## 3. Environment configuration (typed environment variables)
 
@@ -220,13 +218,13 @@ In your `package.json`, add scripts for TypeScript compilation and automatic ser
   "scripts": {
     "build": "tsc",
     "start": "node dist/server.js",
-    "dev": "nodemon --watch 'src/**/*.ts' --exec 'tsx' src/server.ts",
+    "dev": "nodemon --watch 'src/**/*.ts' --exec \"npx tsx src/server.ts\"",
   },
   ...
 }
 ```
 
-- **`tsc --watch`** — For continuous compilation in development.
+- **`tsx --watch`** — For continuous compilation in development.
 - **`nodemon`** — To automatically restart your server when files change.
 
 Start the server:
