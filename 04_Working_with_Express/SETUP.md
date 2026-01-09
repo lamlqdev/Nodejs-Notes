@@ -50,7 +50,37 @@ The `-D`, or `--dev`, flag directs the package manager to install these librarie
 - `eslint` — Lints the code to catch errors and enforce coding standards
 - **`prettier`** — Formats the code to ensure consistent style across the project
 
-## 2. Configure TypeScript
+## 2. Create .gitignore file
+
+Create a `.gitignore` file at the root to exclude unnecessary files:
+
+```text
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+
+# Environment variables
+.env
+.env.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS
+.DS_Store
+Thumbs.db
+```
+
+## 3. Configure TypeScript
 
 Every TypeScript project utilizes a configuration file to manage various project settings. The `tsconfig.json` file, which serves as the TypeScript configuration file, outlines these default options and offers the flexibility to modify or customize compiler settings to suit your needs.
 
@@ -108,7 +138,7 @@ ts-node-express/
 You may notice that in the TypeScript code, we use ES module syntax (`import`/`export`), but there's no `"type": "module"` in `package.json`. This works because:
 
 1. **When running development (`npm run dev`):**
-   - The script uses `tsx` to run TypeScript directly
+   - The script uses `tsx watch` to run TypeScript directly with auto-reload
    - `tsx` handles `import`/`export` syntax in TypeScript without needing to compile first
    - Therefore, `"type": "module"` is not required in `package.json`
 
@@ -119,7 +149,44 @@ You may notice that in the TypeScript code, we use ES module syntax (`import`/`e
 
 **In summary:** You can write TypeScript code using ES module syntax (`import`/`export`), but when running in production, Node.js will execute the compiled CommonJS code. This is a common approach when working with TypeScript and Node.js.
 
-## 3. Environment configuration (typed environment variables)
+## 4. Configure ESLint and Prettier (Optional but Recommended)
+
+**Install additional ESLint dependencies:**
+
+```bash
+npm install -D @typescript-eslint/parser @typescript-eslint/eslint-plugin
+```
+
+**File:** `.eslintrc.js`:
+
+```javascript
+module.exports = {
+  parser: "@typescript-eslint/parser",
+  extends: ["eslint:recommended", "plugin:@typescript-eslint/recommended"],
+  parserOptions: {
+    ecmaVersion: 2022,
+    sourceType: "module",
+  },
+  env: {
+    node: true,
+    es2022: true,
+  },
+};
+```
+
+**File:** `.prettierrc`:
+
+```json
+{
+  "semi": true,
+  "trailingComma": "es5",
+  "singleQuote": true,
+  "printWidth": 80,
+  "tabWidth": 2
+}
+```
+
+## 5. Environment configuration (typed environment variables)
 
 **File:** `src/config/config.ts`:
 
@@ -143,6 +210,12 @@ export default config;
 
 This file loads your environment variables from a `.env` file and provides type checking.
 
+**Create file:** `.env` at the root of your project:
+
+```bash
+touch .env
+```
+
 **File:** `.env`
 
 ```text
@@ -150,7 +223,7 @@ PORT=3000
 NODE_ENV=development
 ```
 
-## 4. Global error handling middleware
+## 6. Global error handling middleware
 
 **File:** `src/middlewares/error.middleware.ts`:
 
@@ -176,7 +249,7 @@ export const errorHandler = (
 
 This middleware catches errors thrown in your routes/controllers and sends a consistent, type-safe JSON error response.
 
-## 5. App setup
+## 7. App setup
 
 **File:** `src/app.ts`:
 
@@ -196,7 +269,7 @@ app.use(errorHandler);
 export default app;
 ```
 
-## 6. Server entry point
+## 8. Server entry point
 
 **File:** `src/server.ts`:
 
@@ -209,28 +282,32 @@ app.listen(config.port, () => {
 });
 ```
 
-## Watchers and development scripts
+## 9. Watchers and development scripts
 
-In your `package.json`, add scripts for TypeScript compilation and automatic server restart. For example:
+In your `package.json`, add scripts for TypeScript compilation and automatic server restart:
 
 ```json
 {
   "scripts": {
     "build": "tsc",
     "start": "node dist/server.js",
-    "dev": "nodemon --watch 'src/**/*.ts' --exec \"npx tsx src/server.ts\"",
-  },
-  ...
+    "dev": "tsx watch src/server.ts",
+    "lint": "eslint src/**/*.ts",
+    "lint:fix": "eslint src/**/*.ts --fix",
+    "format": "prettier --write \"src/**/*.ts\""
+  }
 }
 ```
 
-- **`tsx --watch`** — For continuous compilation in development.
-- **`nodemon`** — To automatically restart your server when files change.
+- **`build`** — Compiles TypeScript to JavaScript
+- **`start`** — Runs the compiled JavaScript in production
+- **`dev`** — Runs the server in development mode with auto-reload (using `tsx watch`)
+- **`lint`** — Checks code for linting errors
+- **`lint:fix`** — Automatically fixes linting errors
+- **`format`** — Formats code using Prettier
 
 Start the server:
 
 ```bash
 npm run dev
 ```
-
-Your Express API is now running with TypeScript.
