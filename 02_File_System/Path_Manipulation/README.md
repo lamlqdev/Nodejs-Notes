@@ -474,7 +474,7 @@ console.log(`import { UserService } from '${importStatement}';`);
 
 ## Best Practices
 
-1. **Always use path methods instead of string concatenation**: Different operating systems use different path delimiters.
+**Always use path methods instead of string concatenation**: Different operating systems use different path delimiters.
 
 ```typescript
 // ❌ Bad
@@ -485,7 +485,7 @@ import { join } from "path";
 const filePath = join(baseDir, filename);
 ```
 
-2. **Use `resolve()` for absolute paths**: When you need to ensure a path is absolute.
+**Use `resolve()` for absolute paths**: When you need to ensure a path is absolute.
 
 ```typescript
 // ✅ Good
@@ -493,7 +493,7 @@ import { resolve } from "path";
 const configPath = resolve(process.cwd(), "config", "app.json");
 ```
 
-3. **Normalize user input paths**: Always normalize paths from user input to prevent directory traversal attacks.
+**Normalize user input paths**: Always normalize paths from user input to prevent directory traversal attacks.
 
 ```typescript
 import { normalize, resolve } from "path";
@@ -511,9 +511,9 @@ function sanitizePath(userPath: string, baseDir: string): string {
 }
 ```
 
-4. **Use `parse()` for complex path manipulation**: When you need to work with multiple path components.
+**Use `parse()` for complex path manipulation**: When you need to work with multiple path components.
 
-5. **Check if paths are absolute before operations**: Use `isAbsolute()` to validate paths in configuration or user input.
+**Check if paths are absolute before operations**: Use `isAbsolute()` to validate paths in configuration or user input.
 
 ---
 

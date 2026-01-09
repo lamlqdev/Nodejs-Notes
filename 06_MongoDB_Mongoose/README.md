@@ -88,18 +88,18 @@ export const User = model("User", userSchema);
 
 ### Mongoose Models and Queries
 
-**[Models](https://mongoosejs.com/docs/models.html)** are fancy constructors compiled from Schema definitions. An instance of a model is called a document. Models are responsible for creating and reading documents from the underlying MongoDB database.
+- **[Models](https://mongoosejs.com/docs/models.html)** are fancy constructors compiled from Schema definitions. An instance of a model is called a document. Models are responsible for creating and reading documents from the underlying MongoDB database.
 
-Mongoose models provide several static helper functions for CRUD operations. Each of these functions returns a mongoose Query object. **[Mongoose queries](https://mongoosejs.com/docs/queries.html)** can be executed by using `await`, or by using `then()` to handle the promise returned by the query.
+- Mongoose models provide several static helper functions for CRUD operations. Each of these functions returns a mongoose Query object. **[Mongoose queries](https://mongoosejs.com/docs/queries.html)** can be executed by using `await`, or by using `then()` to handle the promise returned by the query.
 
 ### Populate
 
-MongoDB has the join-like `$lookup` aggregation operator in versions >= 3.2. Mongoose has a more powerful alternative called `populate()`, which lets you reference documents in other collections.
+- MongoDB has the join-like `$lookup` aggregation operator in versions >= 3.2. Mongoose has a more powerful alternative called `populate()`, which lets you reference documents in other collections.
 
-**[Population](https://mongoosejs.com/docs/populate.html)** is the process of automatically replacing the specified paths in the document with document(s) from other collection(s). We may populate a single document, multiple documents, a plain object, multiple plain objects, or all objects returned from a query.
+- **[Population](https://mongoosejs.com/docs/populate.html)** is the process of automatically replacing the specified paths in the document with document(s) from other collection(s). We may populate a single document, multiple documents, a plain object, multiple plain objects, or all objects returned from a query.
 
 ### Middleware (hooks) and Validation
 
-**[Middleware](https://mongoosejs.com/docs/middleware.html)** (also called pre and post hooks) are functions which are passed control during execution of asynchronous functions. Middleware is specified on the schema level and is useful for writing plugins.
+- **[Middleware](https://mongoosejs.com/docs/middleware.html)** (also called pre and post hooks) are functions which are passed control during execution of asynchronous functions. Middleware is specified on the schema level and is useful for writing plugins.
 
-Mongoose provides built-in validation based on the schema definition and allows custom validators. **[Validation](https://mongoosejs.com/docs/validation.html)** ensures that only documents that satisfy your constraints are persisted, similar to constraints in SQL but implemented in application logic.
+- Mongoose provides built-in validation based on the schema definition and allows custom validators. **[Validation](https://mongoosejs.com/docs/validation.html)** ensures that only documents that satisfy your constraints are persisted, similar to constraints in SQL but implemented in application logic.

@@ -72,10 +72,6 @@ As shown in the diagram:
 - **Desktop Applications** - Using frameworks like Electron
 - **IoT Applications** - Internet of Things device programming
 
-### Core Modules
-
-![Core Modules](./public/core-modules.png)
-
 ### Node.js Program Lifecycle
 
 ![Node.js Program Lifecycle](./public/nodejs-program-lifecycle.png)
@@ -320,8 +316,6 @@ console.log("Do other work");
 
 ## References
 
-- [Node.js Official Documentation](https://nodejs.org/docs)
 - [The Node.js Event Loop](https://nodejs.org/en/docs/guides/event-loop-timers-and-nexttick/)
 - [Blocking vs Non-blocking](https://nodejs.org/en/docs/guides/blocking-vs-non-blocking/)
-- [libuv Documentation](http://docs.libuv.org/)
 - [V8 Engine Documentation](https://v8.dev/docs)

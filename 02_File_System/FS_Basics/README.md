@@ -30,20 +30,6 @@ The `fs` (file system) module is a built-in Node.js module that provides both **
 | Typical Use Cases | API handlers, services, background jobs        | App bootstrap, scripts, tooling                            |
 | Recommendation    | Default choice                                 | Exception only                                             |
 
-### Real-world Applications
-
-**File Upload & Storage**: Saving user-uploaded files (images, PDFs, documents) to the server.
-
-**Logging Systems**: Writing application logs, error reports, and audit trails to files.
-
-**Data Export**: Generating reports in various formats (CSV, JSON, Excel) for download.
-
-**File Processing**: Reading, transforming, and writing data files in batch operations.
-
-**Caching**: Storing computed results or API responses to disk for faster retrieval.
-
-**Configuration Management**: Reading and writing application configuration files.
-
 ---
 
 ## Common File System Methods
@@ -436,7 +422,7 @@ backupFile();
 
 ## Best Practices
 
-1. **Always use async methods in production**: Avoid blocking the event loop with synchronous operations.
+**Always use async methods in production**: Avoid blocking the event loop with synchronous operations.
 
 ```typescript
 // ❌ Bad - Blocks event loop
@@ -448,7 +434,7 @@ import { readFile } from "fs/promises";
 const data = await readFile("file.txt", "utf8");
 ```
 
-2. **Handle errors appropriately**: Always wrap file operations in try-catch blocks.
+**Handle errors appropriately**: Always wrap file operations in try-catch blocks.
 
 ```typescript
 // ✅ Good
@@ -461,7 +447,7 @@ try {
 }
 ```
 
-3. **Check file existence before operations**: Use `access()` to prevent errors.
+**Check file existence before operations**: Use `access()` to prevent errors.
 
 ```typescript
 import { access, readFile } from "fs/promises";
@@ -477,7 +463,7 @@ async function safeRead(path: string) {
 }
 ```
 
-4. **Create parent directories before writing**: Ensure the directory structure exists.
+**Create parent directories before writing**: Ensure the directory structure exists.
 
 ```typescript
 import { mkdir, writeFile } from "fs/promises";
@@ -489,7 +475,7 @@ async function safeWrite(path: string, content: string) {
 }
 ```
 
-5. **Use appropriate encodings**: Specify encoding for text files, omit for binary files.
+**Use appropriate encodings**: Specify encoding for text files, omit for binary files.
 
 ```typescript
 // Text files
@@ -499,7 +485,7 @@ const text = await readFile("data.txt", "utf8");
 const buffer = await readFile("image.png");
 ```
 
-6. **Clean up temporary files**: Remove temporary files after use to prevent disk space issues.
+**Clean up temporary files**: Remove temporary files after use to prevent disk space issues.
 
 ```typescript
 import { rm } from "fs/promises";

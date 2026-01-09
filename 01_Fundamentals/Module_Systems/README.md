@@ -8,7 +8,13 @@ Node.js supports two module systems: CommonJS (the original system) and ES Modul
 
 ### What are Modules?
 
-A **module** is a self-contained piece of code that can be exported and imported in other files. Modules help organize code into reusable, maintainable units and prevent global namespace pollution.
+In Node.js Application, a **Module** can be considered as a block of code that provide a simple or complex functionality that can communicate with external application. Modules can be organized in a single file or a collection of multiple files/folders. Almost all programmers prefer modules because of their reusability throughout the application and ability to reduce the complexity of code into smaller pieces.
+
+Types of Modules: In Nodejs, there is 3 type of modules namely
+
+- **Core Modules**: These are built-in modules such as http, fs, path, etc.
+- **Local Modules**: These are modules that are created by the developer for the specific application.
+- **Third-Party Modules**: Third-party modules can be installed from the NPM (Node Package Manager) available online.
 
 ### CommonJS (CJS)
 
@@ -97,28 +103,3 @@ import * as module from "./module.js";
 | Top-level await    | Not supported                  | Supported                    |
 | Tree-shaking       | Limited                        | Full support                 |
 | Default in Node.js | Yes                            | No (requires configuration)  |
-
-### Using ES Modules in Node.js
-
-To use ES Modules in Node.js, you have two options:
-
-**Option 1: Use `.mjs` file extension**
-
-```javascript
-// file.mjs
-export function hello() {
-  return "Hello from ES Module";
-}
-```
-
-**Option 2: Set `"type": "module"` in package.json** (Most common approach)
-
-```json
-{
-  "name": "my-app",
-  "type": "module",
-  "version": "1.0.0"
-}
-```
-
-When `"type": "module"` is set, all `.js` files are treated as ES Modules. Use `.cjs` extension for CommonJS files.

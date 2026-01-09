@@ -29,10 +29,8 @@ A comprehensive collection of Node.js learning materials and practical examples 
 
 ### 5. Databases
 
-- **[MongoDB & Mongoose](./06_Databases/MongoDB_Mongoose/README.md)** - Mongoose ODM, schemas, models, queries
-- **[PostgreSQL & Prisma](./06_Databases/PostgreSQL_Sequelize/README.md)** - Prisma ORM, migrations, associations
-- **[Database Design](./06_Databases/Database_Design/README.md)** - Relationships, indexing, normalization
-- **[Query Optimization](./06_Databases/Query_Optimization/README.md)** - Performance, indexing strategies, query analysis
+- **[PostgreSQL & Prisma](./05_PostgreSQL_Prisma/README.md)** - SQL Database, Prisma ORM, Prisma schema, Prisma client, queries.
+- **[MongoDB & Mongoose](./06_MongoDB_Mongoose/README.md)** - NoSQL Database, MongoDB, Mongoose ODM, schemas, models, queries.
 
 ### 6. Authentication & Security
 
@@ -47,7 +45,6 @@ A comprehensive collection of Node.js learning materials and practical examples 
 - **[REST API Design](./08_API_Development/REST_API_Design/README.md)** - RESTful principles, endpoints, HTTP methods
 - **[CRUD Operations](./08_API_Development/CRUD_Operations/README.md)** - Create, Read, Update, Delete patterns
 - **[API Documentation](./08_API_Development/API_Documentation/README.md)** - Swagger/OpenAPI, Postman collections
-- **[GraphQL](./08_API_Development/GraphQL/README.md)** - Apollo Server, resolvers, queries, mutations, subscriptions
 
 ### 9. Data Querying & Features
 

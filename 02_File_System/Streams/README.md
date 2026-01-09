@@ -519,7 +519,7 @@ sanitizeLogFile("application.log", "sanitized.log");
 
 ## Best Practices
 
-1. **Always use pipeline() instead of pipe() for production code**: Better error handling and automatic cleanup.
+**Always use pipeline() instead of pipe() for production code**: Better error handling and automatic cleanup.
 
 ```typescript
 // ❌ Bad - No automatic cleanup on error
@@ -530,7 +530,7 @@ import { pipeline } from "stream/promises";
 await pipeline(readStream, transformStream, writeStream);
 ```
 
-2. **Handle backpressure properly**: Check the return value of `write()` and wait for `drain`.
+**Handle backpressure properly**: Check the return value of `write()` and wait for `drain`.
 
 ```typescript
 // ✅ Good
@@ -542,7 +542,7 @@ for (const item of largeDataset) {
 }
 ```
 
-3. **Always handle errors**: Streams can fail at any point.
+**Always handle errors**: Streams can fail at any point.
 
 ```typescript
 // ✅ Good
@@ -552,7 +552,7 @@ stream.on("error", (error) => {
 });
 ```
 
-4. **Destroy streams when done or on error**: Prevent memory leaks.
+**Destroy streams when done or on error**: Prevent memory leaks.
 
 ```typescript
 try {
@@ -563,7 +563,7 @@ try {
 }
 ```
 
-5. **Use appropriate highWaterMark**: Adjust buffer size based on your use case.
+**Use appropriate highWaterMark**: Adjust buffer size based on your use case.
 
 ```typescript
 // For large files, use larger chunks
@@ -577,7 +577,7 @@ const realtimeStream = createReadStream("live.log", {
 });
 ```
 
-6. **Pause and resume streams when needed**: Control data flow.
+**Pause and resume streams when needed**: Control data flow.
 
 ```typescript
 const stream = createReadStream("data.txt");
