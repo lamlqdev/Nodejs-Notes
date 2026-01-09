@@ -90,33 +90,22 @@ server.listen(3000, "localhost", () => {
 
 ![URL parts](./public/url-parts.png)
 
-- Scheme: The protocol used to access the resource (e.g., https).
+- **Scheme**: The protocol used to access the resource (e.g., https).
 
-- Subdomain: A subdivision of the main domain (e.g., blog).
+- **Subdomain**: A subdivision of the main domain (e.g., blog).
 
-- Second-level domain: The specific name of the website (e.g., hubspot).
+- **Second-level domain**: The specific name of the website (e.g., hubspot).
 
-- Top-level domain: The extension that follows the domain name (e.g., .com).
+- **Top-level domain**: The extension that follows the domain name (e.g., .com).
 
-- Port: A technical gate used to connect to the server (e.g., :443).
+- **Port**: A technical gate used to connect to the server (e.g., :443).
 
-- Subdirectory: A folder on the server that helps organize content (e.g., /marketing/).
+- **Subdirectory**: A folder on the server that helps organize content (e.g., /marketing/).
 
-- Path: The specific location of the page or file (e.g., /parts-url).
+- **Path**: The specific location of the page or file (e.g., /parts-url).
 
-- Query: The beginning of the parameters, marked by a question mark (?).
+- **Query**: The beginning of the parameters, marked by a question mark (?).
 
-- Parameters: Data sent to the server to provide specific information (e.g., docid=520&hl=en).
+- **Parameters**: Data sent to the server to provide specific information (e.g., docid=520&hl=en).
 
-- Fragments: A reference to a specific section within the page, marked by a hash (#posts).
-
----
-
-## Summary
-
-This section covers the core concepts of web and HTTP:
-
-- **How the Web Works**: Client (browser) sends requests to server via DNS, server processes and returns responses.
-- **HTTP Message**: Common structure includes start-line, headers, and optional body. Requests contain method, URL, version; Responses contain status code, reason phrase.
-- **Node.js Server**: Use `http` module to create server, handle requests and send responses with methods like `createServer()`, `listen()`.
-- **URL Components**: Includes scheme, domain, port, path, query parameters, and fragments.
+- **Fragments**: A reference to a specific section within the page, marked by a hash (#posts).

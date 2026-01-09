@@ -92,14 +92,18 @@ import MyClass, { function1, constant } from "./module.js";
 import * as module from "./module.js";
 ```
 
+**Using ES Modules in Node.js:** Change file extension from `.js` to `.mjs` or use `"type": "module"` in `package.json`
+
 ### Differences Between CommonJS and ES Modules
 
-| Aspect             | CommonJS                       | ES Modules                   |
-| ------------------ | ------------------------------ | ---------------------------- |
-| Syntax             | `require()` / `module.exports` | `import` / `export`          |
-| Loading            | Synchronous                    | Asynchronous                 |
-| Resolution         | Runtime                        | Compile-time (static)        |
-| File extension     | `.js` or `.cjs`                | `.mjs` or `"type": "module"` |
-| Top-level await    | Not supported                  | Supported                    |
-| Tree-shaking       | Limited                        | Full support                 |
-| Default in Node.js | Yes                            | No (requires configuration)  |
+| Aspect             | CommonJS                                                                                           | ES Modules                                                                                                 |
+| ------------------ | -------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| Syntax             | `require()` / `module.exports` (dynamic import, can be called anywhere)                            | `import` / `export` (static import, only at top level, modern JavaScript syntax)                           |
+| Loading            | Synchronous `require()`; module is loaded and executed when it is called                           | Static analysis with async support; the module graph is analyzed first and can work with top‑level `await` |
+| Resolution         | Runtime (paths and exports are resolved when the code runs)                                        | More compile-time-like (analyzed ahead of time, easier for IDEs/bundlers to optimize and catch errors)     |
+| File extension     | `.js` (default in Node), `.cjs` to force CommonJS                                                  | `.mjs` or `.js` when `package.json` has `"type": "module"`                                                 |
+| Top-level await    | Not supported (you must wrap it in an async function)                                              | Supported in ESM modules; you can use `await` directly at the top level                                    |
+| Tree-shaking       | Limited (exports are dynamic objects, harder to analyze)                                           | Good support (exports are static, easier for bundlers to remove unused code)                               |
+| Default in Node.js | Yes, if you do not configure anything else                                                         | No, you need `.mjs` or `"type": "module"` in `package.json` to enable ESM                                  |
+| Interoperability   | Best with other CommonJS modules using `require()`; importing ESM usually needs dynamic `import()` | Can `import` CommonJS modules (by default, `module.exports` is treated like a default export)              |
+| Use cases          | Legacy codebases, quick scripts, many traditional Node.js libraries                                | New projects, sharing code between frontend and backend, needing tree-shaking and top‑level `await`        |
