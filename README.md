@@ -34,13 +34,10 @@ A comprehensive collection of Node.js learning materials and practical examples 
 
 ### 6. Authentication & Security
 
-- **[JWT Authentication](./07_Authentication_Security/JWT_Authentication/README.md)** - Token-based auth, access/refresh tokens
-- **[Session Management](./07_Authentication_Security/Session_Management/README.md)** - Express-session, cookies, session storage
-- **[Password Security](./07_Authentication_Security/Password_Security/README.md)** - bcrypt, hashing, password policies
-- **[OAuth & Social Login](./07_Authentication_Security/OAuth_Social_Login/README.md)** - Google, GitHub, Facebook OAuth
-- **[Security Best Practices](./07_Authentication_Security/Security_Best_Practices/README.md)** - Helmet, CORS, rate limiting, XSS/CSRF protection
+- **[JWT Authentication](./07_JWT_Authentication/README.md)** - Token-based auth, access/refresh tokens
+- **[Session Authentication](./08_Session_Authentication/README.md)** - Session-based auth, session storage
 
-### 8. API Development
+### 7. API Development
 
 - **[REST API Design](./08_API_Development/REST_API_Design/README.md)** - RESTful principles, endpoints, HTTP methods
 - **[CRUD Operations](./08_API_Development/CRUD_Operations/README.md)** - Create, Read, Update, Delete patterns
