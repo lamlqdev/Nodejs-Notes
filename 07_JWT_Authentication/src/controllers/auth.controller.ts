@@ -2,12 +2,13 @@ import type { Request, Response } from 'express';
 import { v4 as uuidv4 } from 'uuid';
 import { users, type User } from '../models/user.model';
 import { hashPassword, comparePassword } from '../utils/password.util';
-import { generateAccessToken, generateRefreshToken } from '../utils/jwt.util';
+import {
+  generateAccessToken,
+  generateRefreshToken,
+  verifyRefreshToken,
+} from '../utils/jwt.util';
 import { AppError } from '../middlewares/error.middleware';
 import config from '../config/config';
-
-// In-memory refresh tokens storage
-const refreshTokens: string[] = [];
 
 // Sign Up
 export async function signUpController(req: Request, res: Response) {
@@ -41,9 +42,6 @@ export async function signUpController(req: Request, res: Response) {
   const tokenPayload = { userId: newUser.id, email: newUser.email };
   const accessToken = generateAccessToken(tokenPayload);
   const refreshToken = generateRefreshToken(tokenPayload);
-
-  // Store refresh token
-  refreshTokens.push(refreshToken);
 
   // Set access token in HTTP-only cookie
   res.cookie('accessToken', accessToken, {
@@ -90,9 +88,6 @@ export async function signInController(req: Request, res: Response) {
   const accessToken = generateAccessToken(tokenPayload);
   const refreshToken = generateRefreshToken(tokenPayload);
 
-  // Store refresh token
-  refreshTokens.push(refreshToken);
-
   // Set access token in HTTP-only cookie
   res.cookie('accessToken', accessToken, {
     httpOnly: true,
@@ -121,17 +116,11 @@ export function refreshTokenController(req: Request, res: Response) {
     throw new AppError('Refresh token is required', 400);
   }
 
-  // Check if refresh token exists
-  if (!refreshTokens.includes(refreshToken)) {
-    throw new AppError('Invalid refresh token', 401);
-  }
-
   try {
-    const { verifyRefreshToken } = require('../utils/jwt.util');
+    // Verify refresh token signature and expiration
     const decoded = verifyRefreshToken(refreshToken);
 
     // Generate new access token
-    const { generateAccessToken } = require('../utils/jwt.util');
     const newAccessToken = generateAccessToken({
       userId: decoded.userId,
       email: decoded.email,
@@ -156,15 +145,6 @@ export function refreshTokenController(req: Request, res: Response) {
 
 // Logout
 export function logoutController(req: Request, res: Response) {
-  const { refreshToken } = req.body;
-
-  if (refreshToken) {
-    const index = refreshTokens.indexOf(refreshToken);
-    if (index > -1) {
-      refreshTokens.splice(index, 1);
-    }
-  }
-
   // Clear access token cookie
   res.clearCookie('accessToken', {
     httpOnly: true,

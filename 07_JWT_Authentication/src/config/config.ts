@@ -29,7 +29,7 @@ const config: Config = {
   jwtRefreshSecret: requireEnv('JWT_REFRESH_SECRET'),
   jwtExpiresIn: process.env.JWT_EXPIRES_IN || '15m',
   jwtRefreshExpiresIn: process.env.JWT_REFRESH_EXPIRES_IN || '7d',
-  cookieSecret: process.env.COOKIE_SECRET || requireEnv('JWT_SECRET'),
+  cookieSecret: requireEnv('COOKIE_SECRET'),
   cookieMaxAge: 15 * 60 * 1000, // 15 minutes in milliseconds
   corsOrigin: process.env.CORS_ORIGIN || 'http://localhost:3000',
 };
