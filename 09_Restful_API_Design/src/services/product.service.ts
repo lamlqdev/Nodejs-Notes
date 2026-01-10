@@ -43,9 +43,6 @@ export interface UpdateProductData {
   stock?: number;
 }
 
-/**
- * Find products with pagination and filtering
- */
 export async function findProducts(
   filter: ProductFilter,
   options: PaginationOptions
@@ -88,28 +85,16 @@ export async function findProducts(
   };
 }
 
-/**
- * Find a product by ID
- * Business logic: Check if product exists
- */
 export async function findProductById(id: string | Types.ObjectId) {
   const product = await Product.findById(id);
   return product;
 }
 
-/**
- * Find a product by name
- * Business logic: Check uniqueness (used for validation)
- */
 export async function findProductByName(name: string) {
   const product = await Product.findOne({ name: name.trim() });
   return product;
 }
 
-/**
- * Create a new product
- * Business logic validation: Check if product name already exists
- */
 export async function createProduct(data: CreateProductData) {
   // Business logic validation: Check uniqueness
   const existingProduct = await findProductByName(data.name);
@@ -128,10 +113,6 @@ export async function createProduct(data: CreateProductData) {
   return product;
 }
 
-/**
- * Update a product by ID (full update)
- * Business logic validation: Check if product exists and name uniqueness
- */
 export async function updateProduct(
   id: string | Types.ObjectId,
   data: UpdateProductData,
@@ -163,10 +144,6 @@ export async function updateProduct(
   return product;
 }
 
-/**
- * Delete a product by ID
- * Business logic validation: Check if product exists
- */
 export async function deleteProduct(id: string | Types.ObjectId) {
   const product = await Product.findByIdAndDelete(id);
   if (!product) {
@@ -175,9 +152,6 @@ export async function deleteProduct(id: string | Types.ObjectId) {
   return product;
 }
 
-/**
- * Count products with filter
- */
 export async function countProducts(filter: ProductFilter): Promise<number> {
   const query: Record<string, any> = {};
   if (filter.category) {

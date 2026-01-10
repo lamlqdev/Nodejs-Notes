@@ -8,7 +8,11 @@ import {
   deleteProductController,
 } from '../controllers/product.controller';
 import { authenticate } from '../middlewares/auth.middleware';
-import { validate, validateObjectId } from '../middlewares/validation.middleware';
+import { authorizeAdmin } from '../middlewares/authorize.middleware';
+import {
+  validate,
+  validateObjectId,
+} from '../middlewares/validation.middleware';
 import {
   createProductSchema,
   updateProductSchema,
@@ -20,33 +24,37 @@ import {
 const router = Router();
 
 // Public routes - no authentication required
-router.get('/', validate(getProductsQuerySchema), getProductsController); // GET /api/products - Get list of products
-router.get('/:id', validate(getProductSchema), getProductController); // GET /api/products/:id - Get product details
+router.get('/', validate(getProductsQuerySchema), getProductsController);
+router.get('/:id', validate(getProductSchema), getProductController);
 
-// Protected routes - authentication required
+// Protected routes - admin only
 router.post(
   '/',
   authenticate,
+  authorizeAdmin,
   validate(createProductSchema),
   createProductController
-); // POST /api/products - Create new product
+);
 router.put(
   '/:id',
   authenticate,
+  authorizeAdmin,
   validate(updateProductSchema),
   updateProductController
-); // PUT /api/products/:id - Update entire product
+);
 router.patch(
   '/:id',
   authenticate,
+  authorizeAdmin,
   validate(patchProductSchema),
   patchProductController
-); // PATCH /api/products/:id - Partially update product
+);
 router.delete(
   '/:id',
   authenticate,
+  authorizeAdmin,
   validateObjectId(),
   deleteProductController
-); // DELETE /api/products/:id - Delete product
+);
 
 export default router;

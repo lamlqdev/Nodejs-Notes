@@ -2,23 +2,6 @@ import type { Request, Response, NextFunction } from 'express';
 import { z, type ZodSchema } from 'zod';
 import { AppError } from './error.middleware';
 
-/**
- * Generic validation middleware factory
- * Validates request data (body, query, params) against a Zod schema
- *
- * @param schema - Zod schema to validate against
- * @returns Express middleware function
- *
- * @example
- * ```ts
- * // In routes file:
- * router.post(
- *   '/',
- *   validate(createProductSchema),
- *   createProductController
- * );
- * ```
- */
 export const validate = (schema: ZodSchema) => {
   return async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -50,13 +33,6 @@ export const validate = (schema: ZodSchema) => {
   };
 };
 
-/**
- * Generic middleware to validate MongoDB ObjectId in params
- * Can be used for any route that has :id parameter
- *
- * @param paramName - Name of the parameter (default: 'id')
- * @returns Express middleware function
- */
 export const validateObjectId = (paramName: string = 'id') => {
   return (req: Request, res: Response, next: NextFunction) => {
     const id = req.params[paramName];
@@ -72,10 +48,6 @@ export const validateObjectId = (paramName: string = 'id') => {
   };
 };
 
-/**
- * Helper function to validate only request body
- * Useful for validating body separately from params/query
- */
 export const validateBody = (schema: ZodSchema) => {
   return async (req: Request, res: Response, next: NextFunction) => {
     try {

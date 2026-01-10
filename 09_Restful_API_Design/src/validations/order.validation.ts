@@ -1,17 +1,11 @@
 import { z } from 'zod';
 
-/**
- * Order item schema (nested schema)
- */
 const orderItemSchema = z.object({
   productId: z.string().regex(/^[0-9a-fA-F]{24}$/, 'Invalid product ID format'),
   quantity: z.number().int().min(1, 'Quantity must be at least 1'),
   price: z.number().min(0, 'Price cannot be negative'),
 });
 
-/**
- * Order status enum
- */
 const orderStatusEnum = z.enum([
   'pending',
   'confirmed',
@@ -20,9 +14,6 @@ const orderStatusEnum = z.enum([
   'cancelled',
 ]);
 
-/**
- * Base order schema
- */
 const orderBaseSchema = {
   customerId: z.string().regex(/^[0-9a-fA-F]{24}$/, 'Invalid customer ID format'),
   items: z
@@ -32,16 +23,10 @@ const orderBaseSchema = {
   status: orderStatusEnum.optional().default('pending'),
 };
 
-/**
- * Schema for creating a new order
- */
 export const createOrderSchema = z.object({
   body: z.object(orderBaseSchema),
 });
 
-/**
- * Schema for updating an order
- */
 export const updateOrderSchema = z.object({
   body: z.object({
     customerId: orderBaseSchema.customerId.optional(),
@@ -54,9 +39,6 @@ export const updateOrderSchema = z.object({
   }),
 });
 
-/**
- * Schema for partial update (PATCH) - at least one field required
- */
 export const patchOrderSchema = z.object({
   body: z
     .object({
@@ -72,18 +54,12 @@ export const patchOrderSchema = z.object({
   }),
 });
 
-/**
- * Schema for getting a single order
- */
 export const getOrderSchema = z.object({
   params: z.object({
     id: z.string().regex(/^[0-9a-fA-F]{24}$/, 'Invalid order ID format'),
   }),
 });
 
-/**
- * Schema for query parameters (pagination and filters)
- */
 export const getOrdersQuerySchema = z.object({
   query: z.object({
     page: z
@@ -109,7 +85,6 @@ export const getOrdersQuerySchema = z.object({
   }),
 });
 
-// Export types for TypeScript inference
 export type CreateOrderInput = z.infer<typeof createOrderSchema>['body'];
 export type UpdateOrderInput = z.infer<typeof updateOrderSchema>['body'];
 export type PatchOrderInput = z.infer<typeof patchOrderSchema>['body'];

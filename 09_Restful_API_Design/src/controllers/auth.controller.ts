@@ -1,7 +1,4 @@
 import type { Request, Response } from 'express';
-import { v4 as uuidv4 } from 'uuid';
-import { users, type User } from '../models/user.model';
-import { hashPassword, comparePassword } from '../utils/password.util';
 import {
   generateAccessToken,
   generateRefreshToken,
@@ -9,44 +6,42 @@ import {
 } from '../utils/jwt.util';
 import { AppError } from '../middlewares/error.middleware';
 import config from '../config/config';
+import {
+  createUser,
+  verifyUserCredentials,
+  findUserById,
+} from '../services/user.service';
 
-// Sign Up
 export async function signUpController(req: Request, res: Response) {
-  const { email, password, name } = req.body;
+  const { email, password, name, phone, address } = req.body;
 
-  if (!email || !password) {
-    throw new AppError('Email and password are required', 400);
-  }
-
-  // Check if user exists
-  const existingUser = users.find((u) => u.email === email);
-  if (existingUser) {
-    throw new AppError('User already exists', 409);
-  }
-
-  // Hash password
-  const hashedPassword = await hashPassword(password);
-
-  // Create user
-  const newUser: User = {
-    id: uuidv4(),
+  // Create user through service layer (handles customer creation if role is 'user')
+  const user = await createUser({
     email,
-    password: hashedPassword,
-    name: name || '',
-    createdAt: new Date(),
-  };
+    password,
+    name,
+    phone,
+    address,
+    role: 'user', // Default role for signup
+  });
 
-  users.push(newUser);
+  if (!user) {
+    throw new AppError('Failed to create user', 500);
+  }
 
   // Generate tokens
-  const tokenPayload = { userId: newUser.id, email: newUser.email };
+  const tokenPayload = {
+    userId: user._id.toString(),
+    email: user.email,
+    role: user.role,
+  };
   const accessToken = generateAccessToken(tokenPayload);
   const refreshToken = generateRefreshToken(tokenPayload);
 
   // Set access token in HTTP-only cookie
   res.cookie('accessToken', accessToken, {
     httpOnly: true,
-    secure: config.nodeEnv === 'production', // Only send over HTTPS in production
+    secure: config.nodeEnv === 'production',
     sameSite: 'strict',
     maxAge: config.cookieMaxAge,
     path: '/',
@@ -55,43 +50,34 @@ export async function signUpController(req: Request, res: Response) {
   res.status(201).json({
     message: 'User created successfully',
     user: {
-      id: newUser.id,
-      email: newUser.email,
-      name: newUser.name,
+      id: user._id,
+      email: user.email,
+      name: user.name,
+      role: user.role,
     },
-    refreshToken, // Only send refresh token in response body
+    refreshToken,
   });
 }
 
-// Sign In
 export async function signInController(req: Request, res: Response) {
   const { email, password } = req.body;
 
-  if (!email || !password) {
-    throw new AppError('Email and password are required', 400);
-  }
-
-  // Find user
-  const user = users.find((u) => u.email === email);
-  if (!user) {
-    throw new AppError('Invalid credentials', 401);
-  }
-
-  // Verify password
-  const isPasswordValid = await comparePassword(password, user.password);
-  if (!isPasswordValid) {
-    throw new AppError('Invalid credentials', 401);
-  }
+  // Verify credentials through service layer
+  const user = await verifyUserCredentials(email, password);
 
   // Generate tokens
-  const tokenPayload = { userId: user.id, email: user.email };
+  const tokenPayload = {
+    userId: user._id.toString(),
+    email: user.email,
+    role: user.role,
+  };
   const accessToken = generateAccessToken(tokenPayload);
   const refreshToken = generateRefreshToken(tokenPayload);
 
   // Set access token in HTTP-only cookie
   res.cookie('accessToken', accessToken, {
     httpOnly: true,
-    secure: config.nodeEnv === 'production', // Only send over HTTPS in production
+    secure: config.nodeEnv === 'production',
     sameSite: 'strict',
     maxAge: config.cookieMaxAge,
     path: '/',
@@ -100,15 +86,15 @@ export async function signInController(req: Request, res: Response) {
   res.json({
     message: 'Sign in successful',
     user: {
-      id: user.id,
+      id: user._id,
       email: user.email,
       name: user.name,
+      role: user.role,
     },
-    refreshToken, // Only send refresh token in response body
+    refreshToken,
   });
 }
 
-// Refresh Token
 export function refreshTokenController(req: Request, res: Response) {
   const { refreshToken } = req.body;
 
@@ -124,6 +110,7 @@ export function refreshTokenController(req: Request, res: Response) {
     const newAccessToken = generateAccessToken({
       userId: decoded.userId,
       email: decoded.email,
+      role: decoded.role,
     });
 
     // Set new access token in HTTP-only cookie
@@ -143,7 +130,6 @@ export function refreshTokenController(req: Request, res: Response) {
   }
 }
 
-// Logout
 export function logoutController(req: Request, res: Response) {
   // Clear access token cookie
   res.clearCookie('accessToken', {
@@ -158,9 +144,8 @@ export function logoutController(req: Request, res: Response) {
   });
 }
 
-// Get current user (protected route)
-export function getMeController(req: Request, res: Response) {
-  const user = users.find((u) => u.id === req.user?.userId);
+export async function getMeController(req: Request, res: Response) {
+  const user = await findUserById(req.user!.userId);
 
   if (!user) {
     throw new AppError('User not found', 404);
@@ -168,9 +153,10 @@ export function getMeController(req: Request, res: Response) {
 
   res.json({
     user: {
-      id: user.id,
+      id: user._id,
       email: user.email,
       name: user.name,
+      role: user.role,
       createdAt: user.createdAt,
     },
   });

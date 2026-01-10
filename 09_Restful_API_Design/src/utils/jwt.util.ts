@@ -5,6 +5,7 @@ import config from '../config/config';
 export interface TokenPayload {
   userId: string;
   email: string;
+  role: 'admin' | 'user';
 }
 
 export function generateAccessToken(payload: TokenPayload): string {
@@ -29,13 +30,14 @@ export function verifyAccessToken(token: string): TokenPayload {
       throw new Error('Invalid token format');
     }
 
-    if (!decoded.userId || !decoded.email) {
+    if (!decoded.userId || !decoded.email || !decoded.role) {
       throw new Error('Invalid token payload');
     }
 
     return {
       userId: decoded.userId as string,
       email: decoded.email as string,
+      role: decoded.role as 'admin' | 'user',
     };
   } catch (error) {
     if (error instanceof jwt.JsonWebTokenError) {
@@ -56,13 +58,14 @@ export function verifyRefreshToken(token: string): TokenPayload {
       throw new Error('Invalid token format');
     }
 
-    if (!decoded.userId || !decoded.email) {
+    if (!decoded.userId || !decoded.email || !decoded.role) {
       throw new Error('Invalid token payload');
     }
 
     return {
       userId: decoded.userId as string,
       email: decoded.email as string,
+      role: decoded.role as 'admin' | 'user',
     };
   } catch (error) {
     if (error instanceof jwt.JsonWebTokenError) {

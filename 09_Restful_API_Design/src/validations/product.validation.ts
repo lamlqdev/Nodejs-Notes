@@ -1,8 +1,5 @@
 import { z } from 'zod';
 
-/**
- * Base product schema - reusable for different validation scenarios
- */
 const productBaseSchema = {
   name: z
     .string()
@@ -23,16 +20,10 @@ const productBaseSchema = {
     .min(0, 'Stock cannot be negative'),
 };
 
-/**
- * Schema for creating a new product (all fields required)
- */
 export const createProductSchema = z.object({
   body: z.object(productBaseSchema),
 });
 
-/**
- * Schema for updating a product (all fields optional for PUT)
- */
 export const updateProductSchema = z.object({
   body: z.object({
     name: productBaseSchema.name.optional(),
@@ -47,9 +38,6 @@ export const updateProductSchema = z.object({
   }),
 });
 
-/**
- * Schema for partial update (PATCH) - at least one field required
- */
 export const patchProductSchema = z.object({
   body: z
     .object({
@@ -68,18 +56,12 @@ export const patchProductSchema = z.object({
   }),
 });
 
-/**
- * Schema for getting a single product (ID validation)
- */
 export const getProductSchema = z.object({
   params: z.object({
     id: z.string().regex(/^[0-9a-fA-F]{24}$/, 'Invalid product ID format'),
   }),
 });
 
-/**
- * Schema for query parameters (pagination and filters)
- */
 export const getProductsQuerySchema = z.object({
   query: z.object({
     page: z
@@ -105,7 +87,6 @@ export const getProductsQuerySchema = z.object({
   }),
 });
 
-// Export types for TypeScript inference
 export type CreateProductInput = z.infer<typeof createProductSchema>['body'];
 export type UpdateProductInput = z.infer<typeof updateProductSchema>['body'];
 export type PatchProductInput = z.infer<typeof patchProductSchema>['body'];

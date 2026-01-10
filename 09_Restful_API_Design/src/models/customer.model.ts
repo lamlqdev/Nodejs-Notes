@@ -2,6 +2,13 @@ import { Schema, model } from 'mongoose';
 
 const customerSchema = new Schema(
   {
+    userId: {
+      type: Schema.Types.ObjectId,
+      ref: 'User',
+      required: [true, 'User ID is required'],
+      unique: true,
+      index: true,
+    },
     name: {
       type: String,
       required: [true, 'Customer name is required'],

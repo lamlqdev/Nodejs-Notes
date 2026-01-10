@@ -7,10 +7,6 @@ import {
   deleteProduct as deleteProductService,
 } from '../services/product.service';
 
-/**
- * GET /api/products - Get list of all products with pagination and filtering
- * Note: Input validation is handled by validateProductQuery middleware
- */
 export async function getProductsController(req: Request, res: Response) {
   const { page = '1', limit = '10', category, search } = req.query;
 
@@ -38,11 +34,6 @@ export async function getProductsController(req: Request, res: Response) {
   });
 }
 
-/**
- * GET /api/products/:id - Get a single product by ID
- * Note: ID format validation is handled by validateObjectId middleware
- * Business logic (check existence) is handled by service layer
- */
 export async function getProductController(req: Request, res: Response) {
   const { id } = req.params;
 
@@ -61,11 +52,6 @@ export async function getProductController(req: Request, res: Response) {
   });
 }
 
-/**
- * POST /api/products - Create a new product (requires authentication)
- * Note: Input validation is handled by validateCreateProduct middleware
- * Business logic (uniqueness check) is handled by service layer
- */
 export async function createProductController(req: Request, res: Response) {
   const { name, price, description, image, category, stock } = req.body;
 
@@ -86,11 +72,6 @@ export async function createProductController(req: Request, res: Response) {
   });
 }
 
-/**
- * PUT /api/products/:id - Update entire product (requires authentication)
- * Note: Input validation is handled by validateUpdateProduct and validateObjectId middlewares
- * Business logic (existence check, uniqueness) is handled by service layer
- */
 export async function updateProductController(req: Request, res: Response) {
   const { id } = req.params;
   const { name, price, description, image, category, stock } = req.body;
@@ -120,11 +101,6 @@ export async function updateProductController(req: Request, res: Response) {
   });
 }
 
-/**
- * PATCH /api/products/:id - Partially update product (requires authentication)
- * Note: Input validation is handled by validatePatchProduct and validateObjectId middlewares
- * Business logic (existence check, uniqueness) is handled by service layer
- */
 export async function patchProductController(req: Request, res: Response) {
   const { id } = req.params;
   const updates = req.body;
@@ -143,11 +119,6 @@ export async function patchProductController(req: Request, res: Response) {
   });
 }
 
-/**
- * DELETE /api/products/:id - Delete a product (requires authentication)
- * Note: ID format validation is handled by validateObjectId middleware
- * Business logic (existence check) is handled by service layer
- */
 export async function deleteProductController(req: Request, res: Response) {
   const { id } = req.params;
 
