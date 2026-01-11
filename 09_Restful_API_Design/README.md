@@ -30,7 +30,7 @@ API developers can design APIs using several different architectures. APIs that 
 
 ### How do RESTful APIs work?
 
-The basic function of a RESTful API is the same as browsing the internet. The client contacts the server by using the API when it requires a resource. API developers explain how the client should use the REST API in the server application API documentation (e.g., OpenAPI, Swagger, Postman Collections). These are the general steps for any REST API call:
+The basic function of a RESTful API is the same as browsing the internet. The client contacts the server by using the API when it requires a resource. API developers explain how the client should use the REST API in the server application [API documentation](../10_Restful_API_Logging_Documents/README.md) (e.g., OpenAPI, Swagger, Postman Collections). These are the general steps for any REST API call:
 
 1. The client sends a request to the server. The client follows the API documentation to format the request in a way that the server understands.
 2. The server authenticates the client and confirms that the client has the right to make that request.

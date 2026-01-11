@@ -1,15 +1,19 @@
 import express from 'express';
-import helmet from 'helmet';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
+import helmet from 'helmet';
 import swaggerUi from 'swagger-ui-express';
+
+import config from './config/config';
+import { swaggerSpec } from './config/swagger.config';
+
 import { errorHandler } from './middlewares/error.middleware';
 import { loggerMiddleware } from './middlewares/logger.middleware';
 import { apiLimiter } from './middlewares/rateLimit.middleware';
-import config from './config/config';
-import { swaggerSpec } from './config/swagger.config';
+
 import authRoutes from './routes/auth.route';
 import productRoutes from './routes/product.route';
+
 import logger from './utils/logger.util';
 
 const app = express();

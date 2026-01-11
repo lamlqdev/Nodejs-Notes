@@ -81,7 +81,7 @@ npm install -D @types/swagger-ui-express
 
 - **winston**: Logging library for Node.js with multiple transports and formats.
 
-Note: We build the OpenAPI specification directly from TypeScript objects instead of using swagger-jsdoc with JSDoc comments. This approach keeps route files clean and makes documentation easier to maintain.
+> Note: We build the OpenAPI specification directly from TypeScript objects instead of using swagger-jsdoc with JSDoc comments. This approach keeps route files clean and makes documentation easier to maintain.
 
 ### 2.2. Winston Logger Configuration
 
@@ -260,7 +260,7 @@ Swagger UI requires an OpenAPI specification. Instead of adding JSDoc comments d
 
 **Organizing Swagger Definitions**: Create a `src/swagger/paths/` directory to store path definitions separately:
 
-```
+```plaintext
 src/swagger/paths/
 ├── products.paths.ts
 ├── auth.paths.ts
@@ -712,7 +712,7 @@ When a log file reaches the maximum size, Winston creates a new file and renames
 
 **Log Directory Structure**:
 
-```
+```plaintext
 logs/
 ├── combined.log      # All logs
 ├── error.log         # Error logs only

@@ -38,6 +38,7 @@ A comprehensive collection of Node.js learning materials and practical examples 
 ## 7. API Development
 
 - **[REST API Design](./09_Restful_API_Design/README.md)** - RESTful API design principles, layered architecture, schema-based validation, error handling, role-based authorization, pagination and filtering.
+- **[API Documentation and Logging](./10_Restful_API_Logging_Documents/README.md)** - API documentation with Swagger/OpenAPI and structured logging with Winston.
 
 ## 8. File Handling
 
