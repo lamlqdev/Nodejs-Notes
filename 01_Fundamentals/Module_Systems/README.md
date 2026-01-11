@@ -22,9 +22,9 @@ To handle these issues before official module systems existed, developers used *
 
 A **Module System** defines the rules and syntax for organizing code into separate files (modules) and managing the dependencies between them. It solves the problem of global scope pollution and dependency management by providing mechanisms for:
 
-1.  **Encapsulation:** Keeping code private within a module unless explicitly exported.
-2.  **Exporting:** Defining which variables, functions, or classes are available for use by other modules.
-3.  **Importing:** Loading and using functionality from other modules.
+1. **Encapsulation:** Keeping code private within a module unless explicitly exported.
+2. **Exporting:** Defining which variables, functions, or classes are available for use by other modules.
+3. **Importing:** Loading and using functionality from other modules.
 
 In the Node.js ecosystem, there are two primary module systems you need to understand: CommonJS and ES Modules.
 

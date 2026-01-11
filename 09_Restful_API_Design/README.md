@@ -764,20 +764,6 @@ Validation should happen at multiple layers:
 
 - **Model Validation**: Mongoose schemas provide additional validation at the database level. This is the last line of defense.
 
-### Separation of Concerns
-
-Each layer should have a single responsibility:
-
-- Routes define endpoints and apply middleware.
-
-- Controllers handle HTTP requests and responses.
-
-- Services contain business logic and database operations.
-
-- Models define data structures and schemas.
-
-This separation makes the codebase easier to understand, test, and maintain.
-
 ### Error Handling
 
 Use consistent error handling throughout the application:
@@ -829,5 +815,4 @@ Implement security best practices:
 - [Zod Documentation](https://zod.dev/) - Zod validation library documentation
 - [Mongoose Documentation](https://mongoosejs.com/docs/) - Mongoose ODM documentation
 - [Express Best Practices](https://expressjs.com/en/advanced/best-practice-security.html) - Express security and best practices
-- [HTTP Status Codes](https://httpstatuses.com/) - Complete list of HTTP status codes
 - [RESTful API Design](https://restfulapi.net/rest-api-design-tutorial-with-example/) - RESTful API design principles
