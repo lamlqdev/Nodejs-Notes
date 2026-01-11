@@ -16,6 +16,8 @@ API documentation is a technical content deliverable that describes how to use a
 
 **Swagger** is a set of open-source tools built around the OpenAPI Specification. Swagger tools include Swagger UI (interactive API documentation), Swagger Editor (editor for OpenAPI specs), and Swagger Codegen (code generation from specs).
 
+![Swagger](./public/swagger.png)
+
 OpenAPI and Swagger are used together: OpenAPI defines the specification standard, while Swagger provides tools to work with OpenAPI specifications. Swagger UI reads OpenAPI specifications and generates interactive documentation that allows developers to test API endpoints directly from the browser.
 
 ### Why Use API Documentation?

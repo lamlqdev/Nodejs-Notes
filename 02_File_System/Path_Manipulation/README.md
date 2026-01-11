@@ -23,17 +23,13 @@ Path manipulation refers to the process of working with file and directory paths
 
 **Path Delimiter**: The character used to separate path segments.
 
+- Example (POSIX): `/`
+- Example (Windows): `\`
+
 **Path Separator**: The character used to separate multiple paths in environment variables.
 
-### Platform Differences
-
-| Feature          | POSIX (Linux/Mac)     | Windows                  |
-| ---------------- | --------------------- | ------------------------ |
-| Path Delimiter   | `/`                   | `\`                      |
-| Path Separator   | `:`                   | `;`                      |
-| Root             | `/`                   | `C:\`, `D:\`, etc.       |
-| Case Sensitivity | Yes                   | No                       |
-| Example Path     | `/home/user/file.txt` | `C:\Users\user\file.txt` |
+- Example (POSIX): `:` (e.g., `/usr/bin:/bin`)
+- Example (Windows): `;` (e.g., `C:\Windows;C:\Program Files`)
 
 ---
 
