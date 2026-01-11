@@ -4,61 +4,42 @@ A comprehensive collection of Node.js learning materials and practical examples 
 
 ---
 
-## Table of Contents
-
-### 1. Fundamentals
+## 1. Fundamentals
 
 - **[Node.js Core Concepts](./01_Fundamentals/Node_Core_Concepts/README.md)** - Event Loop, V8 Engine, Node.js Architecture.
 - **[NPM & Package Management](./01_Fundamentals/NPM_Package_Management/README.md)** - package.json, npm scripts, dependencies, semantic versioning.
 - **[Module Systems](./01_Fundamentals/Module_Systems/README.md)** - CommonJS vs ES Modules, require vs import.
 
-### 2. File System & Streams
+## 2. File System & Streams
 
 - **[File System Basics](./02_File_System/FS_Basics/README.md)** - readFile, writeFile, sync vs async operations.
 - **[Streams](./02_File_System/Streams/README.md)** - Readable, Writable, Transform, Duplex streams.
 - **[Path Manipulation](./02_File_System/Path_Manipulation/README.md)** - path module, file operations, directory handling.
 
-### 3. Web Basics
+## 3. Web Basics
 
 - **[Web basics](./03_Web_Basic/README.md)** - http module, createServer, request/response, url.
 
-### 4. Express.js Framework
+## 4. Express.js Framework
 
 - **[Working with Express.js](./04_Working_with_Express/README.md)** - Routing, middleware, custom middleware, project structure, error handling.
 - **[Express.js Setup](./04_Working_with_Express/SETUP.md)** - Setup TypeScript with Node.js and Express.
 
-### 5. Databases
+## 5. Databases
 
 - **[PostgreSQL & Prisma](./05_PostgreSQL_Prisma/README.md)** - SQL Database, Prisma ORM, Prisma schema, Prisma client, queries.
 - **[MongoDB & Mongoose](./06_MongoDB_Mongoose/README.md)** - NoSQL Database, MongoDB, Mongoose ODM, schemas, models, queries.
 
-### 6. Authentication & Security
+## 6. Authentication & Security
 
 - **[JWT Authentication](./07_JWT_Authentication/README.md)** - Token-based auth, access/refresh tokens
 - **[Session Authentication](./08_Session_Authentication/README.md)** - Session-based auth, session storage
 
-### 7. API Development
+## 7. API Development
 
-- **[REST API Design](./08_API_Development/REST_API_Design/README.md)** - RESTful principles, endpoints, HTTP methods
-- **[CRUD Operations](./08_API_Development/CRUD_Operations/README.md)** - Create, Read, Update, Delete patterns
-- **[API Documentation](./08_API_Development/API_Documentation/README.md)** - Swagger/OpenAPI, Postman collections
+- **[REST API Design](./09_Restful_API_Design/README.md)** - RESTful API design principles, layered architecture, schema-based validation, error handling, role-based authorization, pagination and filtering.
 
-### 9. Data Querying & Features
-
-- **[Pagination](./09_Data_Querying/Pagination/README.md)** - Offset-based, cursor-based, page-based pagination
-- **[Filtering](./09_Data_Querying/Filtering/README.md)** - Query params filtering, advanced operators, dynamic filters
-- **[Sorting](./09_Data_Querying/Sorting/README.md)** - Single/multi-field sorting, dynamic sorting
-- **[Search](./09_Data_Querying/Search/README.md)** - Text search, full-text search, fuzzy search, Elasticsearch
-- **[Aggregation](./09_Data_Querying/Aggregation/README.md)** - Data aggregation, statistics, grouping
-- **[Bulk Operations](./09_Data_Querying/Bulk_Operations/README.md)** - Bulk create/update/delete
-
-### 10. Validation & Error Handling
-
-- **[Input Validation](./10_Validation_Error_Handling/Input_Validation/README.md)** - Joi, Zod, express-validator
-- **[Error Handling](./10_Validation_Error_Handling/Error_Handling/README.md)** - Error middleware, custom errors, error types
-- **[Logging](./10_Validation_Error_Handling/Logging/README.md)** - Winston, Morgan, structured logging, error tracking
-
-### 11. File Handling
+## 8. File Handling
 
 - **[File Upload](./11_File_Handling/File_Upload/README.md)** - Multer, single/multiple file upload, file validation
 - **[Image Processing](./11_File_Handling/Image_Processing/README.md)** - Sharp, resize, compress, format conversion

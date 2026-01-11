@@ -112,7 +112,19 @@ Once you execute this command, you'll notice the tsconfig.json file is created a
 }
 ```
 
-Develop this project structure:
+## 4. Layered Architecture Pattern
+
+Layered architecture separates concerns into distinct layers, each with specific responsibilities:
+
+- **Routes Layer**: Defines API endpoints and applies middleware. Routes map HTTP methods and paths to controller functions.
+
+- **Controllers Layer**: Handles HTTP requests and responses. Controllers extract data from requests, call service functions, and format responses. They should be thin and delegate business logic to services.
+
+- **Services Layer**: Contains business logic and data operations. Services interact with models to perform database operations and implement business rules. This layer is reusable across different controllers.
+
+- **Models Layer**: Defines data structures and database schemas. Models represent entities in the database and provide methods for data access.
+
+This separation improves maintainability, testability, and code organization. Each layer has a single responsibility, making the codebase easier to understand and modify. Example project structure:
 
 ```text
 ts-node-express/
