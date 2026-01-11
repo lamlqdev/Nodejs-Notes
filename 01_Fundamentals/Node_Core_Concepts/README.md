@@ -14,7 +14,7 @@ Node.js is a JavaScript runtime built on Chrome's V8 JavaScript engine. It uses 
 
 ### Creator of Node.js
 
-Node.js was created by **Ryan Dahl** in 2009. Dahl was frustrated with the limitations of existing server-side technologies and wanted to create a platform that could handle many concurrent connections efficiently. He presented Node.js at the JSConf EU conference in 2009, introducing the concept of event-driven, non-blocking I/O for server-side JavaScript.
+Node.js was created by **Ryan Dahl** in 2009. Dahl was frustrated with the limitations of existing server-side technologies and wanted to create a platform that could handle many concurrent connections efficiently. He presented Node.js at the **[JSConf EU conference in 2009](https://www.youtube.com/watch?v=EeYvFl7li9E&list=PL37ZVnwpeshGNXb77ObNUbvax-VQ_DWJe)**, introducing the concept of event-driven, non-blocking I/O for server-side JavaScript.
 
 **Ryan Dahl's Vision:**
 

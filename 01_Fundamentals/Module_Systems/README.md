@@ -10,11 +10,23 @@ Node.js supports two module systems: CommonJS (the original system) and ES Modul
 
 In Node.js Application, a **Module** can be considered as a block of code that provide a simple or complex functionality that can communicate with external application. Modules can be organized in a single file or a collection of multiple files/folders. Almost all programmers prefer modules because of their reusability throughout the application and ability to reduce the complexity of code into smaller pieces.
 
-Types of Modules: In Nodejs, there is 3 type of modules namely
+![Types of Modules](./public/type-of-module.png)
 
-- **Core Modules**: These are built-in modules such as http, fs, path, etc.
-- **Local Modules**: These are modules that are created by the developer for the specific application.
-- **Third-Party Modules**: Third-party modules can be installed from the NPM (Node Package Manager) available online.
+### What is a Module System?
+
+There was no built-in module system in the early days of JavaScript. Codes were written in a global scope, rendering functions and variables accessible globally, resulting in naming conflicts and complex codebases. The lack of encapsulation and modularity made it difficult for developers to reuse code across multiple projects.
+
+To handle these issues before official module systems existed, developers used **Encapsulation Patterns** (like **IIFE** - Immediately Invoked Function Expressions and the **Revealing Module Pattern**) to create private scopes and simulate modularity. However, as applications grew, a standardized solution was needed. This led to the introduction of formal Module Systems.
+
+![Evolution of Javascript module](./public/evolution-modules.png)
+
+A **Module System** defines the rules and syntax for organizing code into separate files (modules) and managing the dependencies between them. It solves the problem of global scope pollution and dependency management by providing mechanisms for:
+
+1.  **Encapsulation:** Keeping code private within a module unless explicitly exported.
+2.  **Exporting:** Defining which variables, functions, or classes are available for use by other modules.
+3.  **Importing:** Loading and using functionality from other modules.
+
+In the Node.js ecosystem, there are two primary module systems you need to understand: CommonJS and ES Modules.
 
 ### CommonJS (CJS)
 

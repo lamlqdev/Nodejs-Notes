@@ -8,14 +8,9 @@ Understanding NPM and package management is essential for working with Node.js p
 
 ### What is NPM and Why Do We Need It?
 
-**NPM** (Node Package Manager) is the main package manager for Node.js, helping to manage libraries and tools in the JavaScript/Node.js development environment. It is also the world's largest repository of open-source software for JavaScript, available for free use.
+**NPM** (Node Package Manager) is the main package manager for Node.js, helping to manage libraries and tools in the JavaScript/Node.js development environment. It is also the world's largest repository of open-source software for JavaScript, available for free use. NPM comes bundled with Node.js installation, so you get it automatically when you install Node.js.
 
-NPM consists of two main parts:
-
-1. **NPM Registry** - A large public database of JavaScript packages
-2. **NPM CLI** - Command-line tool to interact with the registry and manage packages
-
-NPM comes bundled with Node.js installation, so you get it automatically when you install Node.js.
+![NPM parts](./public/part-of-npm.png)
 
 **Why NPM was created:** NPM was created in September 2009 by **Isaac Z. Schlueter**, one of the early developers who joined the founding and development team of Node.js.
 
