@@ -493,58 +493,9 @@ The Swagger configuration defines:
 
 - **Paths**: Merged path definitions from separate files.
 
-### 2.6. Clean Route Files
 
-With Swagger definitions separated into dedicated files, route files remain clean and focused on routing logic:
 
-**Product Routes**: `src/routes/product.route.ts`:
-
-```typescript
-import { Router } from 'express';
-import {
-  getProductsController,
-  getProductController,
-  createProductController,
-} from '../controllers/product.controller';
-import { authenticate } from '../middlewares/auth.middleware';
-import { authorizeAdmin } from '../middlewares/authorize.middleware';
-import { validate } from '../middlewares/validation.middleware';
-import {
-  createProductSchema,
-  getProductsQuerySchema,
-} from '../validations/product.validation';
-
-const router = Router();
-
-// Public routes
-router.get('/', validate(getProductsQuerySchema), getProductsController);
-router.get('/:id', getProductController);
-
-// Protected routes - admin only
-router.post(
-  '/',
-  authenticate,
-  authorizeAdmin,
-  validate(createProductSchema),
-  createProductController
-);
-
-export default router;
-```
-
-Benefits of separating Swagger definitions:
-
-- **Clean Routes**: Route files focus on routing logic, not documentation.
-
-- **Better Organization**: Documentation is organized by feature in separate files.
-
-- **Easier Maintenance**: Update documentation without touching route files.
-
-- **Reusability**: Path definitions can be shared or imported as needed.
-
-- **Type Safety**: TypeScript provides type checking for path definitions.
-
-### 2.7. Integrating Swagger UI
+### 2.6. Integrating Swagger UI
 
 Swagger UI provides an interactive interface for API documentation. Integrate Swagger UI into your Express application to serve the documentation.
 
@@ -700,7 +651,7 @@ For protected endpoints, specify security requirements in the path definition:
 
 The security section indicates that the endpoint requires authentication. Swagger UI will show an "Authorize" button that allows users to enter their JWT token for testing protected endpoints.
 
-### 2.9. Log File Management
+### 2.8. Log File Management
 
 Winston automatically manages log files with rotation. Configure log rotation to prevent log files from growing too large.
 
@@ -725,7 +676,7 @@ logs/
 
 This structure keeps log files manageable and makes it easy to find recent logs or errors.
 
-### 2.10. Environment-Based Logging
+### 2.9. Environment-Based Logging
 
 Configure different logging behavior for development and production environments.
 
@@ -747,7 +698,7 @@ if (process.env.NODE_ENV !== 'production') {
 
 This ensures that console logging is only enabled in development, while file logging works in all environments.
 
-### 2.11. Accessing API Documentation
+### 2.10. Accessing API Documentation
 
 After starting the server, access Swagger UI at `http://localhost:3000/api-docs`. The Swagger UI interface provides:
 
@@ -834,6 +785,19 @@ Secure API documentation in production:
 - Remove or redact sensitive endpoints from documentation if necessary.
 
 ---
+
+## 3. Summary of Implementation Steps
+
+1. **[Project Setup & Dependencies](#21-project-setup--dependencies)**: Install `swagger-ui-express` and `winston`.
+2. **[Winston Logger Configuration](#22-winston-logger-configuration)**: Configure Winston with multiple transports and formats.
+3. **[Logger Middleware](#23-logger-middleware)**: Create middleware to log HTTP requests with structured data.
+4. **[Using Winston Throughout the Application](#24-using-winston-throughout-the-application)**: Replace console logs with Winston logger in server startup and DB integration.
+5. **[Swagger/OpenAPI Configuration](#25-swaggeropenapi-configuration)**: Define Swagger configuration and organize path definitions in separate files.
+6. **[Integrating Swagger UI](#26-integrating-swagger-ui)**: Configure Express to serve interactive API documentation at `/api-docs`.
+7. **[Documenting Authentication](#27-documenting-authentication-and-security)**: Define security schemes and document protected endpoints.
+8. **[Log File Management](#28-log-file-management)**: Configure log rotation to manage log file sizes.
+9. **[Environment-Based Logging](#29-environment-based-logging)**: Differentiate logging behavior for development (console+file) and production (file only).
+10. **[Accessing API Documentation](#210-accessing-api-documentation)**: Access the interactive Swagger UI to test endpoints.
 
 ## 4. Resources
 

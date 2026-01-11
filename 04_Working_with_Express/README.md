@@ -20,7 +20,7 @@ Express.js is a minimal and flexible Node.js web application framework for build
 
 ## Middleware
 
-Middleware is a function that receives `(req, res, next)` and controls the request-response lifecycle. Middleware functions run **in the order** they are registered in the Express app. Each middleware has access to the req and res objects and can either call `next()` to pass control to the next middleware or terminate the request–response cycle by sending a response directly.
+Middleware is a function that receives `(req, res, next)` and controls the request-response lifecycle. Middleware functions run **in the order** they are registered in the Express app. Each middleware has access to the `req` and `res` objects and can either call `next()` to pass control to the next middleware or terminate the request–response cycle by sending a response directly.
 
 ![Middleware](./public/middleware.png)
 

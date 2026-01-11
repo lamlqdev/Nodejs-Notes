@@ -1,29 +1,21 @@
 # How to Set Up TypeScript with Node.js and Express
 
-> Source: [**Aman Mittal** - LogRocket Blog](https://blog.logrocket.com/express-typescript-node/)  
-> Published: March 28, 2025
-
----
-
-Creating a server with TypeScript using Node.js and Express is a good alternative to using JavaScript because it makes it easier to manage complex applications. It also helps when you need to collaborate with a distributed team of developers.
-
 In this article, we'll explore a beginner-friendly way to configure TypeScript in an Express app, and gain an understanding of the fundamental constraints that accompany it. To follow along, you should have:
 
 - Node.js ≥ v18.x installed in your local development environment
 - Access to a package manager like npm, pnpm, or Yarn
-- Basic familiarity with Node.js and Express
 
 ---
 
 ## What is Express TypeScript?
 
-"Express TypeScript" refers to using the Express framework within a TypeScript project. It involves writing your Express server code in TypeScript, leveraging type definitions (often provided via `@types/express`) to enable type checking, auto-completion, and better documentation. Essentially, it's about combining Express's flexibility with TypeScript's safety and developer tooling benefits.
-
-## Is TypeScript good with Express?
+**Express TypeScript** refers to using the Express framework within a TypeScript project. It involves writing your Express server code in TypeScript, leveraging type definitions (often provided via `@types/express`) to enable type checking, auto-completion, and better documentation. Essentially, it's about combining Express's flexibility with TypeScript's safety and developer tooling benefits.
 
 TypeScript is a great companion for Express because it provides static typing, which can catch potential bugs during development. With TypeScript, you can define interfaces for requests, responses, and even middleware, making your Express code more predictable and maintainable. This leads to improved developer productivity and more robust applications.
 
-## 1. Initialize the project
+## Implementation Steps
+
+### 1. Initialize the project
 
 Start with the following:
 
@@ -50,69 +42,33 @@ The `-D`, or `--dev`, flag directs the package manager to install these librarie
 - `eslint` — Lints the code to catch errors and enforce coding standards
 - **`prettier`** — Formats the code to ensure consistent style across the project
 
-## 2. Create .gitignore file
+### 2. Create .gitignore file
 
-Create a `.gitignore` file at the root to exclude unnecessary files:
+Create a [`.gitignore`](../.gitignore) file at the root to exclude unnecessary files
 
-```text
-# Dependencies
-node_modules/
-
-# Build output
-dist/
-
-# Environment variables
-.env
-.env.local
-
-# IDE
-.vscode/
-.idea/
-*.swp
-*.swo
-
-# Logs
-*.log
-npm-debug.log*
-
-# OS
-.DS_Store
-Thumbs.db
-```
-
-## 3. Configure TypeScript
+### 3. Configure TypeScript
 
 Every TypeScript project utilizes a configuration file to manage various project settings. The `tsconfig.json` file, which serves as the TypeScript configuration file, outlines these default options and offers the flexibility to modify or customize compiler settings to suit your needs.
 
-The `tsconfig.json` file is usually placed at the project's root. To generate this file, use the following `tsc` command, initiating the TypeScript compiler:
+The [`tsconfig.json`](./tsconfig.json) file is usually placed at the project's root. To generate this file, use the following `tsc` command, initiating the TypeScript compiler:
 
 ```bash
 npx tsc --init
 ```
 
-Once you execute this command, you'll notice the tsconfig.json file is created at the root of your project directory.
+**Configuration notes:**
 
-**Important:** Update your `tsconfig.json` for ESM support without explicit `.js` extensions:
+**Module System**: Before starting, decide whether to compile to **CommonJS** or **ESM** with `"module": "commonjs"` or `"module": "es2022"`.
+- **CommonJS**: File extensions are not required in imports.
+- **ESM**: You **MUST** add `"type": "module"` to `package.json`. Additionally, when compiling with `tsc`, you **must include file extensions** (e.g., `.js`). Node.js ESM requires this.
 
-```json
-{
-  "compilerOptions": {
-    "target": "ES2022",
-    "module": "commonjs",
-    "moduleResolution": "node",
-    "outDir": "./dist",
-    "rootDir": "./src",
-    "strict": true,
-    "esModuleInterop": true,
-    "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true
-  },
-  "include": ["src/**/*"],
-  "exclude": ["node_modules"]
-}
-```
+> Note that `tsx` can handle imports without extensions during development, thus `"type": "module"` is not strictly required for development, but the production build will fail to run if extensions are missing.
 
-## 4. Layered Architecture Pattern
+**Other compiler options**:
+- **`target`**: Specifies the ECMAScript version of the output JavaScript (e.g., `ES2022`).
+- **`moduleResolution`**: Determines how TypeScript resolves module imports (e.g., `node`).
+
+### 4. Layered Architecture Pattern
 
 Layered architecture separates concerns into distinct layers, each with specific responsibilities:
 
@@ -145,23 +101,9 @@ ts-node-express/
 └── .prettierrc              // Prettier configuration
 ```
 
-### Why don't we need `"type": "module"` in package.json?
 
-You may notice that in the TypeScript code, we use ES module syntax (`import`/`export`), but there's no `"type": "module"` in `package.json`. This works because:
 
-1. **When running development (`npm run dev`):**
-   - The script uses `tsx watch` to run TypeScript directly with auto-reload
-   - `tsx` handles `import`/`export` syntax in TypeScript without needing to compile first
-   - Therefore, `"type": "module"` is not required in `package.json`
-
-2. **When building and running production (`npm run build` + `npm start`):**
-   - The TypeScript compiler (`tsc`) compiles TypeScript code to JavaScript
-   - With the `"module": "commonjs"` configuration in `tsconfig.json`, TypeScript converts `import`/`export` to `require()`/`module.exports` (CommonJS)
-   - The compiled JavaScript files use CommonJS, so `"type": "module"` is not needed
-
-**In summary:** You can write TypeScript code using ES module syntax (`import`/`export`), but when running in production, Node.js will execute the compiled CommonJS code. This is a common approach when working with TypeScript and Node.js.
-
-## 4. Configure ESLint and Prettier (Optional but Recommended)
+### 5. Configure ESLint and Prettier (Optional but Recommended)
 
 **Install additional ESLint dependencies:**
 
@@ -198,7 +140,7 @@ module.exports = {
 }
 ```
 
-## 5. Environment configuration (typed environment variables)
+### 6. Environment configuration (typed environment variables)
 
 **File:** `src/config/config.ts`:
 
@@ -220,22 +162,14 @@ const config: Config = {
 export default config;
 ```
 
-This file loads your environment variables from a `.env` file and provides type checking.
-
-**Create file:** `.env` at the root of your project:
-
-```bash
-touch .env
-```
-
-**File:** `.env`
+This file loads your environment variables from a `.env` file and provides type checking. **Create file:** `.env` at the root of your project:
 
 ```text
 PORT=3000
 NODE_ENV=development
 ```
 
-## 6. Global error handling middleware
+### 7. Global error handling middleware
 
 **File:** `src/middlewares/error.middleware.ts`:
 
@@ -261,7 +195,7 @@ export const errorHandler = (
 
 This middleware catches errors thrown in your routes/controllers and sends a consistent, type-safe JSON error response.
 
-## 7. App setup
+### 8. App setup
 
 **File:** `src/app.ts`:
 
@@ -281,7 +215,7 @@ app.use(errorHandler);
 export default app;
 ```
 
-## 8. Server entry point
+### 9. Server entry point
 
 **File:** `src/server.ts`:
 
@@ -294,7 +228,7 @@ app.listen(config.port, () => {
 });
 ```
 
-## 9. Watchers and development scripts
+### 10. Watchers and development scripts
 
 In your `package.json`, add scripts for TypeScript compilation and automatic server restart:
 

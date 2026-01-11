@@ -1,6 +1,6 @@
-import http, { IncomingMessage, ServerResponse } from "http";
+import { IncomingMessage, ServerResponse, createServer } from "http";
 
-const server = http.createServer(
+const server = createServer(
   (req: IncomingMessage, res: ServerResponse) => {
     res.statusCode = 200;
     res.setHeader("Content-Type", "text/plain");

@@ -810,6 +810,19 @@ Implement security best practices:
 
 ---
 
+## 3. Summary of Implementation Steps
+
+1. **[Project Setup & Dependencies](#21-project-setup--dependencies)**: Install `zod` and `mongoose`.
+2. **[Project Structure](#22-project-structure)**: Organize the project with a layered architecture (Controllers, Services, Models, Routes).
+3. **[Schema-Based Validation with Zod](#23-schema-based-validation-with-zod)**: Define reusable Zod schemas for input validation.
+4. **[Service Layer Implementation](#24-service-layer-implementation)**: Implement business logic and database operations, separating them from controllers.
+5. **[Controller Implementation](#25-controller-implementation)**: Create thin controllers to handle HTTP requests and delegate to services.
+6. **[Role-Based Authorization](#26-role-based-authorization)**: Implement middleware to restrict access based on user roles (RBAC).
+7. **[Routes with Validation and Authorization](#27-routes-with-validation-and-authorization)**: Define API endpoints, applying validation and authorization middleware.
+8. **[Pagination and Filtering](#28-pagination-and-filtering)**: Implement pagination and filtering logic in services and controllers.
+9. **[Error Handling](#29-error-handling)**: Use `AppError` and global error handler for consistent error responses.
+10. **[Complete CRUD API Example](#210-complete-crud-api-example)**: Implement full Create, Read, Update, Delete operations for products following REST principles.
+
 ## 4. Resources
 
 - [REST API Tutorial](https://restfulapi.net/) - Comprehensive REST API guide

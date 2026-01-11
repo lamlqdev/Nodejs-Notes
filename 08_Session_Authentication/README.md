@@ -784,6 +784,17 @@ curl -X POST http://localhost:3000/api/auth/logout \
 
 ---
 
+## 3. Summary of Implementation Steps
+
+1. **[Project Setup & Dependencies](#21-project-setup--dependencies)**: Install `express`, `express-session`, `connect-redis`, `redis`, and other packages.
+2. **[Configuration Setup](#22-configuration-setup)**: Configure environment variables (`.env`) including Redis connection details and session secrets.
+3. **[Password Security](#23-password-security-password-hashing)**: Implement password hashing utilities using `bcrypt`.
+4. **[Session Configuration](#24-session-configuration)**: Configure `express-session` with `RedisStore` to manage sessions persistently.
+5. **[Authentication Middleware](#25-authentication-middleware)**: Create middleware to check `req.session.isAuthenticated` and protect routes.
+6. **[Authentication Controllers](#26-authentication-controllers)**: Implement controllers to handle sign up (create session), sign in (create session), and logout (destroy session).
+7. **[Routes Setup](#27-routes-setup)**: Define API endpoints and apply rate limiting and authentication middleware.
+8. **[Express App Configuration](#28-express-app-configuration)**: Assemble the Express app, ensuring correct middleware order (Logger -> Helmet -> CORS -> Session -> Routes -> Error Handler).
+
 ## Resources
 
 - [Express Session Documentation](https://github.com/expressjs/session) - express-session middleware documentation

@@ -837,6 +837,17 @@ curl -X POST http://localhost:3000/api/auth/logout
 
 ---
 
+## 3. Summary of Implementation Steps
+
+1. **[Project Setup & Dependencies](#21-project-setup--dependencies)**: Install `express`, `jsonwebtoken`, `bcrypt`, and other necessary packages.
+2. **[Configuration Setup](#22-configuration-setup)**: Configure environment variables (`.env`) and create the config module to manage secrets and settings.
+3. **[Password Security](#23-password-security-password-hashing)**: Implement `hashPassword` and `comparePassword` utilities using `bcrypt`.
+4. **[JWT Utilities](#24-jwt-utilities-implementation)**: Create functions to generate and verify access/refresh tokens.
+5. **[Authentication Middleware](#25-authentication-middleware)**: Create middleware to verify tokens from headers or cookies and attach user data to the request.
+6. **[Authentication Controllers](#26-authentication-controllers)**: Implement controllers for sign up, sign in (issuing tokens), token refresh, and logout.
+7. **[Routes Setup](#27-routes-setup)**: Define API endpoints (`/signup`, `/signin`, `/refresh`, `/logout`, `/me`) and map them to controllers.
+8. **[Express App Configuration](#28-express-app-configuration)**: Configure the Express app with middleware (CORS, body parser, cookie parser) and mount the auth routes.
+
 ## Resources
 
 - [JWT.io](https://jwt.io/) - JWT debugger and documentation
