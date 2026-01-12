@@ -46,6 +46,10 @@ export const authPaths = {
               schema: {
                 type: 'object',
                 properties: {
+                  success: {
+                    type: 'boolean',
+                    example: true,
+                  },
                   message: {
                     type: 'string',
                     example: 'User created successfully',
@@ -58,6 +62,7 @@ export const authPaths = {
                     description: 'Refresh token for getting new access tokens',
                   },
                 },
+                required: ['success', 'message'],
               },
             },
           },
@@ -112,6 +117,10 @@ export const authPaths = {
               schema: {
                 type: 'object',
                 properties: {
+                  success: {
+                    type: 'boolean',
+                    example: true,
+                  },
                   message: {
                     type: 'string',
                     example: 'Sign in successful',
@@ -123,6 +132,7 @@ export const authPaths = {
                     type: 'string',
                   },
                 },
+                required: ['success', 'message'],
               },
             },
           },
@@ -172,11 +182,16 @@ export const authPaths = {
               schema: {
                 type: 'object',
                 properties: {
+                  success: {
+                    type: 'boolean',
+                    example: true,
+                  },
                   message: {
                     type: 'string',
                     example: 'Token refreshed successfully',
                   },
                 },
+                required: ['success', 'message'],
               },
             },
           },
@@ -202,11 +217,16 @@ export const authPaths = {
               schema: {
                 type: 'object',
                 properties: {
+                  success: {
+                    type: 'boolean',
+                    example: true,
+                  },
                   message: {
                     type: 'string',
                     example: 'Logged out successfully',
                   },
                 },
+                required: ['success', 'message'],
               },
             },
           },
@@ -234,10 +254,15 @@ export const authPaths = {
               schema: {
                 type: 'object',
                 properties: {
+                  success: {
+                    type: 'boolean',
+                    example: true,
+                  },
                   user: {
                     $ref: '#/components/schemas/User',
                   },
                 },
+                required: ['success'],
               },
             },
           },

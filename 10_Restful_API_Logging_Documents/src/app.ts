@@ -50,7 +50,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/products', productRoutes);
 
 app.get('/api/health', (req, res) => {
-  res.status(200).json({ message: 'Server is running' });
+  res.status(200).json({ success: true, message: 'Server is running' });
 });
 
 // Global error handler (should be after routes)

@@ -11,11 +11,16 @@ export const healthPaths = {
               schema: {
                 type: 'object',
                 properties: {
+                  success: {
+                    type: 'boolean',
+                    example: true,
+                  },
                   message: {
                     type: 'string',
                     example: 'Server is running',
                   },
                 },
+                required: ['success', 'message'],
               },
             },
           },

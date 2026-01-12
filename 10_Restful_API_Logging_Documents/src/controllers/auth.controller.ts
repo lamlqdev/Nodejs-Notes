@@ -48,6 +48,7 @@ export async function signUpController(req: Request, res: Response) {
   });
 
   res.status(201).json({
+    success: true,
     message: 'User created successfully',
     user: {
       id: user._id,
@@ -84,6 +85,7 @@ export async function signInController(req: Request, res: Response) {
   });
 
   res.json({
+    success: true,
     message: 'Sign in successful',
     user: {
       id: user._id,
@@ -123,6 +125,7 @@ export function refreshTokenController(req: Request, res: Response) {
     });
 
     res.json({
+      success: true,
       message: 'Token refreshed successfully',
     });
   } catch (error) {
@@ -140,6 +143,7 @@ export function logoutController(req: Request, res: Response) {
   });
 
   res.json({
+    success: true,
     message: 'Logged out successfully',
   });
 }
@@ -152,6 +156,7 @@ export async function getMeController(req: Request, res: Response) {
   }
 
   res.json({
+    success: true,
     user: {
       id: user._id,
       email: user.email,

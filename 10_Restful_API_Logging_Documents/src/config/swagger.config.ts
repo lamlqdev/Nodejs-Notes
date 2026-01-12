@@ -143,11 +143,17 @@ const swaggerDefinition = {
       Error: {
         type: 'object',
         properties: {
+          success: {
+            type: 'boolean',
+            description: 'Indicates if the request was successful',
+            example: false,
+          },
           message: {
             type: 'string',
             description: 'Error message',
           },
         },
+        required: ['success', 'message'],
       },
       Pagination: {
         type: 'object',
@@ -188,6 +194,7 @@ const swaggerDefinition = {
               $ref: '#/components/schemas/Error',
             },
             example: {
+              success: false,
               message: 'No token provided',
             },
           },
@@ -201,6 +208,7 @@ const swaggerDefinition = {
               $ref: '#/components/schemas/Error',
             },
             example: {
+              success: false,
               message: 'Access denied. Admin privileges required',
             },
           },
@@ -214,6 +222,7 @@ const swaggerDefinition = {
               $ref: '#/components/schemas/Error',
             },
             example: {
+              success: false,
               message: 'Product not found',
             },
           },
@@ -227,6 +236,7 @@ const swaggerDefinition = {
               $ref: '#/components/schemas/Error',
             },
             example: {
+              success: false,
               message:
                 'Validation failed: name: Name must be at least 2 characters',
             },

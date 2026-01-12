@@ -391,6 +391,10 @@ export const productPaths = {
               schema: {
                 type: 'object',
                 properties: {
+                  success: {
+                    type: 'boolean',
+                    example: true,
+                  },
                   message: {
                     type: 'string',
                     example: 'Products retrieved successfully',
@@ -404,9 +408,13 @@ export const productPaths = {
                           $ref: '#/components/schemas/Product',
                         },
                       },
+                      pagination: {
+                        $ref: '#/components/schemas/Pagination',
+                      },
                     },
                   },
                 },
+                required: ['success', 'message'],
               },
             },
           },
@@ -451,6 +459,27 @@ export const productPaths = {
       responses: {
         '201': {
           description: 'Product created successfully',
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  success: {
+                    type: 'boolean',
+                    example: true,
+                  },
+                  message: {
+                    type: 'string',
+                    example: 'Product created successfully',
+                  },
+                  data: {
+                    $ref: '#/components/schemas/Product',
+                  },
+                },
+                required: ['success', 'message'],
+              },
+            },
+          },
         },
       },
     },
@@ -472,6 +501,27 @@ export const productPaths = {
       responses: {
         '200': {
           description: 'Product retrieved successfully',
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  success: {
+                    type: 'boolean',
+                    example: true,
+                  },
+                  message: {
+                    type: 'string',
+                    example: 'Product retrieved successfully',
+                  },
+                  data: {
+                    $ref: '#/components/schemas/Product',
+                  },
+                },
+                required: ['success', 'message'],
+              },
+            },
+          },
         },
         '404': {
           $ref: '#/components/responses/NotFoundError',
@@ -634,12 +684,44 @@ export const authPaths = {
       responses: {
         '201': {
           description: 'User created successfully',
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  success: {
+                    type: 'boolean',
+                    example: true,
+                  },
+                  message: {
+                    type: 'string',
+                    example: 'User created successfully',
+                  },
+                  user: {
+                    $ref: '#/components/schemas/User',
+                  },
+                  refreshToken: {
+                    type: 'string',
+                    description: 'Refresh token for getting new access tokens',
+                  },
+                },
+                required: ['success', 'message'],
+              },
+            },
+          },
         },
         '400': {
           $ref: '#/components/responses/ValidationError',
         },
         '409': {
           description: 'User already exists',
+          content: {
+            'application/json': {
+              schema: {
+                $ref: '#/components/schemas/Error',
+              },
+            },
+          },
         },
       },
     },

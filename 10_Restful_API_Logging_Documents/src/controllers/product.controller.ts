@@ -26,6 +26,7 @@ export async function getProductsController(req: Request, res: Response) {
   });
 
   res.json({
+    success: true,
     message: 'Products retrieved successfully',
     data: {
       products: result.data,
@@ -42,11 +43,13 @@ export async function getProductController(req: Request, res: Response) {
   if (!product) {
     // Note: This could also throw AppError from service layer
     return res.status(404).json({
+      success: false,
       message: 'Product not found',
     });
   }
 
   res.json({
+    success: true,
     message: 'Product retrieved successfully',
     data: product,
   });
@@ -67,6 +70,7 @@ export async function createProductController(req: Request, res: Response) {
   });
 
   res.status(201).json({
+    success: true,
     message: 'Product created successfully',
     data: product,
   });
@@ -96,6 +100,7 @@ export async function updateProductController(req: Request, res: Response) {
   );
 
   res.json({
+    success: true,
     message: 'Product updated successfully',
     data: product,
   });
@@ -114,6 +119,7 @@ export async function patchProductController(req: Request, res: Response) {
   const product = await updateProductService(id, updates, currentProductName);
 
   res.json({
+    success: true,
     message: 'Product updated successfully',
     data: product,
   });
@@ -127,6 +133,7 @@ export async function deleteProductController(req: Request, res: Response) {
   const product = await deleteProductService(id);
 
   res.json({
+    success: true,
     message: 'Product deleted successfully',
     data: product,
   });

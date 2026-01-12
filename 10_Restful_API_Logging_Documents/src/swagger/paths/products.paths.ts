@@ -48,6 +48,10 @@ export const productPaths = {
               schema: {
                 type: 'object',
                 properties: {
+                  success: {
+                    type: 'boolean',
+                    example: true,
+                  },
                   message: {
                     type: 'string',
                     example: 'Products retrieved successfully',
@@ -67,6 +71,7 @@ export const productPaths = {
                     },
                   },
                 },
+                required: ['success', 'message'],
               },
             },
           },
@@ -144,6 +149,10 @@ export const productPaths = {
               schema: {
                 type: 'object',
                 properties: {
+                  success: {
+                    type: 'boolean',
+                    example: true,
+                  },
                   message: {
                     type: 'string',
                     example: 'Product created successfully',
@@ -152,6 +161,7 @@ export const productPaths = {
                     $ref: '#/components/schemas/Product',
                   },
                 },
+                required: ['success', 'message'],
               },
             },
           },
@@ -173,6 +183,7 @@ export const productPaths = {
                 $ref: '#/components/schemas/Error',
               },
               example: {
+                success: false,
                 message: 'Product with this name already exists',
               },
             },
@@ -204,6 +215,10 @@ export const productPaths = {
               schema: {
                 type: 'object',
                 properties: {
+                  success: {
+                    type: 'boolean',
+                    example: true,
+                  },
                   message: {
                     type: 'string',
                     example: 'Product retrieved successfully',
@@ -212,6 +227,7 @@ export const productPaths = {
                     $ref: '#/components/schemas/Product',
                   },
                 },
+                required: ['success', 'message'],
               },
             },
           },
@@ -289,6 +305,10 @@ export const productPaths = {
               schema: {
                 type: 'object',
                 properties: {
+                  success: {
+                    type: 'boolean',
+                    example: true,
+                  },
                   message: {
                     type: 'string',
                     example: 'Product updated successfully',
@@ -297,6 +317,7 @@ export const productPaths = {
                     $ref: '#/components/schemas/Product',
                   },
                 },
+                required: ['success', 'message'],
               },
             },
           },
@@ -380,6 +401,10 @@ export const productPaths = {
               schema: {
                 type: 'object',
                 properties: {
+                  success: {
+                    type: 'boolean',
+                    example: true,
+                  },
                   message: {
                     type: 'string',
                     example: 'Product updated successfully',
@@ -388,6 +413,7 @@ export const productPaths = {
                     $ref: '#/components/schemas/Product',
                   },
                 },
+                required: ['success', 'message'],
               },
             },
           },
@@ -436,6 +462,10 @@ export const productPaths = {
               schema: {
                 type: 'object',
                 properties: {
+                  success: {
+                    type: 'boolean',
+                    example: true,
+                  },
                   message: {
                     type: 'string',
                     example: 'Product deleted successfully',
@@ -444,6 +474,7 @@ export const productPaths = {
                     $ref: '#/components/schemas/Product',
                   },
                 },
+                required: ['success', 'message'],
               },
             },
           },
