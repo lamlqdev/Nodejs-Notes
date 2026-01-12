@@ -8,14 +8,6 @@ The `fs` (file system) module is a built-in Node.js module that provides both **
 
 ![File System Operations](./public/file-system-operations.png)
 
-### Key Concepts
-
-**Buffer**: A temporary storage area for binary data. When reading files without specifying an encoding, Node.js returns a Buffer object.
-
-**Encoding**: The character encoding used to interpret file contents as text (e.g., `utf8`, `ascii`, `base64`).
-
-**Dirent**: Directory entry object that contains information about files and directories, including their type.
-
 ### Synchronous vs Asynchronous Operations
 
 | Aspect            | Asynchronous (Recommended)                     | Synchronous (Limited use)                                  |
@@ -78,7 +70,7 @@ async function readImageFile() {
 readImageFile();
 ```
 
-**Explanation**: Without encoding, `readFile()` returns a Buffer containing raw binary data. This is useful for images, videos, or any non-text files that need to be processed or transmitted.
+**Explanation**: Without encoding, `readFile()` returns a **Buffer** (temporary storage area for binary data). This is useful for images, videos, or any non-text files that need to be processed or transmitted.
 
 ---
 
@@ -88,7 +80,7 @@ readImageFile();
 
 ![writeFile syntax](./public/writeFile.png)
 
-#### Example 1: Writing JSON data
+#### Example: Writing JSON data
 
 ```typescript
 import { writeFile } from "fs/promises";
@@ -108,47 +100,6 @@ saveUserData("user123", user);
 ```
 
 **Explanation**: Converts an object to JSON and writes it to a file. The file is created if it doesn't exist, or completely overwritten if it does. Parent directories must exist beforehand.
-
-#### Real-world Example: Generating CSV export
-
-```typescript
-import { writeFile } from "fs/promises";
-
-interface Product {
-  id: string;
-  name: string;
-  price: number;
-  stock: number;
-}
-
-async function exportProductsToCSV(products: Product[]) {
-  try {
-    const headers = "ID,Name,Price,Stock\n";
-    const rows = products
-      .map((p) => `${p.id},${p.name},${p.price},${p.stock}`)
-      .join("\n");
-
-    const csv = headers + rows;
-    const filename = `products_export_${Date.now()}.csv`;
-
-    await writeFile(`exports/${filename}`, csv, "utf8");
-    console.log(`Export completed: ${filename}`);
-  } catch (error) {
-    console.error("Export failed:", error);
-  }
-}
-
-const products = [
-  { id: "P001", name: "Laptop", price: 999.99, stock: 15 },
-  { id: "P002", name: "Mouse", price: 29.99, stock: 50 },
-];
-
-exportProductsToCSV(products);
-```
-
-**Explanation**: Creates a CSV file from structured data. This pattern is common in admin panels, reporting systems, or data export features where users need to download data.
-
----
 
 ### 3. `appendFile()`
 
@@ -310,39 +261,6 @@ getFileInfo("data.txt");
 
 **Explanation**: Provides detailed metadata about a file or directory. Use `isFile()` and `isDirectory()` to determine the type without additional checks.
 
-#### Real-world Example: File size validation before upload
-
-```typescript
-import { stat } from "fs/promises";
-
-async function validateFileSize(
-  filePath: string,
-  maxSizeMB: number
-): Promise<boolean> {
-  try {
-    const info = await stat(filePath);
-    const maxSizeBytes = maxSizeMB * 1024 * 1024;
-
-    if (info.size > maxSizeBytes) {
-      console.error(`File exceeds ${maxSizeMB}MB limit`);
-      return false;
-    }
-
-    console.log(`File size: ${(info.size / 1024 / 1024).toFixed(2)}MB - Valid`);
-    return true;
-  } catch (error) {
-    console.error("Error validating file:", error);
-    return false;
-  }
-}
-
-validateFileSize("upload.pdf", 5); // Max 5MB
-```
-
-**Explanation**: Checks file size before processing to prevent uploading files that exceed size limits. This helps maintain storage quotas and prevents performance issues.
-
----
-
 ### 8. `rename()`
 
 **Purpose**: Renames a file or moves it to a different location.
@@ -420,93 +338,8 @@ backupFile();
 
 **Explanation**: Creates a copy of the file at the destination. Overwrites the destination if it already exists.
 
-## Best Practices
-
-**Always use async methods in production**: Avoid blocking the event loop with synchronous operations.
-
-```typescript
-// ❌ Bad - Blocks event loop
-import { readFileSync } from "fs";
-const data = readFileSync("file.txt", "utf8");
-
-// ✅ Good - Non-blocking
-import { readFile } from "fs/promises";
-const data = await readFile("file.txt", "utf8");
-```
-
-**Handle errors appropriately**: Always wrap file operations in try-catch blocks.
-
-```typescript
-// ✅ Good
-try {
-  const content = await readFile("config.json", "utf8");
-  const config = JSON.parse(content);
-} catch (error) {
-  console.error("Failed to load config:", error);
-  // Provide fallback or exit gracefully
-}
-```
-
-**Check file existence before operations**: Use `access()` to prevent errors.
-
-```typescript
-import { access, readFile } from "fs/promises";
-
-async function safeRead(path: string) {
-  try {
-    await access(path);
-    return await readFile(path, "utf8");
-  } catch {
-    console.log("File not found, using defaults");
-    return "{}";
-  }
-}
-```
-
-**Create parent directories before writing**: Ensure the directory structure exists.
-
-```typescript
-import { mkdir, writeFile } from "fs/promises";
-import { dirname } from "path";
-
-async function safeWrite(path: string, content: string) {
-  await mkdir(dirname(path), { recursive: true });
-  await writeFile(path, content, "utf8");
-}
-```
-
-**Use appropriate encodings**: Specify encoding for text files, omit for binary files.
-
-```typescript
-// Text files
-const text = await readFile("data.txt", "utf8");
-
-// Binary files
-const buffer = await readFile("image.png");
-```
-
-**Clean up temporary files**: Remove temporary files after use to prevent disk space issues.
-
-```typescript
-import { rm } from "fs/promises";
-
-async function processWithCleanup(tempPath: string) {
-  try {
-    // Process file
-    const data = await readFile(tempPath);
-    // ... processing logic
-  } finally {
-    // Always clean up, even if processing fails
-    await rm(tempPath, { force: true });
-  }
-}
-```
-
----
-
 ## References
 
 - [Node.js fs Module Documentation](https://nodejs.org/api/fs.html)
 - [fs.promises API](https://nodejs.org/api/fs.html#fs_fs_promises_api)
 - [File System Best Practices](https://nodejs.org/en/docs/guides/working-with-different-filesystems/)
-- [Node.js Error Handling Best Practices](https://github.com/goldbergyoni/nodebestpractices#2-error-handling-practices)
