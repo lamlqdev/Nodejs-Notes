@@ -21,7 +21,7 @@ Express does not handle file uploads natively. When a form includes file inputs,
 
 ### File Upload Flow
 
-The typical file upload flow involves several steps:
+![File Upload Flow](./public/file-upload-flow.png)
 
 1. **Client sends request**: The client sends a POST request with `multipart/form-data` content type containing the file(s)
 2. **Multer middleware**: Multer intercepts the request, parses the multipart data, and stores the file(s) according to configuration
@@ -31,27 +31,16 @@ The typical file upload flow involves several steps:
 
 ### Storage Options
 
-Multer provides different storage engines:
-
-- **Disk Storage**: Files are stored on the server's filesystem. Useful for persistent storage and when you need to access files later.
-- **Memory Storage**: Files are stored in memory as `Buffer` objects. Useful for temporary processing or when uploading to cloud storage.
-- **Custom Storage**: Implement your own storage engine for cloud storage (S3, Cloudinary, etc.)
+![Storage Options](./public/storage-options.png)
 
 ### Schema-Based Validation with Zod
 
-**Zod** provides runtime type validation for JavaScript/TypeScript. When used with file uploads, Zod schemas validate:
+When used with file uploads, Zod schemas validate:
 
 - **File type**: Ensures only allowed MIME types are accepted
 - **File size**: Validates file size against maximum limits
 - **Required fields**: Checks if files are present when required
 - **Array constraints**: Validates number of files in multiple uploads
-
-Benefits of using Zod for file validation:
-
-- **Type safety**: Validation schemas generate TypeScript types automatically
-- **Reusability**: Define validation rules once and reuse across endpoints
-- **Consistency**: Ensures consistent validation across all file upload endpoints
-- **Error messages**: Provides clear, structured error messages
 
 ---
 
@@ -59,20 +48,19 @@ Benefits of using Zod for file validation:
 
 ### 2.1. Project Setup & Dependencies
 
-This project builds upon the Express.js setup. Install the required dependencies:
+This project builds upon the **[Express.js setup](../04_Working_with_Express/SETUP.md)**. Install the required dependencies:
 
 ```bash
-npm install express multer zod dotenv
+npm install express multer zod
 npm install -D typescript @types/node @types/express @types/multer tsx nodemon
 ```
 
 - **multer**: Middleware for handling `multipart/form-data` file uploads
 - **zod**: Schema-based validation library with TypeScript support
-- **dotenv**: Loads environment variables from `.env` file
 
 ### 2.2. Configuration Setup
 
-**Environment Variables**: Create a `.env` file in the root directory:
+**Environment Variables**:
 
 ```env
 # Server Configuration
@@ -752,12 +740,6 @@ import {
 
 const router = Router();
 
-/**
- * @route   POST /api/files/upload/single
- * @desc    Upload a single file (any allowed type)
- * @access  Public
- * @field   file - The file to upload
- */
 router.post(
   "/upload/single",
   uploadSingle.single("file"),
@@ -765,12 +747,6 @@ router.post(
   uploadSingleFile
 );
 
-/**
- * @route   POST /api/files/upload/multiple
- * @desc    Upload multiple files (any allowed type)
- * @access  Public
- * @field   files - Array of files to upload (max 10)
- */
 router.post(
   "/upload/multiple",
   uploadMultiple.array("files", 10),
@@ -778,12 +754,6 @@ router.post(
   uploadMultipleFiles
 );
 
-/**
- * @route   POST /api/files/upload/image
- * @desc    Upload a single image file
- * @access  Public
- * @field   image - The image file to upload
- */
 router.post(
   "/upload/image",
   multerSingleImage.single("image"),
@@ -791,12 +761,6 @@ router.post(
   uploadSingleImage
 );
 
-/**
- * @route   POST /api/files/upload/images
- * @desc    Upload multiple image files
- * @access  Public
- * @field   images - Array of image files to upload (max 5)
- */
 router.post(
   "/upload/images",
   multerSingleImage.array("images", 5),
@@ -804,11 +768,6 @@ router.post(
   uploadMultipleImages
 );
 
-/**
- * @route   GET /api/files/:filename
- * @desc    Get file information by filename
- * @access  Public
- */
 router.get("/:filename", getFileInfo);
 
 export default router;
@@ -848,48 +807,6 @@ app.use(errorHandler);
 
 export default app;
 ```
-
-The error handler middleware must be placed after all routes to catch errors from route handlers and middleware.
-
-### 2.10. Error Handling
-
-Create error handling middleware. Create `src/middlewares/error.middleware.ts`:
-
-```typescript
-import type { Request, Response, NextFunction } from "express";
-
-export class AppError extends Error {
-  status?: number;
-
-  constructor(message: string, status: number = 500) {
-    super(message);
-    this.status = status;
-    this.name = "AppError";
-  }
-}
-
-export const errorHandler = (
-  err: AppError | Error,
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  if (err instanceof AppError) {
-    return res.status(err.status || 500).json({
-      success: false,
-      message: err.message,
-    });
-  }
-
-  console.error(err);
-  res.status(500).json({
-    success: false,
-    message: "Internal Server Error",
-  });
-};
-```
-
-The error handler catches `AppError` instances and returns appropriate status codes and error messages. Other errors are logged and return generic error messages.
 
 ---
 
@@ -1117,23 +1034,6 @@ Implement security best practices:
 - **Virus Scanning**: Consider scanning uploaded files in production
 - **Rate Limiting**: Implement rate limiting to prevent abuse
 
-### Error Handling
-
-Use consistent error handling:
-
-- Throw `AppError` instances with appropriate status codes
-- Let the global error handler format error responses consistently
-- Don't expose internal file system paths in error messages
-- Provide clear, user-friendly error messages
-
-### File Storage
-
-Consider storage options based on requirements:
-
-- **Disk Storage**: Use for persistent files that need to be accessed later
-- **Memory Storage**: Use for temporary processing or when uploading to cloud storage
-- **Cloud Storage**: Use AWS S3, Cloudinary, or similar services for production applications
-
 ### Performance Optimization
 
 Optimize file upload performance:
@@ -1156,7 +1056,6 @@ Optimize file upload performance:
 7. **[File Upload Controllers](#27-file-upload-controllers)**: Create controllers to handle file uploads and return responses.
 8. **[Routes Setup](#28-routes-setup)**: Define API endpoints with Multer and validation middleware.
 9. **[Express App Configuration](#29-express-app-configuration)**: Integrate file routes into the Express app.
-10. **[Error Handling](#210-error-handling)**: Implement error handling middleware for consistent error responses.
 
 ## 6. Resources
 

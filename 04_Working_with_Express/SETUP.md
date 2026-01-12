@@ -59,12 +59,14 @@ npx tsc --init
 **Configuration notes:**
 
 **Module System**: Before starting, decide whether to compile to **CommonJS** or **ESM** with `"module": "commonjs"` or `"module": "es2022"`.
+
 - **CommonJS**: File extensions are not required in imports.
 - **ESM**: You **MUST** add `"type": "module"` to `package.json`. Additionally, when compiling with `tsc`, you **must include file extensions** (e.g., `.js`). Node.js ESM requires this.
 
 > Note that `tsx` can handle imports without extensions during development, thus `"type": "module"` is not strictly required for development, but the production build will fail to run if extensions are missing.
 
 **Other compiler options**:
+
 - **`target`**: Specifies the ECMAScript version of the output JavaScript (e.g., `ES2022`).
 - **`moduleResolution`**: Determines how TypeScript resolves module imports (e.g., `node`).
 
@@ -100,8 +102,6 @@ ts-node-express/
 ├── .eslintrc.js             // ESLint configuration
 └── .prettierrc              // Prettier configuration
 ```
-
-
 
 ### 5. Configure ESLint and Prettier (Optional but Recommended)
 
@@ -176,24 +176,38 @@ NODE_ENV=development
 ```typescript
 import type { Request, Response, NextFunction } from "express";
 
-export interface AppError extends Error {
+export class AppError extends Error {
   status?: number;
+
+  constructor(message: string, status: number = 500) {
+    super(message);
+    this.status = status;
+    this.name = "AppError";
+  }
 }
 
 export const errorHandler = (
-  err: AppError,
+  err: AppError | Error,
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
+  if (err instanceof AppError) {
+    return res.status(err.status || 500).json({
+      success: false,
+      message: err.message,
+    });
+  }
+
   console.error(err);
-  res.status(err.status || 500).json({
-    message: err.message || "Internal Server Error",
+  res.status(500).json({
+    success: false,
+    message: "Internal Server Error",
   });
 };
 ```
 
-This middleware catches errors thrown in your routes/controllers and sends a consistent, type-safe JSON error response.
+This middleware catches errors thrown in your routes/controllers and sends a consistent, type-safe JSON error response. The `AppError` class allows you to throw errors with custom status codes, and the error handler distinguishes between `AppError` instances and generic `Error` instances to provide appropriate responses.
 
 ### 8. App setup
 
