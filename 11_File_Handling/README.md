@@ -216,25 +216,30 @@ Define TypeScript types for file uploads. Create `src/types/file.types.ts`:
 ```typescript
 import type { Request } from "express";
 
+// File metadata interface
+export interface FileMetadata {
+  filename: string;
+  originalName: string;
+  mimetype: string;
+  size: number;
+  path: string;
+}
+
+// File info interface
+export interface FileInfo {
+  filename: string;
+  size: number;
+  createdAt: Date;
+  modifiedAt: Date;
+}
+
 // File upload response type
 export interface FileUploadResponse {
   success: boolean;
   message: string;
   data?: {
-    file?: {
-      filename: string;
-      originalName: string;
-      mimetype: string;
-      size: number;
-      path: string;
-    };
-    files?: Array<{
-      filename: string;
-      originalName: string;
-      mimetype: string;
-      size: number;
-      path: string;
-    }>;
+    file?: FileMetadata;
+    files?: FileMetadata[];
   };
 }
 
@@ -262,6 +267,12 @@ export interface MultipleFileValidationOptions {
   required?: boolean;
 }
 ```
+
+**Key Types**:
+
+- **`FileMetadata`**: Represents file information after upload (filename, original name, mimetype, size, path)
+- **`FileInfo`**: Represents file information from filesystem (filename, size, creation/modification dates)
+- **`FileUploadResponse`**: Standard response format for file upload endpoints, using `FileMetadata` for file data
 
 ### 2.5. Zod Validation Schemas
 
@@ -492,14 +503,141 @@ export const validateMultipleImages = (
 3. If validation fails, extract error messages and pass to error handler
 4. If validation passes, call `next()` to proceed to controller
 
-### 2.7. File Upload Controllers
+### 2.7. Service Layer Implementation
 
-Controllers handle the business logic after file validation. Create `src/controllers/file.controller.ts`:
+Services contain business logic and file processing operations. They abstract file handling from controllers, making controllers simpler and more focused on HTTP handling. Create `src/services/file.service.ts`:
+
+```typescript
+import path from "path";
+import fs from "fs/promises";
+import { AppError } from "../middlewares/error.middleware.js";
+import type { FileMetadata, FileInfo } from "../types/file.types.js";
+
+/**
+ * Process single file upload
+ * Extracts and formats file metadata from Multer file object
+ */
+export async function processSingleFileUpload(
+  file: Express.Multer.File
+): Promise<FileMetadata> {
+  if (!file) {
+    throw new AppError("No file uploaded", 400);
+  }
+
+  return {
+    filename: file.filename,
+    originalName: file.originalname,
+    mimetype: file.mimetype,
+    size: file.size,
+    path: file.path,
+  };
+}
+
+/**
+ * Process multiple file uploads
+ * Extracts and formats file metadata from Multer files array
+ */
+export async function processMultipleFileUpload(
+  files: Express.Multer.File[] | undefined
+): Promise<FileMetadata[]> {
+  if (!files || files.length === 0) {
+    throw new AppError("No files uploaded", 400);
+  }
+
+  return files.map((file) => ({
+    filename: file.filename,
+    originalName: file.originalname,
+    mimetype: file.mimetype,
+    size: file.size,
+    path: file.path,
+  }));
+}
+
+/**
+ * Process single image upload
+ * Extracts and formats image metadata from Multer file object
+ */
+export async function processSingleImageUpload(
+  file: Express.Multer.File
+): Promise<FileMetadata> {
+  if (!file) {
+    throw new AppError("No image uploaded", 400);
+  }
+
+  return {
+    filename: file.filename,
+    originalName: file.originalname,
+    mimetype: file.mimetype,
+    size: file.size,
+    path: file.path,
+  };
+}
+
+/**
+ * Process multiple image uploads
+ * Extracts and formats image metadata from Multer files array
+ */
+export async function processMultipleImageUpload(
+  files: Express.Multer.File[] | undefined
+): Promise<FileMetadata[]> {
+  if (!files || files.length === 0) {
+    throw new AppError("No images uploaded", 400);
+  }
+
+  return files.map((file) => ({
+    filename: file.filename,
+    originalName: file.originalname,
+    mimetype: file.mimetype,
+    size: file.size,
+    path: file.path,
+  }));
+}
+
+/**
+ * Get file information by filename
+ * Reads file stats from filesystem
+ */
+export async function getFileInfo(filename: string): Promise<FileInfo> {
+  if (!filename || Array.isArray(filename)) {
+    throw new AppError("Filename is required", 400);
+  }
+
+  const filePath = path.join(process.cwd(), "uploads", filename);
+
+  try {
+    const stats = await fs.stat(filePath);
+    return {
+      filename,
+      size: stats.size,
+      createdAt: stats.birthtime,
+      modifiedAt: stats.mtime,
+    };
+  } catch (error) {
+    if (error instanceof Error && "code" in error && error.code === "ENOENT") {
+      throw new AppError("File not found", 404);
+    }
+    throw new AppError("Failed to get file info", 500);
+  }
+}
+```
+
+Services handle business logic validation and file operations. They throw `AppError` instances when errors occur, which are caught by the global error handler. Controllers call service functions instead of directly processing files.
+
+### 2.8. File Upload Controllers
+
+Controllers are thin layers that handle HTTP requests and responses. They extract data from requests, call service functions, and format responses. Controllers focus on the happy path and delegate business logic to services. Create `src/controllers/file.controller.ts`:
 
 ```typescript
 import type { Request, Response } from "express";
 import type { FileUploadResponse } from "../types/file.types.js";
-import path from "path";
+import { AppError } from "../middlewares/error.middleware.js";
+import {
+  processSingleFileUpload,
+  processMultipleFileUpload,
+  processSingleImageUpload,
+  processMultipleImageUpload,
+  getFileInfo as getFileInfoService,
+} from "../services/file.service.js";
 
 /**
  * Handle single file upload
@@ -509,35 +647,15 @@ export const uploadSingleFile = async (
   req: Request,
   res: Response<FileUploadResponse>
 ) => {
-  try {
-    if (!req.file) {
-      return res.status(400).json({
-        success: false,
-        message: "No file uploaded",
-      });
-    }
+  const fileMetadata = await processSingleFileUpload(req.file!);
 
-    const file = req.file;
-
-    res.status(200).json({
-      success: true,
-      message: "File uploaded successfully",
-      data: {
-        file: {
-          filename: file.filename,
-          originalName: file.originalname,
-          mimetype: file.mimetype,
-          size: file.size,
-          path: file.path,
-        },
-      },
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: error instanceof Error ? error.message : "Failed to upload file",
-    });
-  }
+  res.status(200).json({
+    success: true,
+    message: "File uploaded successfully",
+    data: {
+      file: fileMetadata,
+    },
+  });
 };
 
 /**
@@ -548,38 +666,16 @@ export const uploadMultipleFiles = async (
   req: Request,
   res: Response<FileUploadResponse>
 ) => {
-  try {
-    const files = req.files as Express.Multer.File[] | undefined;
+  const files = req.files as Express.Multer.File[] | undefined;
+  const uploadedFiles = await processMultipleFileUpload(files);
 
-    if (!files || files.length === 0) {
-      return res.status(400).json({
-        success: false,
-        message: "No files uploaded",
-      });
-    }
-
-    const uploadedFiles = files.map((file) => ({
-      filename: file.filename,
-      originalName: file.originalname,
-      mimetype: file.mimetype,
-      size: file.size,
-      path: file.path,
-    }));
-
-    res.status(200).json({
-      success: true,
-      message: `${files.length} file(s) uploaded successfully`,
-      data: {
-        files: uploadedFiles,
-      },
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message:
-        error instanceof Error ? error.message : "Failed to upload files",
-    });
-  }
+  res.status(200).json({
+    success: true,
+    message: `${uploadedFiles.length} file(s) uploaded successfully`,
+    data: {
+      files: uploadedFiles,
+    },
+  });
 };
 
 /**
@@ -590,36 +686,15 @@ export const uploadSingleImage = async (
   req: Request,
   res: Response<FileUploadResponse>
 ) => {
-  try {
-    if (!req.file) {
-      return res.status(400).json({
-        success: false,
-        message: "No image uploaded",
-      });
-    }
+  const fileMetadata = await processSingleImageUpload(req.file!);
 
-    const file = req.file;
-
-    res.status(200).json({
-      success: true,
-      message: "Image uploaded successfully",
-      data: {
-        file: {
-          filename: file.filename,
-          originalName: file.originalname,
-          mimetype: file.mimetype,
-          size: file.size,
-          path: file.path,
-        },
-      },
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message:
-        error instanceof Error ? error.message : "Failed to upload image",
-    });
-  }
+  res.status(200).json({
+    success: true,
+    message: "Image uploaded successfully",
+    data: {
+      file: fileMetadata,
+    },
+  });
 };
 
 /**
@@ -630,38 +705,16 @@ export const uploadMultipleImages = async (
   req: Request,
   res: Response<FileUploadResponse>
 ) => {
-  try {
-    const files = req.files as Express.Multer.File[] | undefined;
+  const files = req.files as Express.Multer.File[] | undefined;
+  const uploadedImages = await processMultipleImageUpload(files);
 
-    if (!files || files.length === 0) {
-      return res.status(400).json({
-        success: false,
-        message: "No images uploaded",
-      });
-    }
-
-    const uploadedImages = files.map((file) => ({
-      filename: file.filename,
-      originalName: file.originalname,
-      mimetype: file.mimetype,
-      size: file.size,
-      path: file.path,
-    }));
-
-    res.status(200).json({
-      success: true,
-      message: `${files.length} image(s) uploaded successfully`,
-      data: {
-        files: uploadedImages,
-      },
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message:
-        error instanceof Error ? error.message : "Failed to upload images",
-    });
-  }
+  res.status(200).json({
+    success: true,
+    message: `${uploadedImages.length} image(s) uploaded successfully`,
+    data: {
+      files: uploadedImages,
+    },
+  });
 };
 
 /**
@@ -669,51 +722,24 @@ export const uploadMultipleImages = async (
  * GET /api/files/:filename
  */
 export const getFileInfo = async (req: Request, res: Response) => {
-  try {
-    const { filename } = req.params;
+  const { filename } = req.params;
 
-    if (!filename || Array.isArray(filename)) {
-      return res.status(400).json({
-        success: false,
-        message: "Filename is required",
-      });
-    }
-
-    const filePath = path.join(process.cwd(), "uploads", filename);
-
-    // In a real application, you might want to store file metadata in a database
-    // For now, we'll just check if file exists
-    const fs = await import("fs/promises");
-    try {
-      const stats = await fs.stat(filePath);
-      res.status(200).json({
-        success: true,
-        data: {
-          filename,
-          size: stats.size,
-          createdAt: stats.birthtime,
-          modifiedAt: stats.mtime,
-        },
-      });
-    } catch {
-      res.status(404).json({
-        success: false,
-        message: "File not found",
-      });
-    }
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message:
-        error instanceof Error ? error.message : "Failed to get file info",
-    });
+  if (Array.isArray(filename)) {
+    throw new AppError("Invalid filename parameter", 400);
   }
+
+  const fileInfo = await getFileInfoService(filename!);
+
+  res.status(200).json({
+    success: true,
+    data: fileInfo,
+  });
 };
 ```
 
-Controllers extract file metadata from `req.file` or `req.files` and return structured responses with file information.
+Controllers are simple and focused on HTTP handling. They delegate business logic to services, making the code easier to test and maintain. Controllers handle only the happy path; errors thrown by services are caught by the global error handler middleware.
 
-### 2.8. Routes Setup
+### 2.9. Routes Setup
 
 Define routes with Multer middleware and validation. Create `src/routes/file.routes.ts`:
 
@@ -779,7 +805,7 @@ export default router;
 2. **Validation middleware**: Validates files using Zod schemas
 3. **Controller**: Processes the upload and returns response
 
-### 2.9. Express App Configuration
+### 2.10. Express App Configuration
 
 Integrate file routes into the Express app. Update `src/app.ts`:
 
@@ -1053,9 +1079,10 @@ Optimize file upload performance:
 4. **[TypeScript Types](#24-typescript-types)**: Define TypeScript types for file uploads and responses.
 5. **[Zod Validation Schemas](#25-zod-validation-schemas)**: Create Zod schemas for file validation.
 6. **[File Validation Middleware](#26-file-validation-middleware)**: Implement middleware to validate files using Zod.
-7. **[File Upload Controllers](#27-file-upload-controllers)**: Create controllers to handle file uploads and return responses.
-8. **[Routes Setup](#28-routes-setup)**: Define API endpoints with Multer and validation middleware.
-9. **[Express App Configuration](#29-express-app-configuration)**: Integrate file routes into the Express app.
+7. **[Service Layer Implementation](#27-service-layer-implementation)**: Create service functions to handle business logic and file processing.
+8. **[File Upload Controllers](#28-file-upload-controllers)**: Create controllers to handle HTTP requests and delegate to services.
+9. **[Routes Setup](#29-routes-setup)**: Define API endpoints with Multer and validation middleware.
+10. **[Express App Configuration](#210-express-app-configuration)**: Integrate file routes into the Express app.
 
 ## 6. Resources
 

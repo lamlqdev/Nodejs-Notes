@@ -1,23 +1,7 @@
 import path from "path";
 import fs from "fs/promises";
 import { AppError } from "../middlewares/error.middleware.js";
-
-// File metadata interface
-export interface FileMetadata {
-  filename: string;
-  originalName: string;
-  mimetype: string;
-  size: number;
-  path: string;
-}
-
-// File info interface
-export interface FileInfo {
-  filename: string;
-  size: number;
-  createdAt: Date;
-  modifiedAt: Date;
-}
+import type { FileMetadata, FileInfo } from "../types/file.types.js";
 
 /**
  * Process single file upload

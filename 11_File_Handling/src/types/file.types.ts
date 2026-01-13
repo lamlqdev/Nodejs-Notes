@@ -1,24 +1,29 @@
 import type { Request } from "express";
 
+// File metadata interface
+export interface FileMetadata {
+  filename: string;
+  originalName: string;
+  mimetype: string;
+  size: number;
+  path: string;
+}
+
+// File info interface
+export interface FileInfo {
+  filename: string;
+  size: number;
+  createdAt: Date;
+  modifiedAt: Date;
+}
+
 // File upload response type
 export interface FileUploadResponse {
   success: boolean;
   message: string;
   data?: {
-    file?: {
-      filename: string;
-      originalName: string;
-      mimetype: string;
-      size: number;
-      path: string;
-    };
-    files?: Array<{
-      filename: string;
-      originalName: string;
-      mimetype: string;
-      size: number;
-      path: string;
-    }>;
+    file?: FileMetadata;
+    files?: FileMetadata[];
   };
 }
 
