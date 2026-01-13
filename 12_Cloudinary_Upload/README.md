@@ -12,18 +12,19 @@ A comprehensive guide to implementing cloud-based file storage and management us
 
 - **Cloud Storage**: Store files in the cloud instead of local filesystem
 - **Image/Video Processing**: Transform, optimize, and manipulate media on-the-fly
-- **CDN Delivery**: Fast global content delivery through CDN
+- **CDN Delivery**: Fast global content delivery through CDN (Content Delivery Network) - Ensures files are served from servers geographically closest to your users.
 - **Metadata Management**: Store and manage file metadata, tags, and context
 - **API Management**: Complete REST API for file operations
 
+![Cloudinary](./public/cloudinary.png)
+
 ### Why Use Cloudinary?
 
-- **Scalability**: No storage limits on your server
-- **Performance**: CDN delivery ensures fast access globally
-- **Image Processing**: Built-in transformations (resize, crop, filters, etc.)
-- **Cost-Effective**: Pay only for what you use
-- **Reliability**: Enterprise-grade infrastructure
-- **Security**: Secure uploads and access controls
+- **Performance & Reliability**: Cloudinary utilizes a sophisticated Content Delivery Network (CDN) to ensure your media is delivered with minimal latency. By caching content in servers around the world, your users will always download files from a location near them, significantly speeding up load times. Coupled with enterprise-grade infrastructure, you get high availability and uptime.
+
+- **Powerful Transformations**: Cloudinary offers on-the-fly transformations, allowing you to resize, crop, filter, and optimize images and videos simply by modifying the URL. This dynamic approach saves storage space (no need to save multiple versions) and development time.
+
+- **Scalability & Management**: Cloudinary provides a scalable solution with no hard limits on your server immediately. With a comprehensive API and metadata management, organizing, tagging, and searching for your assets becomes effortless, freeing you to focus on building features.
 
 ---
 

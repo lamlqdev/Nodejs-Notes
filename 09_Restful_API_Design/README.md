@@ -754,7 +754,7 @@ All operations follow the layered architecture: routes apply middleware, control
 
 ## 3. Best Practices
 
-### Validation Strategy
+### 3.1 Validation Strategy
 
 Validation should happen at multiple layers:
 
@@ -764,7 +764,7 @@ Validation should happen at multiple layers:
 
 - **Model Validation**: Mongoose schemas provide additional validation at the database level. This is the last line of defense.
 
-### Error Handling
+### 3.2 Error Handling
 
 Use consistent error handling throughout the application:
 
@@ -776,27 +776,9 @@ Use consistent error handling throughout the application:
 
 - Use appropriate HTTP status codes: 400 for validation errors, 401 for authentication, 403 for authorization, 404 for not found, 409 for conflicts, 500 for server errors.
 
-### Security Considerations
-
-Implement security best practices:
-
-- Validate all input data using schemas.
-
-- Use authentication middleware to protect routes.
-
-- Use authorization middleware to restrict access based on roles.
-
-- Never expose sensitive information in error messages.
-
-- Use parameterized queries (Mongoose handles this automatically).
-
-- Implement rate limiting to prevent abuse.
-
-- Use HTTPS in production.
-
 ---
 
-## 3. Summary of Implementation Steps
+## 4. Summary of Implementation Steps
 
 1. **[Project Setup & Dependencies](#21-project-setup--dependencies)**: Install `zod` and `mongoose`.
 2. **[Project Structure](#22-project-structure)**: Organize the project with a layered architecture (Controllers, Services, Models, Routes).
@@ -809,7 +791,7 @@ Implement security best practices:
 9. **[Error Handling](#29-error-handling)**: Use `AppError` and global error handler for consistent error responses.
 10. **[Complete CRUD API Example](#210-complete-crud-api-example)**: Implement full Create, Read, Update, Delete operations for products following REST principles.
 
-## 4. Resources
+## 5. Resources
 
 - [REST API Tutorial](https://restfulapi.net/) - Comprehensive REST API guide
 - [Zod Documentation](https://zod.dev/) - Zod validation library documentation
