@@ -42,10 +42,8 @@ A comprehensive collection of Node.js learning materials and practical examples 
 
 ## 8. File Handling
 
-- **[File Upload](./11_File_Handling/File_Upload/README.md)** - Multer, single/multiple file upload, file validation
-- **[Image Processing](./11_File_Handling/Image_Processing/README.md)** - Sharp, resize, compress, format conversion
-- **[Cloud Storage](./11_File_Handling/Cloud_Storage/README.md)** - AWS S3, Cloudinary, file storage integration
-- **[Export/Import](./11_File_Handling/Export_Import/README.md)** - CSV/Excel export, PDF generation, data import
+- **[File Upload](./11_File_Handling/README.md)** - Multer, single/multiple file upload, file validation
+- **[Cloud Storage](./12_Cloudinary_Upload/README.md)** - Cloudinary, file storage integration
 
 ### 12. Email & Notifications
 

@@ -6,7 +6,7 @@
 
 Express.js is a minimal and flexible Node.js web application framework for building web applications. It's the most popular server framework for Node.js, providing essential tools without unnecessary complexity.
 
-### Why Use Express.js?
+### Why use Express.js?
 
 **Focus on Business Logic**: Server logic is complex. Express handles the heavy lifting of HTTP operations, routing, and middleware management, so you can concentrate on your application's core functionality instead of infrastructure details.
 

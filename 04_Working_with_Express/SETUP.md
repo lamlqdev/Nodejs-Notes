@@ -1,21 +1,23 @@
-# How to Set Up TypeScript with Node.js and Express
+# How to set up TypeScript with Node.js and Express
 
-In this article, we'll explore a beginner-friendly way to configure TypeScript in an Express app, and gain an understanding of the fundamental constraints that accompany it. To follow along, you should have:
+In this article, we'll explore a friendly way to configure TypeScript in an Express app, and gain an understanding of the fundamental constraints that accompany it. To follow along, you should have:
 
-- Node.js ≥ v18.x installed in your local development environment
-- Access to a package manager like npm, pnpm, or Yarn
+- Node.js ≥ v18.x installed
+- Package manager like npm, pnpm, or Yarn
 
 ---
 
-## What is Express TypeScript?
+## 1. What is Express TypeScript?
 
 **Express TypeScript** refers to using the Express framework within a TypeScript project. It involves writing your Express server code in TypeScript, leveraging type definitions (often provided via `@types/express`) to enable type checking, auto-completion, and better documentation. Essentially, it's about combining Express's flexibility with TypeScript's safety and developer tooling benefits.
 
+![Express TypeScript](./public/express-typescript.png)
+
 TypeScript is a great companion for Express because it provides static typing, which can catch potential bugs during development. With TypeScript, you can define interfaces for requests, responses, and even middleware, making your Express code more predictable and maintainable. This leads to improved developer productivity and more robust applications.
 
-## Implementation Steps
+## 2. Implementation Steps
 
-### 1. Initialize the project
+### 2.1. Initialize the project
 
 Start with the following:
 
@@ -42,11 +44,11 @@ The `-D`, or `--dev`, flag directs the package manager to install these librarie
 - `eslint` — Lints the code to catch errors and enforce coding standards
 - **`prettier`** — Formats the code to ensure consistent style across the project
 
-### 2. Create .gitignore file
+### 2.2. Create .gitignore file
 
 Create a [`.gitignore`](../.gitignore) file at the root to exclude unnecessary files
 
-### 3. Configure TypeScript
+### 2.3. Configure TypeScript
 
 Every TypeScript project utilizes a configuration file to manage various project settings. The `tsconfig.json` file, which serves as the TypeScript configuration file, outlines these default options and offers the flexibility to modify or customize compiler settings to suit your needs.
 
@@ -70,7 +72,7 @@ npx tsc --init
 - **`target`**: Specifies the ECMAScript version of the output JavaScript (e.g., `ES2022`).
 - **`moduleResolution`**: Determines how TypeScript resolves module imports (e.g., `node`).
 
-### 4. Layered Architecture Pattern
+### 2.4. Layered Architecture Pattern
 
 Layered architecture separates concerns into distinct layers, each with specific responsibilities:
 
@@ -103,7 +105,7 @@ ts-node-express/
 └── .prettierrc              // Prettier configuration
 ```
 
-### 5. Configure ESLint and Prettier (Optional but Recommended)
+### 2.5. Configure ESLint and Prettier (Optional but Recommended)
 
 **Install additional ESLint dependencies:**
 
@@ -140,7 +142,7 @@ module.exports = {
 }
 ```
 
-### 6. Environment configuration (typed environment variables)
+### 2.6. Environment configuration (typed environment variables)
 
 **File:** `src/config/config.ts`:
 
@@ -169,7 +171,7 @@ PORT=3000
 NODE_ENV=development
 ```
 
-### 7. Global error handling middleware
+### 2.7. Global error handling middleware
 
 **File:** `src/middlewares/error.middleware.ts`:
 
@@ -209,7 +211,7 @@ export const errorHandler = (
 
 This middleware catches errors thrown in your routes/controllers and sends a consistent, type-safe JSON error response. The `AppError` class allows you to throw errors with custom status codes, and the error handler distinguishes between `AppError` instances and generic `Error` instances to provide appropriate responses.
 
-### 8. App setup
+### 2.8. App setup
 
 **File:** `src/app.ts`:
 
@@ -229,7 +231,7 @@ app.use(errorHandler);
 export default app;
 ```
 
-### 9. Server entry point
+### 2.9. Server entry point
 
 **File:** `src/server.ts`:
 
@@ -242,7 +244,7 @@ app.listen(config.port, () => {
 });
 ```
 
-### 10. Watchers and development scripts
+### 2.10. Watchers and development scripts
 
 In your `package.json`, add scripts for TypeScript compilation and automatic server restart:
 
@@ -271,3 +273,16 @@ Start the server:
 ```bash
 npm run dev
 ```
+
+## 3. Summary of Implementation steps
+
+1. **[Initialize the project](#21-initialize-the-project)** - Start a new Node.js project and install necessary dependencies.
+2. **[Create .gitignore file](#22-create-gitignore-file)** - Exclude unnecessary files and folders from version control.
+3. **[Configure TypeScript](#23-configure-typescript)** - Initialize and customize TypeScript compiler options.
+4. **[Layered Architecture Pattern](#24-layered-architecture-pattern)** - Organize code structure into Routes, Controllers, Services, and Models.
+5. **[Configure ESLint and Prettier](#25-configure-eslint-and-prettier-optional-but-recommended)** - Set up tools for code linting and consistent formatting.
+6. **[Environment configuration](#26-environment-configuration-typed-environment-variables)** - Manage environment variables with type safety.
+7. **[Global error handling middleware](#27-global-error-handling-middleware)** - Implement a centralized system to handle errors gracefully.
+8. **[App setup](#28-app-setup)** - Configure the Express application instance and middlewares.
+9. **[Server entry point](#29-server-entry-point)** - Create the entry point to launch the server.
+10. **[Watchers and development scripts](#210-watchers-and-development-scripts)** - Define npm scripts for running in development and building for production.
