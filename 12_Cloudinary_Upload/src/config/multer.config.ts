@@ -1,0 +1,72 @@
+import multer from "multer";
+
+const storage = multer.memoryStorage();
+
+// File filter function to validate file types
+const fileFilter = (
+  req: Express.Request,
+  file: Express.Multer.File,
+  cb: multer.FileFilterCallback
+) => {
+  // Allow common file types (images, documents, etc.)
+  const allowedMimes = [
+    "image/jpeg",
+    "image/jpg",
+    "image/png",
+    "image/gif",
+    "image/webp",
+    "application/pdf",
+    "text/plain",
+    "application/msword",
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+  ];
+
+  if (allowedMimes.includes(file.mimetype)) {
+    cb(null, true);
+  } else {
+    cb(new Error(`File type ${file.mimetype} is not allowed`));
+  }
+};
+
+// Multer configuration for single file upload
+export const uploadSingle = multer({
+  storage,
+  fileFilter,
+  limits: {
+    fileSize: 5 * 1024 * 1024, // 5MB limit
+  },
+});
+
+// Multer configuration for multiple file uploads
+export const uploadMultiple = multer({
+  storage,
+  fileFilter,
+  limits: {
+    fileSize: 5 * 1024 * 1024, // 5MB per file
+    files: 10, // Maximum 10 files
+  },
+});
+
+// Multer configuration for single image upload (stricter)
+export const uploadSingleImage = multer({
+  storage,
+  fileFilter: (req, file, cb) => {
+    const allowedMimes = [
+      "image/jpeg",
+      "image/jpg",
+      "image/png",
+      "image/gif",
+      "image/webp",
+    ];
+    if (allowedMimes.includes(file.mimetype)) {
+      cb(null, true);
+    } else {
+      cb(new Error("Only image files are allowed"));
+    }
+  },
+  limits: {
+    fileSize: 2 * 1024 * 1024, // 2MB limit for images
+  },
+});
+
+export default { uploadSingle, uploadMultiple, uploadSingleImage };
