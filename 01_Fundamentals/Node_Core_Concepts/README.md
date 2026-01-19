@@ -108,41 +108,72 @@ This architecture allows Node.js to handle many concurrent requests efficiently 
 
 ### The Event Loop
 
+The Event Loop is the core mechanism that allows Node.js to perform non-blocking asynchronous operations using a single JavaScript thread. It coordinates the execution of synchronous code, asynchronous callbacks, and microtasks by moving them into the Call Stack at the appropriate time.
+
+#### 1. Call Stack and Event Loop relationship
+
+JavaScript code is executed on the Call Stack:
+
+- Synchronous code always runs first and blocks the Call Stack.
+- The Event Loop continuously monitors the Call Stack.
+- Callbacks can only be pushed onto the Call Stack when it is empty.
+
+The Event Loop itself is always running; it simply waits until the Call Stack is available before scheduling more work
+
+#### 2. Event Loop Phases in Node.js
+
 ![The Event Loop](./public/event-loop.png)
 
-The Event Loop is Node.js's core mechanism for handling asynchronous operations. It works by monitoring the **Call Stack** and moving functions from various queues into the Call Stack for execution.
+Unlike browsers, Node.js does not use a single “macrotask queue”.
+Instead, the Event Loop is divided into multiple phases, each with its own queue. The main phases are executed in the following order:
 
-**How Event Loop Works:**
+1. Timers phase: Executes callbacks scheduled by `setTimeout()` and `setInterval()`
+2. Pending Callbacks phase: Executes I/O callbacks deferred from the previous loop iteration (e.g., certain system error callbacks)
+3. Idle, Prepare phase: Used internally by Node.js
+4. Poll phase: Retrieves new I/O events (file system, network, etc.)
+5. Check phase: Executes callbacks scheduled by `setImmediate()`
+6. Close Callbacks phase: Executes close event handlers (e.g. `socket.on('close')`)
 
-1. **Call Stack is Empty**: The Event Loop only processes tasks when the Call Stack is empty. This ensures that synchronous code always completes before asynchronous callbacks are executed.
+Each phase may execute multiple callbacks, not just one.
 
-2. **Microtask Queue** (higher priority): Contains callbacks that need to be executed immediately after the current operation completes:
+#### 3. Microtasks in Node.js
 
-   - `process.nextTick()` callbacks
-   - Promise callbacks (`.then()`, `.catch()`, `.finally()`)
+Node.js has two microtask queues, which run outside the normal Event Loop phases. **Priority order:**
 
-3. **Macrotask Queue** (lower priority): Contains callbacks that are executed after microtasks:
+- `process.nextTick()` queue (highest priority)
+- Promise microtask queue: `Promise.then()`, `Promise.catch()`, `Promise.finally()`
+  
+After every callback execution and after each Event Loop phase, Node.js performs the following steps:
 
-   - **Timers**: `setTimeout()` and `setInterval()` callbacks
-   - **I/O Callbacks**: File system, network operations
-   - **setImmediate()**: Callbacks scheduled with `setImmediate()`
-   - **Close Callbacks**: `close` event handlers
+1. Execute all `process.nextTick()` callbacks
+2. Execute all Promise microtasks
 
-**Execution Flow:**
+Only after both queues are empty does the Event Loop continue to the next phase.
 
-1. Execute synchronous code (fills Call Stack)
-2. When Call Stack is empty, Event Loop checks microtask queue first
-3. Process ALL microtasks until the queue is empty
-4. Then process ONE macrotask from the macrotask queue
-5. Repeat from step 2
+**Note:** Because `process.nextTick()` has very high priority, excessive usage can starve the Event Loop.
 
-> **Note:** Within each queue (microtask or macrotask), callbacks are executed in the order they were added (FIFO - First In First Out). There is no priority system within the same queue - the execution order depends solely on which callback entered the queue first. Priority only exists between different queue types (microtasks are processed before macrotasks).
+#### 4. Execution Flow Summary
 
----
+1. Execute synchronous JavaScript code on the Call Stack
+2. When the Call Stack is empty:
+   - Run all `process.nextTick()` callbacks
+   - Run all Promise microtasks
+3. Enter the next Event Loop phase and execute callbacks in that phase
+4. After each callback:
+   - Drain `process.nextTick()` queue
+   - Drain Promise microtask queue
+5. Repeat until there is no more work to do
 
-## Examples and Explanation
+#### 5. Ordering Guarantees and Notes
 
-### Event Loop Order Examples
+Node.js does not guarantee a fixed execution order between:
+
+- `setTimeout()` and `setImmediate()` (except inside I/O callbacks)
+- Callbacks within the same phase generally follow FIFO order
+- Microtasks can interrupt the apparent FIFO flow
+- The Event Loop stops only when: There are no pending timers, No pending I/O, No active handles
+
+### Examples and Explanation
 
 #### Example 1: Basic Event Loop Order
 
@@ -184,7 +215,7 @@ console.log("6. End");
 - Synchronous code runs first (`1. Start`, `6. End`)
 - `process.nextTick()` has the highest priority in the microtask queue
 - Promise callbacks run after `nextTick` but before timers
-- `setTimeout` and `setImmediate` order can vary depending on the context
+- **Important:** In top-level code (outside I/O callbacks), the order between `setTimeout(fn, 0)` and `setImmediate()` is **not guaranteed** and can vary depending on system performance. In this example, `setTimeout` happens to run first, but this is not always the case.
 
 #### Example 2: Microtask vs Macrotask Priority
 
@@ -278,7 +309,7 @@ console.log("10. End");
 
 - Shows the order of execution across different event loop phases
 - Demonstrates how `nextTick` and Promises are prioritized
-- Shows that `setImmediate` runs before `setTimeout` in I/O callbacks
+- **Key insight:** When inside an I/O callback (Poll phase), `setImmediate()` callbacks run in the Check phase, which comes immediately after the Poll phase. Meanwhile, `setTimeout()` callbacks run in the Timers phase, which occurs at the beginning of the next event loop iteration. This is why `setImmediate` runs before `setTimeout` in I/O callbacks.
 
 ### Example 4: Blocking vs Non-blocking I/O
 
