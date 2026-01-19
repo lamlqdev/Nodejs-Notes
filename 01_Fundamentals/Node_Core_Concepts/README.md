@@ -401,6 +401,7 @@ emitter.emit('data', 'message 2'); // Received: message 2
 ```
 
 #### 2. `emitter.once(eventName, listener)`
+
 Registers a listener that will be called only once, then automatically removed.
 
 ```javascript
@@ -413,6 +414,7 @@ emitter.emit('connect'); // (nothing happens)
 ```
 
 #### 3. `emitter.emit(eventName, ...args)`
+
 Synchronously calls all listeners registered for the event, passing the provided arguments.
 
 ```javascript
@@ -424,6 +426,7 @@ emitter.emit('sum', 5, 3); // 8
 ```
 
 #### 4. `emitter.off(eventName, listener)` or `emitter.removeListener()`
+
 Removes a specific listener from the event.
 
 ```javascript
@@ -435,6 +438,7 @@ emitter.emit('data', 'test'); // (nothing happens)
 ```
 
 #### 5. `emitter.removeAllListeners(eventName)`
+
 Removes all listeners for a specific event, or all events if no event name is provided.
 
 ```javascript
@@ -548,6 +552,7 @@ Both patterns serve the same purpose: enabling decoupled, event-driven communica
 ### Best Practices
 
 1. **Always handle error events**: EventEmitter instances can emit 'error' events
+
    ```javascript
    emitter.on('error', (err) => {
      console.error('Error occurred:', err);
@@ -555,6 +560,7 @@ Both patterns serve the same purpose: enabling decoupled, event-driven communica
    ```
 
 2. **Avoid memory leaks**: Remove listeners when they're no longer needed
+
    ```javascript
    const listener = () => {};
    emitter.on('event', listener);
@@ -563,6 +569,7 @@ Both patterns serve the same purpose: enabling decoupled, event-driven communica
    ```
 
 3. **Use `once()` for one-time events**: More efficient than manually removing listeners
+
    ```javascript
    emitter.once('ready', () => {
      console.log('System ready');
@@ -570,6 +577,7 @@ Both patterns serve the same purpose: enabling decoupled, event-driven communica
    ```
 
 4. **Limit listener count**: Too many listeners can impact performance
+  
    ```javascript
    console.log(emitter.listenerCount('event')); // Check listener count
    ```

@@ -7,9 +7,11 @@ A comprehensive collection of Node.js learning materials and practical examples 
 ## 1. Fundamentals
 
 - **[Node.js Core Concepts](./01_Fundamentals/Node_Core_Concepts/README.md)** - Event Loop, V8 Engine, Node.js Architecture.
-- **[NPM & Package Management](./01_Fundamentals/NPM_Package_Management/README.md)** - package.json, npm scripts, dependencies, semantic versioning.
-- **[Module Systems](./01_Fundamentals/Module_Systems/README.md)** - CommonJS vs ES Modules, require vs import.
-
+- **[NPM & Package Management](./01_Fundamentals/NPM_NVM/Node_Package_Manager.md)** - package.json, npm scripts, dependencies, semantic versioning.
+- **[NVM & Version Management](./01_Fundamentals/NPM_NVM/Node_Version_Manager.md)** - Node.js version manager, nvm, node version management.
+- **[Module Systems](./01_Fundamentals/ES6/Module_Systems.md)** - CommonJS vs ES Modules, require vs import.
+- **[ES6 Essentials](./01_Fundamentals/ES6/ES6_Essentials.md)** - Arrow Functions, Template Strings, Spread Operator, Destructuring, Map, Set, Classes.
+  
 ## 2. File System & Streams
 
 - **[File System Basics](./02_File_System/FS_Basics/README.md)** - readFile, writeFile, sync vs async operations.
