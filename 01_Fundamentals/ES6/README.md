@@ -427,11 +427,6 @@ class Person {
   set birthday(year) {
     this.age = new Date().getFullYear() - year;
   }
-  
-  // Static method
-  static species() {
-    return 'Homo sapiens';
-  }
 }
 
 // Creating instance
@@ -443,9 +438,6 @@ person.info;
 
 // Using setter
 person.birthday = 1995;
-
-// Calling static method
-Person.species();
 ```
 
 ### Class Expression

@@ -1,12 +1,12 @@
 # NPM & Package Management
 
-Understanding NPM and package management is essential for working with Node.js projects and managing dependencies effectively.
+Understanding NPM (Node Package Manager) is essential for working with Node.js projects and managing dependencies effectively.
 
 ---
 
 ## Core Terminology
 
-### What is NPM and Why Do We Need It?
+### What is NPM and Why do we need it?
 
 **NPM** (Node Package Manager) is the main package manager for Node.js, helping to manage libraries and tools in the JavaScript/Node.js development environment. It is also the world's largest repository of open-source software for JavaScript, available for free use. NPM comes bundled with Node.js installation, so you get it automatically when you install Node.js.
 
@@ -77,16 +77,10 @@ The `package.json` file is the manifest file for your Node.js project. It contai
 - `main` - Entry point of the package
 - `scripts` - Custom scripts you can run with `npm run`
 - `dependencies` - Packages required for production
-- `devDependencies` - Packages required only for development
+- `devDependencies` - Packages required only for development (testing, building, linting, etc.)
 - `keywords` - Keywords for package discovery
 - `author` - Package author
 - `license` - Package license
-
-### Dependencies vs DevDependencies
-
-**dependencies**: Packages required for your application to run in production. These are installed when someone runs `npm install` in production.
-
-**devDependencies**: Packages required only during development (testing, building, linting, etc.). These are NOT installed in production by default.
 
 ### Semantic Versioning (SemVer)
 
@@ -100,11 +94,11 @@ Semantic versioning follows the format: `MAJOR.MINOR.PATCH`
 
 **Version ranges:**
 
-- `^1.2.3` - Allows updates to any version >= 1.2.3 and < 2.0.0 (caret)
-- `~1.2.3` - Allows updates to any version >= 1.2.3 and < 1.3.0 (tilde)
-- `1.2.3` - Exact version
-- `*` or `latest` - Latest version
-- `>=1.2.3` - Greater than or equal to version
+- `^1.2.3` - allows minor and patch updates >= 1.2.3 and < 2.0.0 (caret)
+- `~1.2.3` - allows only patch updates >= 1.2.3 and < 1.3.0 (tilde)
+- `1.2.3` - exact version locks to that specific version
+- `*` or `latest` - latest version
+- `>=1.2.3` - greater than or equal to version
 
 ### package-lock.json
 
@@ -253,36 +247,7 @@ npm run lint       # Runs "lint" script
 - `pre` and `post` prefixes create lifecycle hooks (e.g., `prestart` runs before `start`)
 - `npm start` and `npm test` are special - you can run them without `run`
 
-### Example 4: Semantic Versioning in Practice
-
-**package.json with version ranges:**
-
-```json
-{
-  "dependencies": {
-    "express": "^4.18.2",
-    "lodash": "~4.17.21",
-    "axios": "1.4.0",
-    "moment": "*"
-  }
-}
-```
-
-**What gets installed:**
-
-- `express`: Any version >= 4.18.2 and < 5.0.0 (e.g., 4.19.0, 4.20.1)
-- `lodash`: Any version >= 4.17.21 and < 4.18.0 (e.g., 4.17.22, 4.17.25)
-- `axios`: Exactly version 1.4.0
-- `moment`: Latest available version
-
-**Explanation:**
-
-- `^` (caret) allows minor and patch updates
-- `~` (tilde) allows only patch updates
-- Exact version locks to that specific version
-- `*` always installs the latest version
-
-### Example 5: Updating and Removing Packages
+### Example 4: Updating and Removing Packages
 
 **Update a specific package:**
 
