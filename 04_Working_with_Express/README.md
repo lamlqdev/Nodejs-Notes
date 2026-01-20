@@ -152,6 +152,7 @@ app.set('views', 'views'); // Set the views directory (default is 'views')
 Pug uses indentation to define the structure of the HTML code (whitespace sensitive). It does not use closing tags. **Example comparison:**
 
 **HTML:**
+
 ```html
 <!DOCTYPE html>
 <html>
@@ -165,6 +166,7 @@ Pug uses indentation to define the structure of the HTML code (whitespace sensit
 ```
 
 **Pug:**
+
 ```pug
 doctype html
 html

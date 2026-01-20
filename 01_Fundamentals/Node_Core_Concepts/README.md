@@ -153,18 +153,6 @@ Only after both queues are empty does the Event Loop continue to the next phase.
 
 > **Note:** Because `process.nextTick()` has very high priority, excessive usage can starve the Event Loop.
 
-#### 4. Execution Flow Summary
-
-1. Execute synchronous JavaScript code on the Call Stack
-2. When the Call Stack is empty:
-   - Run all `process.nextTick()` callbacks
-   - Run all Promise microtasks
-3. Enter the next Event Loop phase and execute callbacks in that phase
-4. After each callback:
-   - Drain `process.nextTick()` queue
-   - Drain Promise microtask queue
-5. Repeat until there is no more work to do
-
 ### Examples and Explanation
 
 #### Example 1: Basic Event Loop Order
@@ -341,44 +329,9 @@ console.log("Do other work");
 
 The Event Emitter is a core Node.js pattern that enables objects to emit named events and allows other code to listen and respond to those events. It's the foundation of Node.js's event-driven architecture and is used extensively throughout the Node.js ecosystem.
 
-### Event Emitter in Node.js vs Browser Events
-
-**Similarities:**
-
-- Both use a publish-subscribe pattern where listeners subscribe to events
-- Both support multiple listeners for the same event
-- Both allow passing data with events
-
-**Differences:**
-
-| Feature | Node.js Event Emitter | Browser DOM Events |
-|---------|----------------------|-------------------|
-| **Usage** | Custom events for any object | Built-in DOM element events |
-| **Inheritance** | Classes extend `EventEmitter` | Elements inherit from `EventTarget` |
-| **API** | `emitter.on()`, `emitter.emit()` | `element.addEventListener()`, `element.dispatchEvent()` |
-| **Scope** | Server-side, any JavaScript object | Client-side, DOM elements only |
-| **Event Types** | Custom string names | Standardized DOM event types |
-
-### Basic Usage
-
-```javascript
-import { EventEmitter } from 'events';
-
-// Create an instance
-const emitter = new EventEmitter();
-
-// Listen for an event
-emitter.on('greet', (name) => {
-  console.log(`Hello, ${name}!`);
-});
-
-// Emit the event
-emitter.emit('greet', 'Alice'); // Output: Hello, Alice!
-```
-
 ### Common Event Emitter Methods
 
-#### 1. `emitter.on(eventName, listener)`
+#### 1. emitter.on(eventName, listener)
 
 Registers a listener function that will be called every time the event is emitted.
 
@@ -391,7 +344,7 @@ emitter.emit('data', 'message 1'); // Received: message 1
 emitter.emit('data', 'message 2'); // Received: message 2
 ```
 
-#### 2. `emitter.once(eventName, listener)`
+#### 2. emitter.once(eventName, listener)
 
 Registers a listener that will be called only once, then automatically removed.
 
@@ -404,7 +357,7 @@ emitter.emit('connect'); // Connected!
 emitter.emit('connect'); // (nothing happens)
 ```
 
-#### 3. `emitter.emit(eventName, ...args)`
+#### 3. emitter.emit(eventName, ...args)
 
 Synchronously calls all listeners registered for the event, passing the provided arguments.
 
@@ -416,7 +369,7 @@ emitter.on('sum', (a, b) => {
 emitter.emit('sum', 5, 3); // 8
 ```
 
-#### 4. `emitter.off(eventName, listener)` or `emitter.removeListener()`
+#### 4. emitter.off(eventName, listener) or emitter.removeListener()
 
 Removes a specific listener from the event.
 
@@ -428,7 +381,7 @@ emitter.off('data', listener); // Remove the listener
 emitter.emit('data', 'test'); // (nothing happens)
 ```
 
-#### 5. `emitter.removeAllListeners(eventName)`
+#### 5. emitter.removeAllListeners(eventName)
 
 Removes all listeners for a specific event, or all events if no event name is provided.
 
@@ -441,70 +394,9 @@ emitter.removeAllListeners('event1'); // Removes both event1 listeners
 emitter.removeAllListeners(); // Removes all listeners
 ```
 
-### Event Emitter in Node.js Built-in Modules
-
-Many Node.js core modules use EventEmitter:
-
-```javascript
-const fs = require('fs');
-const http = require('http');
-
-// File streams emit events
-const readStream = fs.createReadStream('file.txt');
-readStream.on('data', (chunk) => {
-  console.log('Received chunk:', chunk);
-});
-readStream.on('end', () => {
-  console.log('File reading complete');
-});
-
-// HTTP server emits events
-const server = http.createServer();
-server.on('request', (req, res) => {
-  res.end('Hello World');
-});
-server.on('error', (err) => {
-  console.error('Server error:', err);
-});
-```
-
-### Best Practices
-
-1. **Always handle error events**: EventEmitter instances can emit 'error' events
-
-   ```javascript
-   emitter.on('error', (err) => {
-     console.error('Error occurred:', err);
-   });
-   ```
-
-2. **Avoid memory leaks**: Remove listeners when they're no longer needed
-
-   ```javascript
-   const listener = () => {};
-   emitter.on('event', listener);
-   // Later...
-   emitter.off('event', listener);
-   ```
-
-3. **Use `once()` for one-time events**: More efficient than manually removing listeners
-
-   ```javascript
-   emitter.once('ready', () => {
-     console.log('System ready');
-   });
-   ```
-
-4. **Limit listener count**: Too many listeners can impact performance
-  
-   ```javascript
-   console.log(emitter.listenerCount('event')); // Check listener count
-   ```
-
----
-
 ## References
 
 - [The Node.js Event Loop](https://nodejs.org/en/docs/guides/event-loop-timers-and-nexttick/)
 - [Blocking vs Non-blocking](https://nodejs.org/en/docs/guides/blocking-vs-non-blocking/)
 - [V8 Engine Documentation](https://v8.dev/docs)
+- [Event Emitter](https://nodejs.org/en/learn/asynchronous-work/the-nodejs-event-emitter)
