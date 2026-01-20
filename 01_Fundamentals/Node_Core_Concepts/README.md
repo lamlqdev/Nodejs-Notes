@@ -127,13 +127,13 @@ The Event Loop itself is always running; it simply waits until the Call Stack is
 Unlike browsers, Node.js does not use a single “macrotask queue”.
 Instead, the Event Loop is divided into multiple phases, each with its own queue. The main phases are executed in the following order:
 
-1. Timers phase: Executes callbacks scheduled by `setTimeout()` and `setInterval()`. The specified delay represents the minimum time before the callback becomes eligible to run, not a guaranteed execution time.
-2. Pending Callbacks phase: Executes I/O callbacks deferred from the previous loop iteration (e.g., certain system error callbacks)
-3. Idle, Prepare phase: Used internally by Node.js
-4. Poll phase: Retrieves new I/O events (file system, network, etc.). If the poll queue is empty, the Event Loop first checks for pending setImmediate() callbacks and proceeds to the Check phase if any exist.
-If no setImmediate() callbacks are scheduled, the Event Loop then checks for expired timers. If a timer has expired, the Poll phase ends and the Event Loop returns to the Timers phase in the next iteration. Otherwise, the Event Loop may block and wait for new I/O events.
-5. Check phase: Executes callbacks scheduled by `setImmediate()`
-6. Close Callbacks phase: Executes close event handlers (e.g. `socket.on('close')`)
+1. **Timers phase**: Executes callbacks scheduled by `setTimeout()` and `setInterval()`. The specified delay represents the minimum time before the callback becomes eligible to run, not a guaranteed execution time.
+2. **Pending Callbacks phase**: Executes I/O callbacks deferred from the previous loop iteration (e.g., certain system error callbacks)
+3. **Idle, Prepare phase**: Used internally by Node.js
+4. **Poll phase**: Retrieves new I/O events (file system, network, etc.). If the poll queue is empty, the Event Loop first checks for pending `setImmediate()` callbacks and proceeds to the Check phase if any exist.
+If no `setImmediate()` callbacks are scheduled, the Event Loop then checks for expired timers. If a timer has expired, the Poll phase ends and the Event Loop returns to the Timers phase in the next iteration. Otherwise, the Event Loop may block and wait for new I/O events.
+5. **Check phase**: Executes callbacks scheduled by `setImmediate()`
+6. **Close Callbacks phase**: Executes close event handlers (e.g. `socket.on('close')`)
 
 Each phase may execute multiple callbacks, not just one.
 
@@ -151,7 +151,7 @@ After every callback execution and after each Event Loop phase, Node.js performs
 
 Only after both queues are empty does the Event Loop continue to the next phase.
 
-**Note:** Because `process.nextTick()` has very high priority, excessive usage can starve the Event Loop.
+> **Note:** Because `process.nextTick()` has very high priority, excessive usage can starve the Event Loop.
 
 #### 4. Execution Flow Summary
 
@@ -164,15 +164,6 @@ Only after both queues are empty does the Event Loop continue to the next phase.
    - Drain `process.nextTick()` queue
    - Drain Promise microtask queue
 5. Repeat until there is no more work to do
-
-#### 5. Ordering Guarantees and Notes
-
-Node.js does not guarantee a fixed execution order between:
-
-- `setTimeout()` and `setImmediate()` (except inside I/O callbacks)
-- Callbacks within the same phase generally follow FIFO order
-- Microtasks can interrupt the apparent FIFO flow
-- The Event Loop stops only when: There are no pending timers, No pending I/O, No active handles
 
 ### Examples and Explanation
 
@@ -298,11 +289,11 @@ console.log("10. End");
 10. End
 8. nextTick
 9. Promise
-2. Timer
-3. Immediate
 4. I/O callback
 7. nextTick in I/O
+3. Immediate
 6. Immediate in I/O
+2. Timer
 5. Timer in I/O
 ```
 
@@ -450,46 +441,6 @@ emitter.removeAllListeners('event1'); // Removes both event1 listeners
 emitter.removeAllListeners(); // Removes all listeners
 ```
 
-### Creating Custom Event Emitters
-
-Many Node.js built-in modules extend EventEmitter. You can also create your own:
-
-```javascript
-const EventEmitter = require('events');
-
-class MyEmitter extends EventEmitter {
-  constructor() {
-    super();
-    this.data = [];
-  }
-
-  addItem(item) {
-    this.data.push(item);
-    this.emit('itemAdded', item, this.data.length);
-  }
-
-  clear() {
-    const count = this.data.length;
-    this.data = [];
-    this.emit('cleared', count);
-  }
-}
-
-const myEmitter = new MyEmitter();
-
-myEmitter.on('itemAdded', (item, total) => {
-  console.log(`Added ${item}. Total items: ${total}`);
-});
-
-myEmitter.on('cleared', (count) => {
-  console.log(`Cleared ${count} items`);
-});
-
-myEmitter.addItem('apple');  // Added apple. Total items: 1
-myEmitter.addItem('banana'); // Added banana. Total items: 2
-myEmitter.clear();           // Cleared 2 items
-```
-
 ### Event Emitter in Node.js Built-in Modules
 
 Many Node.js core modules use EventEmitter:
@@ -516,38 +467,6 @@ server.on('error', (err) => {
   console.error('Server error:', err);
 });
 ```
-
-### Comparison with Browser Event Handling
-
-**Browser (DOM Events):**
-
-```javascript
-// Browser example
-const button = document.querySelector('button');
-button.addEventListener('click', (event) => {
-  console.log('Button clicked!', event);
-});
-
-// Trigger programmatically
-button.dispatchEvent(new Event('click'));
-```
-
-**Node.js (Event Emitter):**
-
-```javascript
-// Node.js example
-const EventEmitter = require('events');
-const button = new EventEmitter();
-
-button.on('click', (event) => {
-  console.log('Button clicked!', event);
-});
-
-// Trigger programmatically
-button.emit('click', { timestamp: Date.now() });
-```
-
-Both patterns serve the same purpose: enabling decoupled, event-driven communication between different parts of an application.
 
 ### Best Practices
 

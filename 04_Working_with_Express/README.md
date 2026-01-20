@@ -174,13 +174,6 @@ html
     h1 Hello World
 ```
 
-**Interpolation:** To inject data passed from the route, use `#{variableName}`.
-
-```pug
-h1 #{pageTitle}
-p Welcome to #{shopName}
-```
-
 ### How to write a pug file
 
 1. **Create a Pug file**: Create a file named `shop.pug` inside the `views` directory.
