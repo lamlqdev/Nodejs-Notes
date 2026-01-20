@@ -101,3 +101,114 @@ Routing in Express defines how an application responds to client requests for sp
 Routing is used to organize application endpoints, map HTTP methods to business logic, separate concerns by feature or resource, and structure RESTful APIs in a clear and maintainable way.
 
 ![Routing](./public/routing.png)
+
+## Serving Static Files
+
+You generally manage your static files (like CSS, images, client-side JavaScript) in a `public` folder. To serve these files, you use the `express.static` built-in middleware.
+
+```javascript
+app.use(express.static('public'));
+```
+
+This acts as a read-only pass-through. If a file exists in the `public` folder, it is served; otherwise, the request continues to the next middleware.
+
+For example, if you have a file at `public/css/main.css`, you can access it in your HTML/Pug file like this:
+
+```html
+<link rel="stylesheet" href="/css/main.css">
+```
+
+## Template Engines
+
+### What is template engine in Express?
+
+A **template engine** enables you to use static template files in your application. At runtime, the **template engine** replaces variables in a template file with actual values, and transforms the template into an HTML file sent to the client. This approach makes it easier to design an HTML page and saves you from writing static HTML files for every route.
+
+![Template Engine](./public/template-engines.png)
+
+Some popular template engines include **Pug**, **EJS**, and **Handlebars**.
+
+![Available Template Engines](./public/available-template-engines.png)
+
+### Configure Pug template engine for app
+
+To use Pug, first install it:
+
+```bash
+npm install pug
+```
+
+Then, configure it in your Express application:
+
+```javascript
+app.set('view engine', 'pug'); // Set the template engine to pug
+app.set('views', 'views'); // Set the views directory (default is 'views')
+```
+
+### Introduce Pug
+
+![Pug](./public/pug.png)
+
+Pug uses indentation to define the structure of the HTML code (whitespace sensitive). It does not use closing tags. **Example comparison:**
+
+**HTML:**
+```html
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>My App</title>
+  </head>
+  <body>
+    <h1>Hello World</h1>
+  </body>
+</html>
+```
+
+**Pug:**
+```pug
+doctype html
+html
+  head
+    title My App
+  body
+    h1 Hello World
+```
+
+**Interpolation:** To inject data passed from the route, use `#{variableName}`.
+
+```pug
+h1 #{pageTitle}
+p Welcome to #{shopName}
+```
+
+### How to write a pug file
+
+1. **Create a Pug file**: Create a file named `shop.pug` inside the `views` directory.
+
+```pug
+doctype html
+html
+  head
+    title #{docTitle}
+    link(rel="stylesheet", href="/css/main.css")
+  body
+    header.main-header
+      nav.main-header__nav
+        ul.main-header__item-list
+          li.main-header__item
+            a(class=(path === '/' ? 'active' : ''), href="/") Shop
+          li.main-header__item
+            a(href="/admin/add-product") Add Product
+    main
+      h1 My Products
+      p List of all the products...
+```
+
+2. **Render the file in a route**: Use `res.render()` to render the template.
+
+```javascript
+app.get('/', (req, res, next) => {
+  const products = adminData.products;
+  res.render('shop', { docTitle: 'Shop', path: '/' });
+});
+```
