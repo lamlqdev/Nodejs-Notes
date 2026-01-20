@@ -225,6 +225,10 @@ app.use(express.json());
 
 // Routes
 
+app.get("/", (req, res) => {
+  res.send("Hello World");
+});
+
 // Global error handler (should be after routes)
 app.use(errorHandler);
 
@@ -254,8 +258,6 @@ In your `package.json`, add scripts for TypeScript compilation and automatic ser
     "build": "tsc",
     "start": "node dist/server.js",
     "dev": "tsx watch src/server.ts",
-    "lint": "eslint src/**/*.ts",
-    "lint:fix": "eslint src/**/*.ts --fix",
     "format": "prettier --write \"src/**/*.ts\""
   }
 }
@@ -264,8 +266,6 @@ In your `package.json`, add scripts for TypeScript compilation and automatic ser
 - **`build`** — Compiles TypeScript to JavaScript
 - **`start`** — Runs the compiled JavaScript in production
 - **`dev`** — Runs the server in development mode with auto-reload (using `tsx watch`)
-- **`lint`** — Checks code for linting errors
-- **`lint:fix`** — Automatically fixes linting errors
 - **`format`** — Formats code using Prettier
 
 Start the server:

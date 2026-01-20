@@ -60,18 +60,6 @@ As shown in the diagram:
 - **Node.js** uses the **V8 Engine** to execute JavaScript
 - **Node.js** is built with **C++**, which adds new features to JavaScript (like file system access, networking, etc.) that aren't available in browser JavaScript, enabling server-side functionality
 
-### Nodejs is not limited to the Server
-
-![Other Roles of Node.js](./public/other-roles-of-nodejs.png)
-
-**Node.js is a JavaScript Runtime** - You can use it for more than just server-side code. Beyond building web servers, Node.js is also commonly used for:
-
-- **Utility Scripts** - Automation scripts, file processing, data manipulation
-- **Build Tools** - Task runners, bundlers, and build automation (e.g., Webpack, Gulp, Grunt)
-- **CLI Tools** - Command-line applications and developer tools
-- **Desktop Applications** - Using frameworks like Electron
-- **IoT Applications** - Internet of Things device programming
-
 ### Node.js Program Lifecycle
 
 ![Node.js Program Lifecycle](./public/nodejs-program-lifecycle.png)
@@ -110,17 +98,7 @@ This architecture allows Node.js to handle many concurrent requests efficiently 
 
 The Event Loop is the core mechanism that allows Node.js to perform non-blocking asynchronous operations using a single JavaScript thread. It coordinates the execution of synchronous code, asynchronous callbacks, and microtasks by moving them into the Call Stack at the appropriate time.
 
-#### 1. Call Stack and Event Loop relationship
-
-JavaScript code is executed on the Call Stack:
-
-- Synchronous code always runs first and blocks the Call Stack.
-- The Event Loop continuously monitors the Call Stack.
-- Callbacks can only be pushed onto the Call Stack when it is empty.
-
-The Event Loop itself is always running; it simply waits until the Call Stack is available before scheduling more work
-
-#### 2. Event Loop Phases in Node.js
+#### 1. Event Loop Phases in Node.js
 
 ![The Event Loop](./public/event-loop.png)
 
@@ -137,7 +115,7 @@ If no `setImmediate()` callbacks are scheduled, the Event Loop then checks for e
 
 Each phase may execute multiple callbacks, not just one.
 
-#### 3. Microtasks in Node.js
+#### 2. Microtasks in Node.js
 
 Node.js has two microtask queues, which run outside the normal Event Loop phases. **Priority order:**
 

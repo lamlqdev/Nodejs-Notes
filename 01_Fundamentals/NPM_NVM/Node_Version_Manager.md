@@ -12,8 +12,7 @@ Understanding NVM (Node Version Manager) is essential for managing multiple Node
 
 **Why NVM was created:** Different projects often require different Node.js versions. Without a version manager, you would need to manually uninstall and reinstall Node.js versions, which is time-consuming and error-prone. NVM solves this problem by allowing you to:
 
-- Install multiple Node.js versions simultaneously
-- Switch between versions quickly with a single command
+- Install and switch between versions quickly with a single command
 - Automatically use the correct version for each project
 - Test your application against different Node.js versions
 - Ensure team consistency by sharing version requirements
