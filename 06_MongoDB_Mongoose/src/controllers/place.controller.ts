@@ -5,7 +5,7 @@ import { CreatePlaceData, UpdatePlaceData } from "../types/place.types";
 export async function getPlaces(req: Request, res: Response, next: NextFunction) {
   try {
     const { city, category, page, limit, sort } = req.query;
-    
+
     const filter: any = {};
     if (city) {
       filter.city = city as string;
@@ -30,13 +30,13 @@ export async function getPlaces(req: Request, res: Response, next: NextFunction)
 export async function getPlaceById(req: Request, res: Response, next: NextFunction) {
   try {
     const { id } = req.params;
-    
+
     if (!id) {
       return res.status(400).json({ error: "Place ID is required" });
     }
 
     const place = await findPlaceById(id as string);
-    
+
     if (!place) {
       return res.status(404).json({ error: "Place not found" });
     }
@@ -88,7 +88,7 @@ export async function updatePlace(req: Request, res: Response, next: NextFunctio
     if (address !== undefined) updateData.address = address;
 
     const place = await updatePlaceService(id as string, updateData);
-    
+
     if (!place) {
       return res.status(404).json({ error: "Place not found" });
     }
@@ -108,14 +108,14 @@ export async function deletePlace(req: Request, res: Response, next: NextFunctio
     }
 
     const place = await softDeletePlaceService(id as string);
-    
+
     if (!place) {
       return res.status(404).json({ error: "Place not found" });
     }
 
-    res.status(200).json({ 
+    res.status(200).json({
       message: "Place deleted successfully",
-      data: place 
+      data: place
     });
   } catch (error) {
     next(error);

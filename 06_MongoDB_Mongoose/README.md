@@ -152,7 +152,7 @@ Mongoose allows defining custom methods directly on the schema, which can be div
   const places = await Place.findByCity(cityId);
   ```
 
-  > Note: Do not declare static methods as ES6 arrow functions, because `this` will not refer to the model itself, but to the global object.
+> Note: Do not declare static methods as ES6 arrow functions, because `this` will not refer to the model itself, but to the global object.
 
 ### 3. Mongoose Models
 
@@ -198,132 +198,29 @@ Mongoose models provide several static helper functions for CRUD operations. Eac
 
 #### 4.1 Find Methods
 
-Documents can be retrieved using a model's `find`, `findOne`, `findById` or `where` static functions. See implementation in **[find.service.ts](./src/services/find.service.ts)**.
+Documents can be retrieved using a model's `find`, `findOne`, `findById` or `where` static functions.
 
-**`Model.find()`** - Finds all documents matching the filter, supports pagination. Returns all documents if no filter is provided.
+- **`Model.find()`** - Finds all documents matching the filter, supports pagination. Returns all documents if no filter is provided.
 
-```typescript
-import { findUsers } from "./services/find.service";
+- **`Model.findById()`** - Finds a document by ID, faster than `findOne({ _id })` because MongoDB optimizes queries on `_id`.
 
-// Find all users
-const allUsers = await findUsers();
-
-// Find users with filter
-const users = await findUsers({ email: "john@example.com" });
-
-// Find users with pagination
-const paginatedUsers = await findUsers(
-  { username: "John" },
-  { 
-    page: 1, 
-    limit: 10, 
-    sort: { createdAt: -1 } 
-  }
-);
-```
-
-**`Model.findById()`** - Finds a document by ID, faster than `findOne({ _id })` because MongoDB optimizes queries on `_id`.
-
-```typescript
-import { findUserById } from "./services/find.service";
-
-const user = await findUserById("507f1f77bcf86cd799439011");
-```
-
-**`Model.findOne()`** - Finds the first document matching the filter, useful when you know only one document matches (e.g., finding by unique email).
-
-```typescript
-import { findOneUser } from "./services/find.service";
-
-const user = await findOneUser({ email: "john@example.com" });
-const user = await findOneUser({ username: "John Doe" });
-```
+- **`Model.findOne()`** - Finds the first document matching the filter, useful when you know only one document matches (e.g., finding by unique email).
 
 #### 4.2 Update Methods
 
 Mongoose provides multiple update methods, but in real-world application code, you should generally prefer update methods that return the updated document. See implementation in **[update.service.ts](./src/services/update.service.ts)**.
 
-**`Model.updateMany()`** - Updates multiple documents matching the filter and returns update metadata (matched and modified counts), not the updated documents.
+- **`Model.updateMany()`** - Updates multiple documents matching the filter and returns update metadata (matched and modified counts), not the updated documents.
 
-```typescript
-import { updateManyUsers } from "./services/update.service";
+- **`Model.updateOne()`** - Updates the first document matching the filter and returns update metadata (matched and modified counts). It does not return the updated document.
 
-const result = await updateManyUsers(
-  { email: "test@example.com" },
-  { avatar: "default-avatar.png" }
-);
-```
+- **`Model.findByIdAndUpdate()`** - Finds a document by ID and updates it, returns the old document by default, or the new document if `{ new: true }` option is used.
 
-**`Model.updateOne()`** - Updates the first document matching the filter and returns update metadata (matched and modified counts). It does not return the updated document.
+- **`Model.findOneAndUpdate()`** - Finds a document matching the filter and updates it, similar to `findByIdAndUpdate` but uses typed filter conditions.
 
-```typescript
-import { updateOneUser } from "./services/update.service";
+- **`Model.findOneAndReplace()`** - Finds a document and replaces the entire document with a new one, unlike `updateOne`, this method replaces the entire document instead of updating only specified fields, unspecified fields will be removed. It returns the old document by default, or the new document if `{ new: true }` option is used.
 
-const result = await updateOneUser(
-  { email: "john@example.com" },
-  { username: "Updated Username" }
-);
-```
-
-**`Model.findByIdAndUpdate()`** - Finds a document by ID and updates it, returns the old document by default, or the new document if `{ new: true }` option is used.
-
-```typescript
-import { findByIdAndUpdateUser } from "./services/update.service";
-
-const updatedUser = await findByIdAndUpdateUser(
-  userId,
-  { username: "New Username" },
-  { new: true, runValidators: true }
-);
-
-const oldUser = await findByIdAndUpdateUser(
-  userId,
-  { email: "newemail@example.com" }
-);
-```
-
-**`Model.findOneAndUpdate()`** - Finds a document matching the filter and updates it, similar to `findByIdAndUpdate` but uses typed filter conditions.
-
-```typescript
-import { findOneAndUpdateUser } from "./services/update.service";
-
-const updatedUser = await findOneAndUpdateUser(
-  { email: "john@example.com" },
-  { username: "John Updated" },
-  { new: true }
-);
-```
-
-**`Model.findOneAndReplace()`** - Finds a document and replaces the entire document with a new one, unlike `updateOne`, this method replaces the entire document instead of updating only specified fields, unspecified fields will be removed. It returns the old document by default, or the new document if `{ new: true }` option is used.
-
-```typescript
-import { findOneAndReplaceUser } from "./services/update.service";
-
-const replacedUser = await findOneAndReplaceUser(
-  { email: "john@example.com" },
-  { 
-    username: "John Doe",
-    email: "john@example.com",
-    avatar: "new-avatar.png"
-  },
-  { new: true }
-);
-```
-
-**`Model.replaceOne()`** - Replaces the first document matching the filter, similar to `findOneAndReplace` but doesn't return the document, only the update metadata (matched and modified counts).
-
-```typescript
-import { replaceOneUser } from "./services/update.service";
-
-const result = await replaceOneUser(
-  { email: "john@example.com" },
-  { 
-    username: "John Doe",
-    email: "john@example.com",
-    avatar: "new-avatar.png"
-  }
-);
-```
+- **`Model.replaceOne()`** - Replaces the first document matching the filter, similar to `findOneAndReplace` but doesn't return the document, only the update metadata (matched and modified counts).
 
 In practice, `findByIdAndUpdate()` and `findOneAndUpdate()` are the most commonly used update methods **for API development**. They allow you to confirm that a document exists, apply updates, and optionally return the updated document to the application.
 
@@ -333,40 +230,15 @@ Replacement methods like `findOneAndReplace()` and `replaceOne()` completely ove
 
 #### 4.3 Delete Methods
 
-Mongoose provides several delete methods, but in real-world application code, you usually should prefer methods that return the deleted document. See implementation in **[delete.service.ts](./src/services/delete.service.ts)**.
+Mongoose provides several delete methods, but in real-world application code, you usually should prefer methods that return the deleted document.
 
-**`Model.deleteMany()`** - Deletes multiple documents matching the filter. Deletes ALL documents in the collection if no filter is provided (use with caution!).
+- **`Model.deleteMany()`** - Deletes multiple documents matching the filter. Deletes ALL documents in the collection if no filter is provided (use with caution!).
 
-```typescript
-import { deleteManyUsers } from "./services/delete.service";
+- **`Model.deleteOne()`** - Deletes the first document matching the filter. Only deletes the first document found.
 
-const result = await deleteManyUsers({ email: "test@example.com" });
-const result = await deleteManyUsers();
-```
+- **`Model.findByIdAndDelete()`** - Finds a document by ID and deletes it. Returns the deleted document or null if not found.
 
-**`Model.deleteOne()`** - Deletes the first document matching the filter. Only deletes the first document found.
-
-```typescript
-import { deleteOneUser } from "./services/delete.service";
-
-const result = await deleteOneUser({ email: "john@example.com" });
-```
-
-**`Model.findByIdAndDelete()`** - Finds a document by ID and deletes it. Returns the deleted document or null if not found.
-
-```typescript
-import { findByIdAndDeleteUser } from "./services/delete.service";
-
-const deletedUser = await findByIdAndDeleteUser(userId);
-```
-
-**`Model.findOneAndDelete()`** - Finds a document matching the filter and deletes it. Returns the deleted document or null.
-
-```typescript
-import { findOneAndDeleteUser } from "./services/delete.service";
-
-const deletedUser = await findOneAndDeleteUser({ email: "john@example.com" });
-```
+- **`Model.findOneAndDelete()`** - Finds a document matching the filter and deletes it. Returns the deleted document or null.
 
 In practice, `findByIdAndDelete()` and `findOneAndDelete()` are recommended over `deleteOne()` and `deleteMany()` because they allow you to verify that a document actually existed and was deleted, and they return the deleted document for further processing such as logging or response payloads.
 

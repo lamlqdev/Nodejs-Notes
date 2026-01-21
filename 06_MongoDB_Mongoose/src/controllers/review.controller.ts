@@ -57,14 +57,14 @@ export async function deleteReview(req: Request, res: Response, next: NextFuncti
     }
 
     const review = await deleteReviewService(id as string);
-    
+
     if (!review) {
       return res.status(404).json({ error: "Review not found" });
     }
 
-    res.status(200).json({ 
+    res.status(200).json({
       message: "Review deleted successfully",
-      data: review 
+      data: review
     });
   } catch (error) {
     next(error);

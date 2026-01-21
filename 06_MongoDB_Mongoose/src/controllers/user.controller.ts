@@ -5,7 +5,7 @@ import { CreateUserData, UpdateUserData } from "../types/user.types";
 export async function getUsers(req: Request, res: Response, next: NextFunction) {
   try {
     const { username, email, page, limit, sort } = req.query;
-    
+
     const filter: any = {};
     if (username) {
       filter.username = username as string;
@@ -30,13 +30,13 @@ export async function getUsers(req: Request, res: Response, next: NextFunction) 
 export async function getUserById(req: Request, res: Response, next: NextFunction) {
   try {
     const { id } = req.params;
-    
+
     if (!id) {
       return res.status(400).json({ error: "User ID is required" });
     }
 
     const user = await findUserById(id as string);
-    
+
     if (!user) {
       return res.status(404).json({ error: "User not found" });
     }
@@ -82,7 +82,7 @@ export async function updateUser(req: Request, res: Response, next: NextFunction
     if (email !== undefined) updateData.email = email;
 
     const user = await updateUserService(id as string, updateData);
-    
+
     if (!user) {
       return res.status(404).json({ error: "User not found" });
     }
@@ -102,14 +102,14 @@ export async function deleteUser(req: Request, res: Response, next: NextFunction
     }
 
     const user = await softDeleteUserService(id as string);
-    
+
     if (!user) {
       return res.status(404).json({ error: "User not found" });
     }
 
-    res.status(200).json({ 
+    res.status(200).json({
       message: "User deleted successfully",
-      data: user 
+      data: user
     });
   } catch (error) {
     next(error);
