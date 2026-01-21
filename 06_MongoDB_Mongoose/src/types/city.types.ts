@@ -1,7 +1,5 @@
-export interface UserFilter {
-  username?: string;
-  email?: string;
-  avatar?: string;
+export interface CityFilter {
+  country?: string;
 }
 
 export interface PaginationOptions {
@@ -22,12 +20,14 @@ export interface PaginatedResult<T> {
   };
 }
 
-export interface CreateUserData {
-  username: string;
-  email: string;
+export interface CreateCityData {
+  name: string;
+  country: string;
+  description?: string;
 }
 
-export interface UpdateUserData {
-  username?: string;
-  email?: string;
+export interface UpdateCityData {
+  name?: string;
+  country?: string;
+  description?: string;
 }

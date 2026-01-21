@@ -10,20 +10,40 @@ const placeSchema = new Schema({
     ref: 'City',
     required: true
   },
-  description: String,
+  description: {
+    type: String,
+    maxlength: 2000
+  },
   category: {
     type: String,
     enum: ['restaurant', 'hotel', 'attraction', 'museum', 'park', 'other']
   },
-  images: [String],
-  address: String,
+  address: {
+    type: String,
+    maxlength: 500
+  },
   averageRating: {
     type: Number,
+    default: 0,
+    min: 0,
+    max: 5
+  },
+  reviewCount: {
+    type: Number,
     default: 0
+  },
+  isDeleted: {
+    type: Boolean,
+    default: false
   }
 }, {
   timestamps: true
 });
+
+placeSchema.index({ city: 1 });
+placeSchema.index({ isDeleted: 1 });
+placeSchema.index({ category: 1 });
+placeSchema.index({ averageRating: -1 });
 
 // Pre-save: Validate city exists
 placeSchema.pre('save', async function () {
@@ -33,6 +53,15 @@ placeSchema.pre('save', async function () {
     if (!cityExists) {
       throw new Error('City not found');
     }
+  }
+});
+
+// Pre-find: Filter out deleted places by default
+// Note: To query deleted places, use Place.find({ isDeleted: true }) explicitly
+placeSchema.pre(['find', 'findOne'], function () {
+  // Only apply filter if isDeleted is not explicitly set in the query
+  if (this.getQuery().isDeleted === undefined) {
+    this.where('isDeleted', false);
   }
 });
 

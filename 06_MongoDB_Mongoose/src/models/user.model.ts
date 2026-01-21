@@ -10,12 +10,21 @@ const userSchema = new Schema({
   email: {
     type: String,
     required: true,
-    unique: true
+    unique: true,
+    lowercase: true,
+    trim: true,
+    match: [/^\S+@\S+\.\S+$/, 'Please provide a valid email address']
   },
-  avatar: String
+  isActive: {
+    type: Boolean,
+    default: true
+  }
 }, {
   timestamps: true
 });
+
+userSchema.index({ email: 1 });
+userSchema.index({ isActive: 1 });
 
 // Pre-remove: Delete all reviews of user when deleting user
 userSchema.pre('deleteOne', { document: true, query: false }, async function () {

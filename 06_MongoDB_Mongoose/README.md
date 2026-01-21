@@ -99,7 +99,7 @@ const placeSchema = new Schema({
 });
 ```
 
-> Notes: By default, Mongoose adds an `_id` property to the schema, you can overrid it by your own `_id` field.
+> Notes: By default, Mongoose adds an `_id` property to the schema, you can override it by your own `_id` field.
 
 #### SchemaTypes (Data Types)
 
@@ -121,11 +121,44 @@ const placeSchema = new Schema({
 
 - Other schema-level options include `versionKey` to control the internal versioning field, `toJSON` and `toObject` transforms to customize how documents are serialized, and `index` definitions to optimize queries.
 
+#### Schema Methods
+
+Mongoose allows defining custom methods directly on the schema, which can be divided into **instance methods** and **static methods**. These methods help encapsulate logic that is closely related to the model itself.
+
+- **Instance Methods**: are defined on `schema.methods` and are available on document instances. Inside an instance method, `this` refers to the current document. Instance methods are typically used for behavior that belongs to a single document and requires access to its fields.
+
+  ```typescript
+  // Definition schema method
+  placeSchema.methods.isHighlyRated = function () {
+    return this.averageRating >= 4;
+  };
+
+  // Usage
+  const place = await Place.findById(placeId);
+  if (place.isHighlyRated()) {
+    console.log('This place is highly rated');
+  }
+  ```
+
+- **Static Methods**: are defined on `schema.statics` and are available on the model itself, not on individual documents. Static methods are commonly used to encapsulate reusable query logic.
+
+  ```typescript
+  // Definition static method
+  placeSchema.statics.findByCity = function (cityId: string) {
+    return this.find({ city: cityId, isDeleted: false });
+  };
+
+  // Usage
+  const places = await Place.findByCity(cityId);
+  ```
+
+  > Note: Do not declare static methods as ES6 arrow functions, because `this` will not refer to the model itself, but to the global object.
+
 ### 3. Mongoose Models
 
 **[Models](https://mongoosejs.com/docs/models.html)** are fancy constructors compiled from Schema definitions. Models are responsible for creating and reading documents from the underlying MongoDB database.
 
-**Compling model**: when we call `model()` function, Mongoose compiles the schema into a model. The first argument is the name of the model, and the second argument is the schema.
+**Compiling model**: when we call `model()` function, Mongoose compiles the schema into a model. The first argument is the name of the model, and the second argument is the schema.
 
 ```typescript
 import { model } from "mongoose";
@@ -345,9 +378,9 @@ Mongoose provides built-in validation based on the schema definition and allows 
 
 #### 5.1 Built-in Validation
 
-Mongoose has serveral built-in validators:
+Mongoose has several built-in validators:
 
-- All SchemaTypes haave the built-in `required` validator.
+- All SchemaTypes have the built-in `required` validator.
 - Number have `min` and `max` validators.
 - String have `enum`, `minlength`, `maxlength` and `match` validators.
 

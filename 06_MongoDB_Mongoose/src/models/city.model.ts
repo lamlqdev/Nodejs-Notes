@@ -3,17 +3,27 @@ import { model, Schema } from "mongoose";
 const citySchema = new Schema({
   name: {
     type: String,
-    required: true
+    required: true,
+    unique: true
   },
   country: {
     type: String,
     required: true
   },
-  description: String,
-  image: String
+  description: {
+    type: String,
+    maxlength: 2000
+  },
+  isActive: {
+    type: Boolean,
+    default: true
+  }
 }, {
   timestamps: true
 });
+
+citySchema.index({ name: 1 });
+citySchema.index({ isActive: 1 });
 
 // Pre-save: Trim name and country
 citySchema.pre('save', function () {
