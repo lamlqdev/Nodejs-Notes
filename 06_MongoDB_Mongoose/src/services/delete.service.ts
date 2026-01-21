@@ -37,10 +37,6 @@ export async function findByIdAndDeleteUser(id: string) {
   return await User.findByIdAndDelete(id);
 }
 
-export async function findByIdAndRemoveUser(id: string) {
-  return await User.findByIdAndDelete(id);
-}
-
 export async function findOneAndDeleteUser(filter: UserFilter) {
   const query: Record<string, any> = {};
   

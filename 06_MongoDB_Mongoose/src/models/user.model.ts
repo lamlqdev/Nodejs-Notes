@@ -17,4 +17,15 @@ const userSchema = new Schema({
   timestamps: true
 });
 
+// Pre-remove: Delete all reviews of user when deleting user
+userSchema.pre('deleteOne', { document: true, query: false }, async function () {
+  try {
+    const Review = model('Review');
+    await Review.deleteMany({ user: this._id });
+    console.log(`Deleted all reviews for user: ${this.username}`);
+  } catch (error) {
+    console.error(`Error deleting reviews for user: ${this.username}`, error);
+  }
+});
+
 export const User = model("User", userSchema);
