@@ -237,29 +237,6 @@ import { Product } from '../models/product.model';
 import type { Types } from 'mongoose';
 import { AppError } from '../middlewares/error.middleware';
 
-export interface ProductFilter {
-  category?: string;
-  search?: string;
-}
-
-export interface PaginationOptions {
-  page: number;
-  limit: number;
-  sort?: Record<string, 1 | -1>;
-}
-
-export interface PaginatedResult<T> {
-  data: T[];
-  pagination: {
-    currentPage: number;
-    totalPages: number;
-    totalItems: number;
-    itemsPerPage: number;
-    hasNextPage: boolean;
-    hasPrevPage: boolean;
-  };
-}
-
 export async function findProducts(
   filter: ProductFilter,
   options: PaginationOptions
@@ -585,24 +562,7 @@ Routes define API endpoints and apply middleware in the correct order. Validatio
 
 ```typescript
 import { Router } from 'express';
-import {
-  getProductsController,
-  getProductController,
-  createProductController,
-  updateProductController,
-  patchProductController,
-  deleteProductController,
-} from '../controllers/product.controller';
-import { authenticate } from '../middlewares/auth.middleware';
-import { authorizeAdmin } from '../middlewares/authorize.middleware';
-import { validate } from '../middlewares/validation.middleware';
-import {
-  createProductSchema,
-  updateProductSchema,
-  patchProductSchema,
-  getProductSchema,
-  getProductsQuerySchema,
-} from '../validations/product.validation';
+// import controllers, validation middleware, and validation schemas
 
 const router = Router();
 
@@ -639,9 +599,13 @@ Public routes (GET) don't require authentication. Protected routes (POST, PUT, P
 
 ### 2.8. Pagination and Filtering
 
-Pagination and filtering are common features in RESTful APIs. They allow clients to retrieve data in manageable chunks and filter results based on criteria.
+In most REST APIs, the client sends filtering, sorting, and pagination information through query parameters in the URL. A common request looks like this:
 
-**Pagination Implementation**: The service layer handles pagination:
+```bash
+GET /api/products?page=1&limit=10&category=electronics&search=laptop
+```
+
+**Pagination Implementation**: The service layer receives filter, sort, and pagination options from the controller, then builds and executes the database query.
 
 ```typescript
 export async function findProducts(
@@ -684,17 +648,71 @@ export async function findProducts(
 }
 ```
 
-Pagination uses `skip` and `limit` to retrieve a subset of results. The total count is calculated in parallel with the data query for efficiency. The response includes pagination metadata to help clients navigate through pages.
+#### Filtering
 
-**Filtering**: Filters are applied to the MongoDB query. Category filtering uses exact match, while search filtering uses regex for partial matching in name and description fields.
+Filtering is implemented using a **plain JavaScript object** that represents query conditions. This object is passed directly to `Model.find(filter)`. Technically, the filter object may contain fields that are not defined in the schema, and the query will still execute without throwing an error. However, this behavior can easily lead to silent logic bugs and potential security issues if client input is trusted blindly.
 
-**Usage Example**:
+For this reason, services **should not trust incoming filters**. A common best practice is to define an allowlist of filterable fields and construct the filter object explicitly from that list.
 
-```bash
-GET /api/products?page=1&limit=10&category=electronics&search=laptop
+```typescript
+export interface ProductFilter {
+  category?: string;
+  search?: string;
+}
 ```
 
-This retrieves the first page of electronics products containing "laptop" in the name or description, with 10 items per page.
+```typescript
+export interface PaginationOptions {
+  page: number;
+  limit: number;
+  sort?: Record<string, 1 | -1>;
+}
+```
+
+#### Search (Text / Keyword Search)
+
+Search is used for keyword or partial matching, typically for user-facing search boxes. Unlike exact filtering, search allows flexible matching and is usually combined with filter and pagination in the same endpoint. MongoDB provides two common approaches: `$regex` for simple pattern matching and `$text` for full-text search using text indexes. `$regex` is easy to use but does not scale well, while `$text` is more suitable for larger datasets.
+
+Common MongoDB operators used in search:
+
+- `$regex`: matches strings based on a pattern (often combined with `$options: "i"` for case-insensitive search)
+- `$text`: performs full-text search on fields with a text index
+- `$in`: matches any value in a given array
+- `$ne`: excludes a specific value
+- `$gt`, `$gte`: greater than / greater than or equal
+- `$lt`, `$lte`: less than / less than or equal
+- `$and`, `$or`: combine multiple search or filter conditions
+
+#### Sorting
+
+Sorting defines **the order** in which documents are returned before pagination is applied. It is necessary because pagination depends on a stable and predictable order of data. Without sorting, the same record may appear on different pages across requests.
+
+Sorting is usually defined by a field and a direction: **ascending (1)** or **descending (-1)**. For example, sorting by createdAt in descending order ensures that the newest records are returned first. Sorting can also be applied to multiple fields, where the next field is used when values of the previous field are equal.
+
+#### Page-Based Pagination
+
+Page-based pagination is based on the principle that the server should not return all records in a single response. Instead, data is returned in smaller chunks to reduce payload size and improve performance.
+
+In this approach, the client sends a page number and a limit (items per page). The server converts these values into a skip value using the formula `(page - 1) * limit`, then applies skip and limit to the query after sorting.
+
+Along with the paginated data, the server **should return pagination metadata** so the client can correctly render navigation controls. This metadata typically includes the **current page, total pages, total items, items per page,** and **flags** indicating whether next or previous pages are available. This structure allows the client to handle pagination logic without needing to calculate it locally and keeps responsibilities clearly separated between client and server.
+
+```typescript
+export interface PaginationResult<T> {
+  data: T[];
+  pagination: {
+    currentPage: number;
+    totalPages: number;
+    totalItems: number;
+    itemsPerPage: number;
+    hasNextPage: boolean;
+    hasPrevPage: boolean;
+  };
+}
+```
+
+> Note: Search conditions are merged into the same filter object passed to `find()`. Query building is typically done using **chain methods** such as `find()`, `sort()`, `skip()`, and `limit()`, which makes the logic clearer and easier to maintain.
+
 
 ### 2.9. Error Handling
 
@@ -736,20 +754,6 @@ export const errorHandler = (
 
 This ensures that all errors are handled consistently and clients receive appropriate error messages with correct status codes.
 
-### 2.10. Complete CRUD API Example
-
-A complete CRUD API follows RESTful principles:
-
-- **Create (POST)**: `POST /api/products` creates a new product. Requires authentication and admin role. Validates input using Zod schema.
-
-- **Read (GET)**: `GET /api/products` retrieves a list of products with pagination and filtering. `GET /api/products/:id` retrieves a specific product. Both are public endpoints.
-
-- **Update (PUT/PATCH)**: `PUT /api/products/:id` updates the entire product. `PATCH /api/products/:id` partially updates the product. Both require authentication and admin role.
-
-- **Delete (DELETE)**: `DELETE /api/products/:id` removes a product. Requires authentication and admin role.
-
-All operations follow the layered architecture: routes apply middleware, controllers handle HTTP, services contain business logic, and models interact with the database.
-
 ---
 
 ## 3. Best Practices
@@ -789,7 +793,6 @@ Use consistent error handling throughout the application:
 7. **[Routes with Validation and Authorization](#27-routes-with-validation-and-authorization)**: Define API endpoints, applying validation and authorization middleware.
 8. **[Pagination and Filtering](#28-pagination-and-filtering)**: Implement pagination and filtering logic in services and controllers.
 9. **[Error Handling](#29-error-handling)**: Use `AppError` and global error handler for consistent error responses.
-10. **[Complete CRUD API Example](#210-complete-crud-api-example)**: Implement full Create, Read, Update, Delete operations for products following REST principles.
 
 ## 5. Resources
 

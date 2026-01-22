@@ -19,7 +19,7 @@ MongoDB organizes data in three main levels: database → collection → documen
 
 ![Collections](./public/collections.png)
 
-- **Database**: A logical container for collections, similar to a database in PostgreSQL/MySQL. You can have multiple databases (for example app_dev, app_test, analytics) on the same MongoDB server.
+- **Database**: A logical container for collections, similar to a database in PostgreSQL/MySQL. You can have multiple databases (for example `app_dev`, `app_test`, `analytics`) on the same MongoDB server.
 - **Collection**: A collection is a group of documents, roughly equivalent to a table in SQL. Collections are schemaless by default: documents in the same collection do not need to share the same fields or structure.
 - **Document**: A document is the basic unit of data stored in a collection, similar to a row in SQL, but represented as a BSON object. A document is a set of key–value pairs and can contain nested objects and arrays.
 
@@ -36,7 +36,7 @@ In MongoDB you design your model around how the application reads and writes dat
 Because MongoDB doesn’t enforce relationships between collections, there’s nothing built-in to guarantee data consistency across them. For example:
 
 - A `id` in a `customers` collection might not actually exist in the `books` collection.
-- There are no automatic checks, constraints, or warnings if data goes out of sync.
+- There are no automatic checks or warnings if data goes out of sync.
 - Joining related data requires manual `$lookup` queries - and those can get complex, especially as your data grows.
 
 This flexibility is part of what makes MongoDB powerful - but without structure, it can also become a hidden risk. You lose some of the clarity and safety that comes from defined relationships in relational databases.
@@ -52,7 +52,7 @@ This flexibility is part of what makes MongoDB powerful - but without structure,
 Indexes in MongoDB are special data structures that store a small portion of the collection’s data in a way that makes queries faster, similar to indexes in SQL. They allow the database to avoid scanning every document and instead jump directly to matching entries based on the index keys. Important points:
 
 - `_id` is automatically indexed and unique for every document.
-- You can create **single-field indexes**, **compound indexes** (on multiple fields), **unique indexes** (no duplicates), **text indexes** (for search), and **geospatial indexes**.
+- You can create **single-field indexes**, **compound indexes** (on multiple fields), **unique indexes** (no duplicates), **text indexes** (for search), **geospatial indexes** (for location-based queries).
 - Indexes speed up read-heavy operations but add overhead for writes (insert/update/delete must also update the index).
 
 ## Mongoose overview (ODM)
@@ -88,7 +88,6 @@ const placeSchema = new Schema({
     type: String,
     enum: ['restaurant', 'hotel', 'attraction', 'museum', 'park', 'other']
   },
-  images: [String],
   address: String,
   averageRating: {
     type: Number,
@@ -101,15 +100,86 @@ const placeSchema = new Schema({
 
 > Notes: By default, Mongoose adds an `_id` property to the schema, you can override it by your own `_id` field.
 
+#### BaseSchema
+
+BaseSchema is a foundational schema that contains common fields that can be reused by other schemas. This helps avoid code duplication and ensures consistency across schemas in your application.
+
+**Creating BaseSchema**:
+
+```typescript
+import { Schema } from "mongoose";
+
+// Define BaseSchema with common fields
+const baseSchemaOptions = {
+  timestamps: true, // Automatically adds createdAt and updatedAt
+  toJSON: { virtuals: true },
+  toObject: { virtuals: true }
+};
+
+const baseSchema = new Schema({
+  isDeleted: {
+    type: Boolean,
+    default: false
+  },
+  deletedAt: {
+    type: Date,
+    default: null
+  }
+}, baseSchemaOptions);
+
+// Add instance method for soft delete
+baseSchema.methods.softDelete = function() {
+  this.isDeleted = true;
+  this.deletedAt = new Date();
+  return this.save();
+};
+
+// Add static method to query non-deleted documents
+baseSchema.statics.findActive = function() {
+  return this.find({ isDeleted: false });
+};
+```
+
+**Using BaseSchema with other schemas**:
+
+```typescript
+import { Schema } from "mongoose";
+
+// Create new schema by combining with BaseSchema
+const userSchema = new Schema({
+  username: {
+    type: String,
+    required: true,
+    unique: true
+  },
+  email: {
+    type: String,
+    required: true,
+    unique: true
+  },
+  password: {
+    type: String,
+    required: true
+  }
+}, baseSchemaOptions);
+
+// Add fields from BaseSchema to userSchema
+userSchema.add(baseSchema.obj);
+
+// Use methods from BaseSchema
+const user = await User.findById(userId);
+await user.softDelete(); // Use instance method from BaseSchema
+
+const activeUsers = await User.findActive(); // Use static method from BaseSchema
+```
+
 #### SchemaTypes (Data Types)
 
 - SchemaTypes describe what **kind of data** a field stores. Mongoose provides a set of built-in types that map to MongoDB’s BSON types. Common SchemaTypes include `String`, `Number`, `Boolean`, `Date`, `Array`, `Map`, `Buffer`, `UUID`, `Decimal128`, `Mixed` and `Schema.Types.ObjectId`. The ObjectId type is especially important because it is used to reference documents in other collections.
 
-- For example, a string field can be defined as `name: String`, a numeric field as `rating: Number`, a reference as `city: Schema.Types.ObjectId`, and an array of strings as `images: [String]`.
-
 #### Field Options and Validators
 
-- In addition to the data type, each field can define options and validators that control **how data is stored, validated and queried**. These options are not data types themselves; they describe rules and behavior applied to the field.
+- In addition to the data type, each field can define options and validators that control **how data is stored, validated** and **queried**. These options are not data types themselves; they describe rules and behavior applied to the field.
 
 - Validation options such as `required`, `min`, `max`, `minlength`, `maxlength`, `enum`, `match` and custom validate functions are used to ensure data correctness. Default and transform options like `default`, `trim`, `lowercase`, and `uppercase` help normalize data before it is saved.
 
@@ -200,49 +270,41 @@ Mongoose models provide several static helper functions for CRUD operations. Eac
 
 Documents can be retrieved using a model's `find`, `findOne`, `findById` or `where` static functions.
 
-- **`Model.find()`** - Finds all documents matching the filter, supports pagination. Returns all documents if no filter is provided.
+- **`Model.find()`** - Finds all documents that match the filter (plain object). If no filter is provided, it returns all documents. Pagination can be implemented in two ways: **passing options** directly to `find(filter, projection, options)`, or using **chain methods (recommended)** such as `sort()`, `skip()`, and `limit()`.
 
-- **`Model.findById()`** - Finds a document by ID, faster than `findOne({ _id })` because MongoDB optimizes queries on `_id`.
+- **`Model.findById()`** - Finds a document **by ID**, shortcut for `findOne({ _id: id })`.
 
-- **`Model.findOne()`** - Finds the first document matching the filter, useful when you know only one document matches (e.g., finding by unique email).
+- **`Model.findOne()`** - Finds one document **matching the filter**, useful when you know only one document matches (e.g., finding by unique email).
 
 #### 4.2 Update Methods
 
-Mongoose provides multiple update methods, but in real-world application code, you should generally prefer update methods that return the updated document. See implementation in **[update.service.ts](./src/services/update.service.ts)**.
+Mongoose provides multiple update methods, in practice, you should generally prefer update methods that return the updated document.
 
-- **`Model.updateMany()`** - Updates multiple documents matching the filter and returns update metadata (matched and modified counts), not the updated documents.
+- **`Model.updateMany()`** - Updates **multiple** documents matching the filter and returns update metadata (matched and modified counts).
 
-- **`Model.updateOne()`** - Updates the first document matching the filter and returns update metadata (matched and modified counts). It does not return the updated document.
+- **`Model.updateOne()`** - Updates **one** document matching the filter and returns update metadata (matched and modified counts).
 
-- **`Model.findByIdAndUpdate()`** - Finds a document by ID and updates it, returns the old document by default, or the new document if `{ new: true }` option is used.
+- **`Model.findByIdAndUpdate()`** - Finds a document **by ID** and updates it, returns the old document by default, or the new document if `{ new: true }` option is used. **(Recommended)**
 
-- **`Model.findOneAndUpdate()`** - Finds a document matching the filter and updates it, similar to `findByIdAndUpdate` but uses typed filter conditions.
+- **`Model.findOneAndUpdate()`** - Finds a document **matching the filter** and updates it, similar to `findByIdAndUpdate` but uses typed filter conditions. **(Recommended)**
 
-- **`Model.findOneAndReplace()`** - Finds a document and replaces the entire document with a new one, unlike `updateOne`, this method replaces the entire document instead of updating only specified fields, unspecified fields will be removed. It returns the old document by default, or the new document if `{ new: true }` option is used.
+- **`Model.findOneAndReplace()`** - Finds a document and replaces **the entire document with a new one**, unspecified fields will be removed. It returns the old document by default, or the new document if `{ new: true }` option is used. **(Rarely used)**
 
-- **`Model.replaceOne()`** - Replaces the first document matching the filter, similar to `findOneAndReplace` but doesn't return the document, only the update metadata (matched and modified counts).
-
-In practice, `findByIdAndUpdate()` and `findOneAndUpdate()` are the most commonly used update methods **for API development**. They allow you to confirm that a document exists, apply updates, and optionally return the updated document to the application.
-
-Methods such as `updateOne()` and `updateMany()` update documents directly in the database but do not return the updated documents. These methods are better suited for **bulk updates**, **background jobs**, or **maintenance scripts**, rather than user-facing APIs.
-
-Replacement methods like `findOneAndReplace()` and `replaceOne()` completely overwrite an existing document. Because they can easily remove fields unintentionally, they are **rarely used** in REST APIs and should be applied with caution.
+- **`Model.replaceOne()`** - Replaces **one** document matching the filter, returns the update metadata (matched and modified counts). **(Rarely used)**
 
 #### 4.3 Delete Methods
 
-Mongoose provides several delete methods, but in real-world application code, you usually should prefer methods that return the deleted document.
+In real-world applications, hard delete is rarely used. Instead, most systems implement soft delete (for example, using a deletedAt field) to preserve data for recovery, auditing, and historical tracking. As a result, delete operations in APIs are typically implemented as update operations, while true delete methods are reserved for background jobs or maintenance tasks.
 
-- **`Model.deleteMany()`** - Deletes multiple documents matching the filter. Deletes ALL documents in the collection if no filter is provided (use with caution!).
+- **`Model.deleteMany()`** - Deletes **multiple** documents matching the filter. Deletes **ALL** documents in the collection if no filter is provided (use with caution!).
 
-- **`Model.deleteOne()`** - Deletes the first document matching the filter. Only deletes the first document found.
+- **`Model.deleteOne()`** - Deletes **one** document matching the filter.
 
-- **`Model.findByIdAndDelete()`** - Finds a document by ID and deletes it. Returns the deleted document or null if not found.
+- **`Model.findByIdAndDelete()`** - Finds a document **by ID** and deletes it, returns the deleted document or null if not found. **(Recommended)**
 
-- **`Model.findOneAndDelete()`** - Finds a document matching the filter and deletes it. Returns the deleted document or null.
+- **`Model.findOneAndDelete()`** - Finds a document **matching the filter** and deletes it, returns the deleted document or null. **(Recommended)**
 
-In practice, `findByIdAndDelete()` and `findOneAndDelete()` are recommended over `deleteOne()` and `deleteMany()` because they allow you to verify that a document actually existed and was deleted, and they return the deleted document for further processing such as logging or response payloads.
-
-`deleteOne()` and `deleteMany()` should be used mainly for bulk operations, maintenance tasks, or background jobs, where returning the deleted data is unnecessary. Using these methods directly in user-facing APIs can make error handling and debugging harder, since they do not return the deleted document.
+> Note: `Model.updateMany()`, `Model.updateOne()`, `Model.deleteMany()`, `Model.deleteOne()` are suitable for bulk updates, background jobs, or maintenance scripts.
 
 ### 5. Validation
 
@@ -267,7 +329,7 @@ You can configure the error message for individual validators in the schema defi
 
 Custom validators are used when validation logic goes beyond what built-in options provide. They allow defining custom functions to validate field values and are typically used for business-specific rules.
 
-Custom validation is declared by passing a validation function to the `validate` option in the schema definition. This function receives the value and path of the field (`props.value` and `props.path`) and can access the document (by `this` keyword). The validation function should return a boolean indicating whether the value is valid. If the validation function returns `false`, the validation will fail and the document will not be saved.
+Custom validation is declared by passing a validation function to the `validate` option in the schema definition. This function receives the value and path of the field (`props.value` and `props.path`) and can access the document (by `this` keyword). The validation function should return a boolean indicating whether the value is valid.
 
 ```typescript
 const userSchema = new Schema({
