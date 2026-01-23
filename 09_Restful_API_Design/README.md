@@ -57,6 +57,27 @@ The REST API request and response details vary slightly depending on how the API
 
 ![Authorization](./public/authentication-authorization.png)
 
+### Passport.js
+
+**Passport.js** is a popular authentication middleware for Node.js applications. It provides a simple, unobtrusive way to handle authentication strategies, making it easy to integrate different authentication methods into Express applications.
+
+**Strategies**: In Passport.js terminology, a **strategy** is a specific authentication mechanism. Strategies are pluggable modules that implement authentication logic for different methods. Common strategies include:
+
+- **JWT Strategy** (`passport-jwt`): Authenticates users using JSON Web Tokens
+- **Local Strategy** (`passport-local`): Authenticates with username and password
+- **OAuth Strategies**: Authenticate using third-party providers (Google, Facebook, etc.)
+
+Each strategy is configured with specific options (like secret keys, token extraction methods) and a verify callback function that determines how to authenticate the user. Once configured, strategies are registered with Passport using `passport.use()`.
+
+**Role**: Passport.js acts as an authentication framework that handles the authentication flow. When a request comes in, Passport performs the following operations:
+
+- **Extract credentials**: Extracts authentication credentials (tokens, keys, etc.) from the request using configurable extractors (e.g., from Authorization header, cookies, query parameters)
+- **Verify credentials**: Verifies the extracted credentials (decodes JWT tokens, validates signatures, checks expiration)
+- **Executes the verify callback** where the application decides whether the JWT payload represents a valid user or not
+- **Attach user to request**: If authentication succeeds, attaches the authenticated user object to `req.user` for use in subsequent middleware and route handlers
+- **Handle authentication errors**: Manages authentication failures, returning appropriate responses or passing errors to error handlers
+- **Session management** (optional): Can manage user sessions if session-based authentication is enabled
+
 ---
 
 ## 2. Implementation Guide
@@ -552,7 +573,121 @@ export const User = model('User', userSchema);
 
 Users have a role field that can be either 'admin' or 'user'. The default role is 'user'. JWT tokens should include the role so that authorization middleware can check it.
 
-### 2.7. Routes with Validation and Authorization
+### 2.7. Passport.js Implementation
+
+This project uses Passport.js with JWT strategy for authentication. Passport provides a clean, modular approach to handle authentication.
+
+**Install Dependencies**: Install Passport.js and the JWT strategy:
+
+```bash
+npm install passport passport-jwt
+npm install --save-dev @types/passport-jwt
+```
+
+**Extend Express Types**: Create `src/types/express.d.ts` to extend Express Request with the `user` property:
+
+```typescript
+declare global {
+  namespace Express {
+    interface User {
+      userId: string;
+      email: string;
+      role: 'admin' | 'user';
+    }
+  }
+}
+
+export { };
+```
+
+This TypeScript declaration extends the Express `Request` interface, allowing `req.user` to be properly typed throughout the application.
+
+**Configure Passport Strategy**: Create `src/config/passport.ts`:
+
+```typescript
+import { Strategy as JwtStrategy, ExtractJwt, type StrategyOptions } from 'passport-jwt';
+import passport from 'passport';
+import type { Request } from 'express';
+
+import config from './config';
+import { findUserById } from '../services/user.service';
+import type { TokenPayload } from '../utils/jwt.util';
+
+const jwtOptions: StrategyOptions = {
+  jwtFromRequest: ExtractJwt.fromExtractors([
+    ExtractJwt.fromAuthHeaderAsBearerToken(),
+    (req: Request) => {
+      let token = null;
+      if (req && req.cookies) {
+        token = req.cookies.accessToken;
+      }
+      return token;
+    },
+  ]),
+  secretOrKey: config.jwtSecret,
+};
+
+const jwtStrategy = new JwtStrategy(jwtOptions, async (payload: TokenPayload, done) => {
+  try {
+    const user = await findUserById(payload.userId);
+    if (!user) {
+      return done(null, false);
+    }
+    return done(null, {
+      userId: user._id.toString(),
+      email: user.email,
+      role: user.role as 'admin' | 'user',
+    });
+  } catch (error) {
+    return done(error as Error, false);
+  }
+});
+
+passport.use(jwtStrategy);
+
+export default passport;
+```
+
+The JWT strategy is configured to extract tokens from:
+- Authorization header as Bearer token
+- HTTP-only cookies (for cookie-based authentication)
+
+The verify callback fetches the user from the database and returns user information to be attached to `req.user`.
+
+**Initialize Passport in Express App**: Update `src/app.ts`:
+
+```typescript
+import passport from './config/passport';
+
+// ... other middleware
+
+// Passport middleware
+app.use(passport.initialize());
+```
+
+**Create Authentication Middleware**: Create `src/middlewares/auth.middleware.ts`:
+
+```typescript
+import passport from 'passport';
+
+export const authenticate = passport.authenticate('jwt', {
+  session: false,
+});
+```
+
+This middleware uses Passport's JWT strategy to authenticate requests. When authentication succeeds, `req.user` is populated with the user information returned from the strategy's verify callback.
+
+**Use Authentication Middleware in Routes**: Apply the `authenticate` middleware to protected routes:
+
+```typescript
+import { authenticate } from '../middlewares/auth.middleware';
+
+router.get('/me', authenticate, getMeController);
+```
+
+After authentication, `req.user` is available in controllers and can be used for authorization checks.
+
+### 2.8. Routes with Validation and Authorization
 
 Routes define API endpoints and apply middleware in the correct order. Validation middleware should run before controllers, and authorization middleware should run after authentication.
 
@@ -595,7 +730,7 @@ export default router;
 
 Public routes (GET) don't require authentication. Protected routes (POST, PUT, PATCH, DELETE) require authentication and admin authorization. Validation middleware runs before controllers to ensure data is valid.
 
-### 2.8. Pagination and Filtering
+### 2.9. Pagination and Filtering
 
 In most REST APIs, the client sends filtering, sorting, and pagination information through query parameters in the URL. A common request looks like this:
 
@@ -712,7 +847,7 @@ export interface PaginationResult<T> {
 > Note: Search conditions are merged into the same filter object passed to `find()`. Query building is typically done using **chain methods** such as `find()`, `sort()`, `skip()`, and `limit()`, which makes the logic clearer and easier to maintain.
 
 
-### 2.9. Error Handling
+### 2.10. Error Handling
 
 Error handling should be consistent across the application. The service layer throws errors that are caught by the global error handler.
 
@@ -788,9 +923,10 @@ Use consistent error handling throughout the application:
 4. **[Service Layer Implementation](#24-service-layer-implementation)**: Implement business logic and database operations, separating them from controllers.
 5. **[Controller Implementation](#25-controller-implementation)**: Create thin controllers to handle HTTP requests and delegate to services.
 6. **[Role-Based Authorization](#26-role-based-authorization)**: Implement middleware to restrict access based on user roles (RBAC).
-7. **[Routes with Validation and Authorization](#27-routes-with-validation-and-authorization)**: Define API endpoints, applying validation and authorization middleware.
-8. **[Pagination and Filtering](#28-pagination-and-filtering)**: Implement pagination and filtering logic in services and controllers.
-9. **[Error Handling](#29-error-handling)**: Use `AppError` and global error handler for consistent error responses.
+7. **[Passport.js Implementation](#27-passportjs-implementation)**: Configure Passport.js with JWT strategy, extend Express types, and create authentication middleware.
+8. **[Routes with Validation and Authorization](#28-routes-with-validation-and-authorization)**: Define API endpoints, applying validation and authorization middleware.
+9. **[Pagination and Filtering](#29-pagination-and-filtering)**: Implement pagination and filtering logic in services and controllers.
+10. **[Error Handling](#210-error-handling)**: Use `AppError` and global error handler for consistent error responses.
 
 ## 5. Resources
 

@@ -17,8 +17,7 @@ export const validate = (schema: ZodSchema) => {
       if (error instanceof z.ZodError) {
         // Format Zod validation errors into a readable message
         const errorMessages = error.errors.map((err: z.ZodIssue) => {
-          const path = err.path.join('.');
-          return `${path}: ${err.message}`;
+          return `${err.message}`;
         });
 
         throw new AppError(

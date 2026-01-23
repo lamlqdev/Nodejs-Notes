@@ -4,6 +4,7 @@ import cors from 'cors';
 import cookieParser from 'cookie-parser';
 
 import config from './config/config';
+import passport from './config/passport';
 import authRoutes from './routes/auth.route';
 import productRoutes from './routes/product.route';
 
@@ -33,6 +34,9 @@ app.use(express.urlencoded({ extended: true }));
 
 // Cookie parser
 app.use(cookieParser(config.cookieSecret));
+
+// Passport middleware
+app.use(passport.initialize());
 
 // Rate limiting
 app.use('/api', apiLimiter);
