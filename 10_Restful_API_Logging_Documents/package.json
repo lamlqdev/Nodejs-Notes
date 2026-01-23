@@ -1,5 +1,5 @@
 {
-  "name": "07_jwt_authentication",
+  "name": "10_restful_api_logging_documents",
   "version": "1.0.0",
   "description": "JWT Authentication with Express and TypeScript",
   "main": "index.js",

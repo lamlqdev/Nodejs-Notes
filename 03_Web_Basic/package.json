@@ -1,8 +1,8 @@
 {
-  "name": "nodejs-typescript-server",
+  "name": "03_web_basic",
   "version": "1.0.0",
   "type": "module",
-  "description": "Node.js HTTP Server with TypeScript and ES Modules",
+  "description": "Basic Web Development with Node.js and TypeScript",
   "main": "dist/server.js",
   "scripts": {
     "build": "tsc",

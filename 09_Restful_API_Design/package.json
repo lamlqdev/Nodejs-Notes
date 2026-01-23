@@ -1,7 +1,7 @@
 {
-  "name": "07_jwt_authentication",
+  "name": "09_restful_api_design",
   "version": "1.0.0",
-  "description": "JWT Authentication with Express and TypeScript",
+  "description": "RESTful API Design with Express and TypeScript",
   "main": "index.js",
   "scripts": {
     "build": "tsc",
