@@ -70,9 +70,6 @@ export const validateBody = (schema: ZodSchema) => {
   };
 };
 
-/**
- * Helper function to validate only query parameters
- */
 export const validateQuery = (schema: ZodSchema) => {
   return async (req: Request, res: Response, next: NextFunction) => {
     try {

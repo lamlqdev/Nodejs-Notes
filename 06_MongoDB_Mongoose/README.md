@@ -408,9 +408,7 @@ assert.ok(error);
 
 ### 6. Middleware (hooks)
 
-**[Middleware](https://mongoosejs.com/docs/middleware.html)**, also called hooks, are functions that run at specific stages of document or query lifecycle. They allow you to inject custom logic before or after certain operations.
-
-**Types of Middleware**:
+**[Middleware](https://mongoosejs.com/docs/middleware.html)**, also called hooks, are functions that run at specific stages of document or query lifecycle. They allow you to inject custom logic before or after certain operations. **Types of Middleware**:
 
 1. **Document Middleware**: Runs on document instances. Applied to operations like `save()`, `validate()`, `remove()`, `init()`.
 2. **Query Middleware**: Runs on query operations like `find()`, `findOne()`, `updateOne()`, `deleteOne()`, etc.
@@ -423,6 +421,8 @@ assert.ok(error);
 
 - Pre-hooks run before the operation executes: Validate or transform data before saving, add computed fields, implement business logic checks, hash passwords, sanitize inputs, etc.
 - Post-hooks run after the operation executes: Log changes, send notifications, update related documents, clean up temporary data, etc.
+
+![Mongoose Middleware](./public/mongoose-middleware.png)
 
 ### 7. Populate
 

@@ -2,12 +2,14 @@ import express from 'express';
 import helmet from 'helmet';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
-import { errorHandler } from './middlewares/error.middleware';
-import { logger } from './middlewares/logger.middleware';
-import { apiLimiter } from './middlewares/rateLimit.middleware';
+
 import config from './config/config';
 import authRoutes from './routes/auth.route';
 import productRoutes from './routes/product.route';
+
+import { logger } from './middlewares/logger.middleware';
+import { apiLimiter } from './middlewares/rateLimit.middleware';
+import { AppError, errorHandler } from './middlewares/error.middleware';
 
 const app = express();
 
@@ -42,6 +44,11 @@ app.use('/api/products', productRoutes);
 // Health check route
 app.get('/api/health', (req, res) => {
   res.status(200).json({ message: 'Server is running' });
+});
+
+// 404 Not Found
+app.use((req, res, next) => {
+  next(new AppError("Route not found", 404));
 });
 
 // Global error handler (should be after routes)

@@ -43,15 +43,13 @@ The REST API request and response details vary slightly depending on how the API
 
 ### Schema-Based Validation
 
-**Schema-based validation** uses predefined schemas to validate request data. Instead of writing validation logic in each controller, you define validation rules in schemas and reuse them across the application. Benefits of schema-based validation:
+**Schema-based validation** uses predefined schemas to validate incoming request data. Validation rules are defined once and reused across the application instead of being duplicated inside controllers. This approach improves reusability, consistency, type safety, and long-term maintainability. In practice, validation should be applied to **all data coming from the client**, not only the request body.
 
-- **Reusability**: Define validation rules once and use them multiple times.
+- **Request Body (req.body)**: Body validation ensures that domain data entering the application is structurally correct and meaningful: required fields and data types, format and constraints (email, length, range, patterns), business rules.
 
-- **Type Safety**: Validation schemas can generate TypeScript types automatically.
+- **Route Parameters (req.params)**: Validating route parameters prevents database casting errors and avoids unnecessary queries with invalid identifiers: resource identifiers (id, slug) and identifier format (ObjectId, UUID).
 
-- **Consistency**: Ensures consistent validation across all endpoints.
-
-- **Maintainability**: Centralized validation logic is easier to update and maintain.
+- **Query Parameters (req.query)**: Query parameters are always strings and must be validated to avoid logic errors and performance issues: pagination values (page, limit), sorting options (sortBy, order), filtering criteria.
 
 ### Role-Based Authorization
 

@@ -1,5 +1,5 @@
 import express from "express";
-import { errorHandler } from "./middlewares/error.middleware";
+import { AppError, errorHandler } from "./middlewares/error.middleware";
 import cityRoutes from "./routes/city.routes";
 import placeRoutes from "./routes/place.routes";
 import reviewRoutes from "./routes/review.routes";
@@ -18,6 +18,11 @@ app.use("/cities", cityRoutes);
 app.use("/places", placeRoutes);
 app.use("/users", userRoutes);
 app.use("/", reviewRoutes);
+
+// 404 Not Found
+app.use((req, res, next) => {
+  next(new AppError("Route not found", 404));
+});
 
 // Global error handler (should be after routes)
 app.use(errorHandler);

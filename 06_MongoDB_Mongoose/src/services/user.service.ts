@@ -1,12 +1,13 @@
 import { User } from "../models/user.model";
 import { UserFilter, PaginationOptions, PaginatedResult, CreateUserData, UpdateUserData } from "../types/user.types";
+import { AppError } from "../middlewares/error.middleware";
 
 export async function findUsers(
   filter: UserFilter = {},
   pagination?: PaginationOptions
 ): Promise<PaginatedResult<any>> {
   const query: Record<string, any> = { isActive: true };
-  
+
   if (filter.username) {
     query.username = filter.username;
   }
@@ -57,6 +58,10 @@ export async function findUserById(id: string) {
 }
 
 export async function createUser(data: CreateUserData) {
+  const existingUser = await User.findOne({ email: data.email });
+  if (existingUser) {
+    throw new AppError("User with this email already exists", 409);
+  }
   return await User.create(data);
 }
 
