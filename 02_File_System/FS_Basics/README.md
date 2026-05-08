@@ -13,14 +13,11 @@ The `fs` (file system) module is a built-in Node.js module that provides both **
 | Aspect            | Asynchronous (Recommended)                     | Synchronous (Limited use)                                  |
 | ----------------- | ---------------------------------------------- | ---------------------------------------------------------- |
 | Execution         | Returns a Promise; executed with `async/await` | Blocks execution until complete                            |
-| Event Loop        | Does not block the event loop                  | Blocks the event loop                                      |
-| Production Use    | Preferred for production backend code          | Avoid in runtime code (acceptable for startup or CLI only) |
 | Method Naming     | Methods without `Sync` suffix                  | Methods with `Sync` suffix                                 |
 | Examples          | `readFile`, `writeFile`, `readdir`             | `readFileSync`, `writeFileSync`, `readdirSync`             |
 | Error Handling    | `try/catch` on Promise rejection               | `try/catch` for thrown errors                              |
 | Concurrency       | Scales well with concurrent requests           | Prevents concurrency while running                         |
 | Typical Use Cases | API handlers, services, background jobs        | App bootstrap, scripts, tooling                            |
-| Recommendation    | Default choice                                 | Exception only                                             |
 
 ---
 
@@ -39,18 +36,19 @@ import { readFile } from "fs/promises";
 
 async function readConfigFile() {
   try {
+    // Read config.json and return its content as a UTF-8 string
     const content = await readFile("config.json", "utf8");
+
+    // Parse JSON string into a JavaScript object
     const config = JSON.parse(content);
+
     console.log("Configuration loaded:", config);
   } catch (error) {
+    // Handle file read or JSON parse errors
     console.error("Error reading config:", error);
   }
 }
-
-readConfigFile();
 ```
-
-**Explanation**: Reads the entire file into memory as a string when encoding is specified. This is ideal for small to medium files like configuration files, but not suitable for very large files (use streams for those).
 
 #### Example 2: Reading without encoding (Buffer)
 
@@ -59,15 +57,15 @@ import { readFile } from "fs/promises";
 
 async function readImageFile() {
   try {
+    // Read the image file as raw binary data (Buffer)
     const buffer = await readFile("avatar.png");
+
     console.log("File size:", buffer.length, "bytes");
     console.log("First 10 bytes:", buffer.slice(0, 10));
   } catch (error) {
     console.error("Error reading image:", error);
   }
 }
-
-readImageFile();
 ```
 
 **Explanation**: Without encoding, `readFile()` returns a **Buffer** (temporary storage area for binary data). This is useful for images, videos, or any non-text files that need to be processed or transmitted.
@@ -87,8 +85,12 @@ import { writeFile } from "fs/promises";
 
 async function saveUserData(userId: string, userData: object) {
   try {
+    // `null, 2` formats the JSON with 2-space indentation for readability
     const jsonData = JSON.stringify(userData, null, 2);
+
+    // Write the JSON string to a file
     await writeFile(`users/${userId}.json`, jsonData, "utf8");
+
     console.log("User data saved successfully");
   } catch (error) {
     console.error("Error saving user data:", error);
@@ -145,7 +147,7 @@ log({
 });
 ```
 
-**Explanation**: Appends log entries to a file without overwriting existing content. This is essential for logging systems where you need to preserve historical data. Each call adds to the end of the file.
+**Explanation**: Appends log entries to a file without overwriting existing content. This is essential for logging systems where you need to preserve historical data.
 
 ---
 
@@ -168,8 +170,6 @@ async function listFiles() {
     console.error("Error reading directory:", error);
   }
 }
-
-listFiles();
 ```
 
 **Explanation**: Returns an array of file and folder names in the specified directory. This is non-recursive, meaning it only shows direct children, not nested contents.
@@ -197,8 +197,6 @@ async function setupProjectStructure() {
     console.error("Error creating directories:", error);
   }
 }
-
-setupProjectStructure();
 ```
 
 **Explanation**: With `recursive: true`, `mkdir()` creates all necessary parent directories. If the directory already exists, no error is thrown. This is perfect for ensuring required folder structures exist before file operations.
@@ -224,8 +222,6 @@ async function deleteOldLog() {
     console.error("Error deleting file:", error);
   }
 }
-
-deleteOldLog();
 ```
 
 **Explanation**: Removes a single file. Throws an error if the file doesn't exist unless `force: true` is used.
@@ -255,8 +251,6 @@ async function getFileInfo(filePath: string) {
     console.error("Error getting file info:", error);
   }
 }
-
-getFileInfo("data.txt");
 ```
 
 **Explanation**: Provides detailed metadata about a file or directory. Use `isFile()` and `isDirectory()` to determine the type without additional checks.
@@ -280,8 +274,6 @@ async function renameFile() {
     console.error("Error renaming file:", error);
   }
 }
-
-renameFile();
 ```
 
 **Explanation**: Changes the file name or moves it to a new location on the same file system. Overwrites the destination if it already exists.
@@ -332,8 +324,6 @@ async function backupFile() {
     console.error("Error creating backup:", error);
   }
 }
-
-backupFile();
 ```
 
 **Explanation**: Creates a copy of the file at the destination. Overwrites the destination if it already exists.

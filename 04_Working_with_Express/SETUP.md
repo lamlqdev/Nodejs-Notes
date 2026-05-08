@@ -1,12 +1,5 @@
 # How to set up TypeScript with Node.js and Express
 
-In this article, we'll explore a friendly way to configure TypeScript in an Express app, and gain an understanding of the fundamental constraints that accompany it. To follow along, you should have:
-
-- Node.js ≥ v18.x installed
-- Package manager like npm, pnpm, or Yarn
-
----
-
 ## 1. What is Express TypeScript?
 
 **Express TypeScript** refers to using the Express framework within a TypeScript project. It involves writing your Express server code in TypeScript, leveraging type definitions (often provided via `@types/express`) to enable type checking, auto-completion, and better documentation. Essentially, it's about combining Express's flexibility with TypeScript's safety and developer tooling benefits.
@@ -60,7 +53,7 @@ npx tsc --init
 
 **Configuration notes:**
 
-**Module System**: Before starting, decide whether to compile to **CommonJS** or **ESM** with `"module": "commonjs"` or `"module": "es2022"`.
+**Module System Options**: Before starting, decide whether to compile to **CommonJS** or **ESM** with `"module": "commonjs"` or `"module": "es2022"`.
 
 - **CommonJS**: File extensions are not required in imports.
 - **ESM**: You **MUST** add `"type": "module"` to `package.json`. Additionally, when compiling with `tsc`, you **must include file extensions** (e.g., `.js`). Node.js ESM requires this.
@@ -73,6 +66,8 @@ npx tsc --init
 - **`moduleResolution`**: Determines how TypeScript resolves module imports (e.g., `node`).
 
 ### 2.4. Layered Architecture Pattern
+
+![Layered Architecture](./public/layer-pattern.png)
 
 Layered architecture separates concerns into distinct layers, each with specific responsibilities:
 

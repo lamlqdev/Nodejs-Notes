@@ -4,22 +4,16 @@
 
 ### What are Streams?
 
-Streams are collections of data that might not be available all at once and don't have to fit in memory. Think of them like a conveyor belt where data arrives and is processed piece by piece, rather than as a whole batch.
+Streams are a way to handle data **piece by piece (in chunks)** instead of loading the entire data into memory at once.
 
-![Streams and Buffers](./public/streams-buffers.png)
+![Streams](./public/streams.png)
 
 In Node.js, streams are instances of **EventEmitter**, which means they emit events like `data`, `end`, `error`, `drain`, etc. that can be used to read and write data. There are four fundamental stream types in Node.js:
 
-- Readable - streams from which data can be read (e.g., reading a file, HTTP response, stdin)
-- Writable - streams to which data can be written (e.g., writing to a file, HTTP request, stdout)
-- Duplex - streams that are both Readable and Writable (e.g., TCP sockets, WebSockets)
-- Transform - Duplex streams that can modify or transform data as it's written or read (e.g., compression, encryption, data transformation)
-
-**Stream Modes**:
-
-- **Binary Mode** (default): Data is processed as **Buffer** objects, suitable for any file type.
-
-- **Object Mode**: Data can be any JavaScript object (set with `objectMode: true`), useful for processing structured data.
+- **Readable**: streams from which data can be read (e.g., reading a file, HTTP response, stdin)
+- **Writable**: streams to which data can be written (e.g., writing to a file, HTTP request, stdout)
+- **Duplex**: streams that are both Readable and Writable (e.g., TCP sockets, WebSockets)
+- **Transform**: Duplex streams that can modify or transform data as it's written or read (e.g., compression, encryption, data transformation)
 
 ### Benefits of Streams
 
@@ -29,17 +23,32 @@ In Node.js, streams are instances of **EventEmitter**, which means they emit eve
 
 - **Composability**: Chain multiple operations together using pipes, creating powerful data processing pipelines.
 
-- **Backpressure Handling**: The mechanism that prevents a fast data source from overwhelming a slow consumer. When the writable stream's buffer is full, it signals the readable stream to pause until space is available.
+---
+
+## Backpressure
+
+**Backpressure** is a mechanism that prevents data from being written faster than it can be consumed. When a writable stream's internal buffer is full, it signals that it cannot accept more data, causing the readable stream to pause until the buffer has space again.
+
+![Backpressure](./public/backpressure.png)
+
+### How it works:
+
+- When `stream.write()` returns `false`, it indicates the buffer is full and backpressure is occurring
+- The readable stream automatically pauses when the writable stream cannot accept more data
+- Once the writable stream processes data and has space (emits `drain` event), the readable stream resumes
+- This prevents memory overflow and ensures efficient data flow between streams
+
+### Why it matters:
+
+Without backpressure handling, fast producers (readable streams) can overwhelm slow consumers (writable streams), leading to excessive memory usage and potential crashes. Proper backpressure management ensures streams work together harmoniously, regardless of their processing speeds.
 
 ---
 
 ## Common Stream Methods
 
-### 1. `createReadStream()`
+### `createReadStream()`
 
 **Purpose**: Creates a readable stream for reading data from a file in **chunks**.
-
-Chunk is a small piece of data transferred at a time. Instead of loading an entire file (e.g., 1GB) into memory, streams break it down into smaller chunks (typically 16KB by default) and process them sequentially.
 
 ![createReadStream syntax](./public/createReadStream.png)
 
@@ -82,7 +91,7 @@ readLargeLog();
 
 **Explanation**: Reads a large log file in small chunks without loading the entire file into memory. This allows processing files that are larger than available RAM. Perfect for log analysis or data processing.
 
-### 2. `createWriteStream()`
+### `createWriteStream()`
 
 **Purpose**: Creates a writable stream for writing data to a file in chunks.
 
@@ -123,7 +132,15 @@ writeStreamExample();
 
 **Explanation**: Writes a large amount of data while respecting backpressure. When `write()` returns `false`, it means the buffer is full, so we wait for the `drain` event before continuing. This prevents memory overflow.
 
-### 3. `pipe()`
+---
+
+## Piping Streams
+
+Streams can be piped together, creating a chain of data processing steps that enhances code readability, maintainability, and makes it easy to create complex data processing pipelines.
+
+![Piping Streams](./public/stream-pipe-able.png)
+
+### `.pipe()`
 
 **Purpose**: Connects a readable stream to a writable stream, automatically managing data flow and backpressure.
 

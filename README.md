@@ -46,6 +46,14 @@ A comprehensive collection of Node.js learning materials and practical examples 
 - **[File Upload](./11_File_Handling/README.md)** - Multer, single/multiple file upload, file validation
 - **[Cloud Storage](./12_Cloudinary_Upload/README.md)** - Cloudinary, file storage integration
 
+## 9. Cloudinary File Upload
+
+- **[Cloudinary File Upload](./12_Cloudinary_Upload/README.md)** - Cloudinary, file storage integration
+
+## 10. Process Manager
+
+- **[Process Manager](./13_Process_Manager/README.md)** - PM2, process management, deployment
+
 ### 12. Email & Notifications
 
 - **[Email Basics](./12_Email_Notifications/Email_Basics/README.md)** - Nodemailer, SMTP configuration, basic emails

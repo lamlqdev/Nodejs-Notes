@@ -29,16 +29,16 @@ Node.js was created by **Ryan Dahl** in 2009. Dahl was frustrated with the limit
 **Client-Server Interaction:**
 
 - The **Client (Browser)** sends a **Request** to the **Server**
-- The **Server** (powered by Node.js) processes the request and sends back a **Response** (typically JSON data)
+- The **Server** processes the request and sends back a **Response** (typically JSON data)
 
 **Server-side Capabilities (handled by Node.js):**
 
 - **Database** - Data storage and retrieval
 - **Authentication** - Verifying user identities
 - **Input Validation** - Ensuring data integrity and security
-- **Your Business Logic** - Implementing the core functionality of the application
+- **Business Logic** - Implementing the core functionality of the application
 
-> **Note:** The diagram shows "Response 'HTML Page'" which reflects older web architecture. Modern Node.js backends typically return JSON data (or other data formats) rather than HTML pages. The client-side JavaScript then handles rendering the UI based on this data.
+> **Note:** The diagram shows "Response 'HTML Page'" which reflects older web architecture. Modern Node.js backends typically return JSON data rather than HTML pages. The client-side JavaScript then handles rendering the UI based on this data.
 
 ### Node.js' Role (in Web Development)
 
