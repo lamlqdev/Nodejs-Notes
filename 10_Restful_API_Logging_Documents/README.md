@@ -783,61 +783,15 @@ Swagger UI makes it easy for developers to understand and test your API without 
 
 ### Logging Best Practices
 
-Use appropriate log levels:
-
-- **error**: For errors that require immediate attention or indicate system failures.
-
-- **warn**: For warnings that indicate potential issues but don't stop execution.
-
-- **info**: For informational messages about application flow (request logging, important events).
-
-- **verbose/debug**: For detailed debugging information (only in development).
-
-Include contextual information in logs:
-
-- Add metadata objects with relevant context (user ID, request ID, operation details).
-
-- Use structured logging (JSON format) for easy parsing and analysis.
-
-- Avoid logging sensitive information (passwords, tokens, credit card numbers).
+![Log Best Practices](./public/log.png)
 
 ### API Documentation Best Practices
 
-Keep documentation up to date:
-
-- Document all endpoints, including error cases.
-
-- Update documentation when APIs change.
-
-- Use clear descriptions and examples.
-
-Make documentation comprehensive:
-
-- Include authentication requirements.
-
-- Document all request parameters and response formats.
-
-- Provide example requests and responses.
-
-- Document error responses with status codes and messages.
+![Documentation Best Practices](./public/doc.png)
 
 ### Security Considerations
 
-Don't expose sensitive information in logs:
-
-- Avoid logging passwords, tokens, or personal information.
-
-- Use log levels appropriately (don't log sensitive data at info level).
-
-- Consider log encryption for production environments.
-
-Secure API documentation in production:
-
-- Consider restricting access to Swagger UI in production.
-
-- Use authentication for API documentation if it contains sensitive information.
-
-- Remove or redact sensitive endpoints from documentation if necessary.
+![Security Considerations](./public/security.png)
 
 ---
 

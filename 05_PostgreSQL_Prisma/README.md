@@ -81,8 +81,8 @@ The `user_tournaments` is intermediate table that connects `users` and `tourname
 
 - [Basic SQL SELECT](./Query_Syntax/02_Basic_SQL_Statements.md)
 - [Aggregation and grouping](./Query_Syntax/03_GROUP_BY_Aggregations.md)
-- [Joins and subqueries](./Query_Syntax/05_SQL_Joins.md)
-- [Advanced SQL commands](./Query_Syntax/06_Advanced_SQL_Commands.md)
+- [Joins](./Query_Syntax/05_SQL_Joins.md)
+- [Advanced SQL commands and subqueries](./Query_Syntax/06_Advanced_SQL_Commands.md)
 - [Modifying and designing data](./Query_Syntax/08_Creating_Databases_Tables.md)
 - [Conditional expressions and procedures](./Query_Syntax/10_Conditional_Expressions_Procedures.md)
 

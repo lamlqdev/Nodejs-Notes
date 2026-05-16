@@ -51,20 +51,25 @@ The [`tsconfig.json`](./tsconfig.json) file is usually placed at the project's r
 npx tsc --init
 ```
 
-**Configuration notes:**
+**Module System Options**: Before starting, decide whether to use **CommonJS** or **ESM** — `module` and `moduleResolution` must always match.
 
-**Module System Options**: Before starting, decide whether to compile to **CommonJS** or **ESM** with `"module": "commonjs"` or `"module": "es2022"`.
+| | CommonJS | ESM |
+|---|---|---|
+| `module` | `node16` | `node16` |
+| `moduleResolution` | `node16` | `node16` |
+| `package.json` | no `"type"` needed | `"type": "module"` required |
+| import extensions | not required | `.js` extension required |
 
-- **CommonJS**: File extensions are not required in imports.
-- **ESM**: You **MUST** add `"type": "module"` to `package.json`. Additionally, when compiling with `tsc`, you **must include file extensions** (e.g., `.js`). Node.js ESM requires this.
+> For Express + Node.js projects, **CommonJS is recommended** — less config, better library compatibility.
 
-> Note that `tsx` can handle imports without extensions during development, thus `"type": "module"` is not strictly required for development, but the production build will fail to run if extensions are missing.
+> `tsx` handles imports without extensions during development regardless of module system. However if using ESM, missing `.js` extensions will cause the production build to fail.
 
 **Other compiler options**:
 
 - **`target`**: Specifies the ECMAScript version of the output JavaScript (e.g., `ES2022`).
-- **`moduleResolution`**: Determines how TypeScript resolves module imports (e.g., `node`).
-
+- **`resolveJsonModule`**: Allows importing `.json` files directly in TypeScript.
+- **`outDir`** / **`rootDir`**: Output directory for compiled JS and source TypeScript root.
+- **`strict`**: Enables all strict type-checking options — always keep this `true`.
 ### 2.4. Layered Architecture Pattern
 
 ![Layered Architecture](./public/layer-pattern.png)

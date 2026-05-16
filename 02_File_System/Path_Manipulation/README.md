@@ -8,28 +8,13 @@ Path manipulation refers to the process of working with file and directory paths
 
 ### Key Concepts
 
-**Absolute Path**: A complete path from the root directory to a specific file or folder.
-
-- Example (POSIX): `/home/user/project/src/index.ts`
-- Example (Windows): `C:\Users\user\project\src\index.ts`
-
-**Relative Path**: A path relative to the current working directory.
-
-- Example: `./src/index.ts` or `../config/settings.json`
-
-**Path Segment**: Individual parts of a path separated by delimiters.
-
-- Example: In `/home/user/docs`, the segments are `home`, `user`, and `docs`
-
-**Path Delimiter**: The character used to separate path segments.
-
-- Example (POSIX): `/`
-- Example (Windows): `\`
-
-**Path Separator**: The character used to separate multiple paths in environment variables.
-
-- Example (POSIX): `:` (e.g., `/usr/bin:/bin`)
-- Example (Windows): `;` (e.g., `C:\Windows;C:\Program Files`)
+| Concept | Description | POSIX | Windows |
+|---|---|---|---|
+| **Absolute path** | Full path from the root. Unambiguous regardless of cwd. | `/home/user/index.ts` | `C:\Users\user\index.ts` |
+| **Relative path** | Path relative to the current working directory. | `./src/index.ts` `../config/app.json` | `.\src\index.ts` `..\config\app.json` |
+| **Path segment** | Individual parts of a path split by the delimiter. | In `/home/user/docs` → `home`, `user`, `docs` | In `C:\Users\user` → `Users`, `user` |
+| **Path delimiter** | Character that separates segments inside a single path. | `/` (forward slash) | `\` (backslash) |
+| **Path separator** | Character that separates multiple paths in env vars like `PATH`. | `:` → `/usr/bin:/bin` | `;` → `C:\Win;C:\Prog` |
 
 ---
 
