@@ -10,7 +10,7 @@ A comprehensive collection of Node.js learning materials and practical examples 
 - **[NPM & Package Management](./01_Fundamentals/NPM_NVM/Node_Package_Manager.md)** - package.json, npm scripts, dependencies, semantic versioning.
 - **[NVM & Version Management](./01_Fundamentals/NPM_NVM/Node_Version_Manager.md)** - Node.js version manager, nvm, node version management.
 - **[Module Systems](./01_Fundamentals/ES6/Module_Systems.md)** - CommonJS vs ES Modules, require vs import.
-  
+
 ## 2. File System & Streams
 
 - **[File System Basics](./02_File_System/FS_Basics/README.md)** - readFile, writeFile, sync vs async operations.
@@ -19,7 +19,7 @@ A comprehensive collection of Node.js learning materials and practical examples 
 
 ## 3. Web Basics
 
-- **[Web basics](./03_Web_Basic/README.md)** - http module, createServer, request/response, url.
+- **[Web Basics](./03_Web_Basic/README.md)** - http module, createServer, request/response, url.
 
 ## 4. Express.js Framework
 
@@ -33,76 +33,53 @@ A comprehensive collection of Node.js learning materials and practical examples 
 
 ## 6. Authentication & Security
 
-- **[JWT Authentication](./07_JWT_Authentication/README.md)** - Token-based auth, access/refresh tokens
-- **[Session Authentication](./08_Session_Authentication/README.md)** - Session-based auth, session storage
+- **[JWT Authentication](./07_JWT_Authentication/README.md)** - Token-based auth, access/refresh tokens.
+- **[Session Authentication](./08_Session_Authentication/README.md)** - Session-based auth, session storage.
 
 ## 7. API Development
 
 - **[REST API Design](./09_Restful_API_Design/README.md)** - RESTful API design principles, layered architecture, schema-based validation, error handling, role-based authorization, pagination and filtering.
 - **[API Documentation and Logging](./10_Restful_API_Logging_Documents/README.md)** - API documentation with Swagger/OpenAPI and structured logging with Winston.
 
-## 8. File Handling
+## 8. File Handling & Cloud Storage
 
-- **[File Upload](./11_File_Handling/README.md)** - Multer, single/multiple file upload, file validation
-- **[Cloud Storage](./12_Cloudinary_Upload/README.md)** - Cloudinary, file storage integration
+- **[File Upload](./11_File_Handling/README.md)** - Multer, single/multiple file upload, file validation.
+- **[Cloudinary Upload](./12_Cloudinary_Upload/README.md)** - Cloudinary integration, cloud storage, image/file management.
 
-## 9. Cloudinary File Upload
+## 9. Performance & Scaling
 
-- **[Cloudinary File Upload](./12_Cloudinary_Upload/README.md)** - Cloudinary, file storage integration
+- **[Performance & Scaling](./13_Performance/README.md)** - Caching strategies, clustering, load balancing, PM2 process management.
 
-## 10. Process Manager
+## 10. Sending Emails with Resend
 
-- **[Process Manager](./13_Process_Manager/README.md)** - PM2, process management, deployment
+- **[Resend Email API](./14_Resend_Email/README.md)** - Transactional emails, Resend SDK, batch sending, scheduling, rate limiting.
 
-### 12. Email & Notifications
+## 11. Background Jobs
 
-- **[Email Basics](./12_Email_Notifications/Email_Basics/README.md)** - Nodemailer, SMTP configuration, basic emails
-- **[Email Templates](./12_Email_Notifications/Email_Templates/README.md)** - HTML templates, Handlebars, template engines
-- **[Email Queue](./12_Email_Notifications/Email_Queue/README.md)** - Queue emails with Bull, background processing
-- **[Notifications](./12_Email_Notifications/Notifications/README.md)** - In-app notifications, push notifications, email alerts
+- **[Background Jobs API](./15_Background_Jobs/README.md)** - Job queues, BullMQ, Redis, cron scheduling, task processing.
 
-### 13. Background Jobs & Scheduling
+## 12. Real-Time Communication
 
-- **[Job Queues](./13_Background_Jobs/Job_Queues/README.md)** - Bull, Redis queues, job processing
-- **[Cron Jobs](./13_Background_Jobs/Cron_Jobs/README.md)** - node-cron, scheduled tasks, recurring jobs
-- **[Task Scheduling](./13_Background_Jobs/Task_Scheduling/README.md)** - Advanced scheduling, job priorities
+- **[Real-Time Communication](./16_Real_Time_Communication/README.md)** - WebSockets, Server-Sent Events (SSE), polling, Socket.io.
 
-### 14. Real-Time Communication
+---
 
-- **[WebSockets](./14_Real_Time/WebSockets/README.md)** - Socket.io, native WebSockets, real-time events
-- **[Server-Sent Events](./14_Real_Time/Server_Sent_Events/README.md)** - SSE implementation, one-way communication
-- **[Real-Time Chat](./14_Real_Time/Real_Time_Chat/README.md)** - Complete chat application example
+## 13. Testing
 
-### 15. Testing
+- **[Unit Testing](./17_Testing/Unit_Testing/README.md)** - Jest, Mocha, test structure, mocking
+- **[Integration Testing](./17_Testing/Integration_Testing/README.md)** - Supertest, API testing, database testing
+- **[E2E Testing](./17_Testing/E2E_Testing/README.md)** - End-to-end testing strategies, test databases
 
-- **[Unit Testing](./15_Testing/Unit_Testing/README.md)** - Jest, Mocha, test structure, mocking
-- **[Integration Testing](./15_Testing/Integration_Testing/README.md)** - Supertest, API testing, database testing
-- **[E2E Testing](./15_Testing/E2E_Testing/README.md)** - End-to-end testing strategies, test databases
+## 14. Deployment & DevOps
 
-### 16. Performance & Optimization
+- **[Environment Configuration](./18_Deployment/Environment_Config/README.md)** - dotenv, config management, environment variables
+- **[Docker](./18_Deployment/Docker/README.md)** - Dockerfile, docker-compose, containerization
+- **[CI/CD](./18_Deployment/CI_CD/README.md)** - GitHub Actions, automated testing, deployment pipelines
+- **[Production Best Practices](./18_Deployment/Production_Best_Practices/README.md)** - Monitoring, logging, scaling, security
 
-- **[Caching](./16_Performance/Caching/README.md)** - Redis caching, in-memory caching, cache strategies
-- **[Clustering](./16_Performance/Clustering/README.md)** - Cluster module, PM2, process management
-- **[Load Balancing](./16_Performance/Load_Balancing/README.md)** - Load balancing strategies, horizontal scaling
-- **[Performance Monitoring](./16_Performance/Performance_Monitoring/README.md)** - Profiling, memory leaks, performance metrics
+## 15. Advanced Topics
 
-### 17. Deployment & DevOps
-
-- **[Environment Configuration](./17_Deployment/Environment_Config/README.md)** - dotenv, config management, environment variables
-- **[Docker](./17_Deployment/Docker/README.md)** - Dockerfile, docker-compose, containerization
-- **[CI/CD](./17_Deployment/CI_CD/README.md)** - GitHub Actions, automated testing, deployment pipelines
-- **[Production Best Practices](./17_Deployment/Production_Best_Practices/README.md)** - Monitoring, logging, scaling, security
-
-### 18. Advanced Topics
-
-- **[Microservices](./18_Advanced_Topics/Microservices/README.md)** - Service architecture, inter-service communication
-- **[Message Queues](./18_Advanced_Topics/Message_Queues/README.md)** - RabbitMQ, Kafka basics, event-driven architecture
-- **[GraphQL Advanced](./18_Advanced_Topics/GraphQL_Advanced/README.md)** - Subscriptions, federation, schema stitching
-- **[TypeScript with Node.js](./18_Advanced_Topics/TypeScript_Node/README.md)** - TypeScript setup, type safety, best practices
-
-### 19. Practical Projects
-
-- **[E-Commerce API](./19_Practical_Projects/E_Commerce_API/README.md)** - Complete e-commerce API with products, orders, payments
-- **[Blog API](./19_Practical_Projects/Blog_API/README.md)** - Blog API with posts, comments, tags, search
-- **[Social Media API](./19_Practical_Projects/Social_Media_API/README.md)** - Social media API with posts, likes, feeds, real-time
-- **[Task Management API](./19_Practical_Projects/Task_Management_API/README.md)** - Task API with teams, assignments, notifications
+- **[Microservices](./19_Advanced_Topics/Microservices/README.md)** - Service architecture, inter-service communication
+- **[Message Queues](./19_Advanced_Topics/Message_Queues/README.md)** - RabbitMQ, Kafka basics, event-driven architecture
+- **[GraphQL](./19_Advanced_Topics/GraphQL/README.md)** - Subscriptions, federation, schema stitching
+- **[TypeScript with Node.js](./19_Advanced_Topics/TypeScript_Node/README.md)** - TypeScript setup, type safety, best practices
