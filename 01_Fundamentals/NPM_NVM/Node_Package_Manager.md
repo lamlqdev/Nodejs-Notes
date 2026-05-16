@@ -24,15 +24,7 @@ Recognizing the need to automate this process, Isaac wrote a Node program to do 
 
 ### Types of Packages in NPM
 
-The npm repository contains millions of packages ranging from small to large scale:
-
-- **Small Packages**: Like `chalk` - a library for coloring text in the terminal
-
-- **Large Packages**: Like `tailwindcss` - a utility-first CSS framework with hundreds of utility classes
-
-- **Frameworks**: Like `react`, `vue`, `angular` - popular JavaScript frameworks
-
-- **Tools**: Like `webpack`, `vite` - build and bundling tools
+![NPM types](./public/npm-types.png)
 
 ### Installing Packages: Local vs Global
 
@@ -62,6 +54,11 @@ npm install --global nodemon
 | Availability | Only in current project  | System-wide, accessible from anywhere               |
 | package.json | Added to dependencies    | Not added to package.json                           |
 | Use case     | Application dependencies | CLI tools, global utilities                         |
+
+Useful command to check installed global packages:
+```bash
+npm list -g --depth=0
+```
 
 ### package.json
 
@@ -136,82 +133,6 @@ NPM scripts are custom commands defined in the `scripts` field of `package.json`
 - `npm run <script>` - Runs any custom script
 
 ---
-
-## Examples and Explanation
-
-### Example 1: Creating and Understanding package.json
-
-**Initializing a new project:**
-
-```bash
-npm init
-# or
-npm init -y  # Skip questions and use defaults
-```
-
-**Example package.json:**
-
-```json
-{
-  "name": "my-node-app",
-  "version": "1.0.0",
-  "description": "A sample Node.js application",
-  "main": "index.js",
-  "scripts": {
-    "start": "node index.js",
-    "dev": "node index.js",
-    "test": "jest"
-  },
-  "keywords": ["nodejs", "example"],
-  "author": "Your Name",
-  "license": "MIT",
-  "dependencies": {
-    "express": "^4.18.2"
-  },
-  "devDependencies": {
-    "jest": "^29.5.0"
-  }
-}
-```
-
-### Example 2: Installing Packages
-
-**Install a production dependency:**
-
-```bash
-npm install express
-# or
-npm install express --save
-# or short form
-npm i express
-```
-
-**Install a development dependency:**
-
-```bash
-npm install jest --save-dev
-# or short form
-npm i jest -D
-```
-
-**Install exact version:**
-
-```bash
-npm install express@4.18.2
-```
-
-**Install from package.json:**
-
-```bash
-npm install
-# Installs all dependencies listed in package.json
-```
-
-**Explanation:**
-
-- `npm install <package>` adds the package to `dependencies` by default
-- `--save-dev` or `-D` adds to `devDependencies`
-- `npm install` without arguments installs all dependencies from `package.json`
 
 ## References
 

@@ -137,7 +137,5 @@ nvm use  # Automatically uses 20.5.0
 
 ## References
 
-- [NVM Official Repository (Unix)](https://github.com/nvm-sh/nvm)
 - [NVM-Windows Repository](https://github.com/coreybutler/nvm-windows)
-- [Node.js Releases](https://nodejs.org/en/about/releases/)
 - [NVM Documentation](https://github.com/nvm-sh/nvm#readme)

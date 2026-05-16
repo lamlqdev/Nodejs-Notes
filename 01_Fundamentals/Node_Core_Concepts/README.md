@@ -1,9 +1,5 @@
 # Node.js Core Concepts
 
-Node.js is a JavaScript runtime built on Chrome's V8 JavaScript engine. It uses an event-driven, non-blocking I/O model that makes it lightweight and efficient. Understanding Node.js core architecture is essential for writing performant applications and debugging effectively.
-
----
-
 ## Core Terminology
 
 ### What is Node.js?
