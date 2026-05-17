@@ -16,7 +16,7 @@ A practical guide to sending transactional emails in a Node.js/Express applicati
 
 | Type | Description | Examples |
 |---|---|---|
-| **Transactional** | Triggered by a user action, sent to one recipient at a time | Welcome emails, password resets, order confirmations, invoices |
+| **Transactional** | Triggered by a user action, sent to one recipient at a time | Welcome emails, order confirmations, invoices |
 | **Marketing** | Sent to a list of subscribers, typically in bulk | Newsletters, promotional campaigns, announcements |
 
 Resend is optimized for **transactional** email. Sending bulk marketing emails via Resend without proper list hygiene can damage your sender reputation.

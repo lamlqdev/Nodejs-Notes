@@ -10,15 +10,7 @@ A Job Board REST API that demonstrates real-world background job patterns using 
 
 A **background job** is a unit of work that runs outside the HTTP request/response cycle. Instead of making the client wait while the server sends an email, processes a file, or updates thousands of database rows, the server queues that work and responds immediately. A separate process picks it up and executes it asynchronously.
 
-```
-Without background jobs:
-  POST /apply → [save to DB] → [send email] → [wait 2s] → 201 OK
-
-With background jobs:
-  POST /apply → [save to DB] → [enqueue email job] → 201 OK
-                                        ↓
-                              Worker sends email in background
-```
+![Background jobs overview](./public/background-job-overview.png)
 
 Benefits:
 - **Faster responses** — the HTTP handler returns immediately.
@@ -31,11 +23,7 @@ Benefits:
 
 A **job queue** is a data structure (stored in Redis) where producers add jobs and consumers (workers) pick them up. It acts as a buffer between the API and the background processing layer.
 
-```
-[API Server]  →  adds job  →  [Redis Queue]  →  picks up job  →  [Worker]
-                                                                       ↓
-                                                               [Sends Email / etc.]
-```
+![Job queue](./public/job-queue.png)
 
 ### 1.3. What is Redis?
 
@@ -76,6 +64,8 @@ async function processEmailJob(job: Job) {
   await sendEmail(job.data);
 }
 ```
+
+![Overview picture](./public/overview.png)
 
 ### 1.6. What is node-cron?
 
@@ -299,23 +289,7 @@ cron.schedule('0 8 * * 1', async () => {
 
 ### 4.1. Data Flow
 
-```
-HTTP Request
-     │
-     ▼
-Controller (thin — try/catch + delegate)
-     │
-     ▼
-Service (business logic)
-     │
-     ├── Prisma (write to SQLite)
-     │
-     └── addEmailJob() → [Redis / BullMQ Queue]
-                                  │
-                          Email Worker picks up job
-                                  │
-                          sendEmailForJob() → Resend API
-```
+![Project data flow](./public/project-flow.png)
 
 ### 4.2. Folder Structure
 
