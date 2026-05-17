@@ -13,17 +13,7 @@ Caching is the practice of storing the result of an expensive operation so that
 future requests for the same data can be served faster, without repeating the
 expensive work.
 
-```
-Without cache:
-Request → Server → Database → Response   (100ms)
-Request → Server → Database → Response   (100ms)
-Request → Server → Database → Response   (100ms)
-
-With cache:
-Request → Server → Database → Cache → Response   (100ms)  ← cache miss
-Request → Server → Cache → Response              (1ms)    ← cache hit
-Request → Server → Cache → Response              (1ms)    ← cache hit
-```
+![Caching](./public/caching.png)
 
 ### Cache Hit vs Cache Miss
 

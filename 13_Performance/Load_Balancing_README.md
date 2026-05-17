@@ -13,24 +13,9 @@ horizontal scaling, and how it connects to clustering.
 Load balancing distributes incoming network traffic across multiple servers
 or processes so no single instance becomes a bottleneck.
 
-```
-Without load balancing:
-                              ┌─────────────┐
-All traffic ────────────────▶ │   Server 1  │ ← overloaded 😓
-                              └─────────────┘
+![Without load balancing](./public/without-load-balancing.png)
 
-With load balancing:
-                              ┌─────────────┐
-              ┌──────────────▶│   Server 1  │
-              │               └─────────────┘
-Traffic ──▶ [Load Balancer]
-              │               ┌─────────────┐
-              └──────────────▶│   Server 2  │
-                              └─────────────┘
-                              ┌─────────────┐
-              ┌──────────────▶│   Server 3  │
-              └───────────────└─────────────┘
-```
+![With load balancing](./public/with-load-balancing.png)
 
 ### Load Balancing vs Clustering
 
