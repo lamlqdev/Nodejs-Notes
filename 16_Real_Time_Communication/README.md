@@ -10,30 +10,6 @@ HTTP was designed as a request/response protocol — the client always initiates
 
 Four techniques solve this in different ways, each with different trade-offs:
 
-```
-Client          Server
-  │─── request ──▶│   HTTP (normal)
-  │◀── response ──│
-
-  │─── request ──▶│
-  │◀── response ──│   Short Polling (repeat)
-  │─── request ──▶│
-  │◀── response ──│
-
-  │─── request ──▶│
-  │    (wait...)  │   Long Polling (hold then respond)
-  │◀── response ──│
-
-  │─── request ──▶│
-  │◀── event ─────│
-  │◀── event ─────│   SSE (server pushes, one direction)
-  │◀── event ─────│
-
-  │◀──── msg ─────│
-  │───── msg ────▶│   WebSocket (full-duplex, both directions)
-  │◀──── msg ─────│
-```
-
 ---
 
 ## 2. Short Polling
@@ -42,17 +18,7 @@ Client          Server
 
 The client sends repeated HTTP requests at a fixed interval, regardless of whether the server has new data. Each request is a complete HTTP round-trip.
 
-```
-Client                   Server
-  │──── GET /messages ──▶│
-  │◀─── 200 (empty) ─────│
-  │  (wait 3 seconds)
-  │──── GET /messages ──▶│
-  │◀─── 200 (1 new) ─────│
-  │  (wait 3 seconds)
-  │──── GET /messages ──▶│
-  │◀─── 200 (empty) ─────│
-```
+![Short polling](./public/short-polling.png)
 
 ### Code Example
 
@@ -99,18 +65,7 @@ app.get('/api/messages', async (req, res) => {
 
 The client sends a request and the server **holds it open** until new data is available (or a timeout occurs). When the server responds, the client immediately sends another request. This creates a near-real-time channel with a standard HTTP connection.
 
-```
-Client                      Server
-  │──── GET /messages ──▶  │
-  │     (server holds...)  │  ...waiting for data...
-  │                        │  ...new message arrives...
-  │◀─── 200 (1 new msg) ── │
-  │──── GET /messages ──▶  │  (immediately reconnects)
-  │     (server holds...)  │
-  │                        │  ...timeout after 30s...
-  │◀─── 200 (empty) ─────  │
-  │──── GET /messages ──▶  │  (reconnects again)
-```
+![Long polling](./public/long-polling.png)
 
 ### Code Example
 
@@ -179,17 +134,7 @@ poll();
 
 SSE is a **one-directional** persistent HTTP connection where the server can push events to the client at any time. The client opens one connection using the browser's `EventSource` API and the server keeps it open, writing events as they occur.
 
-```
-Client                         Server
-  │──── GET /api/rooms/1/sse ▶ │
-  │◀─── 200 text/event-stream  │  (connection stays open)
-  │                            │
-  │◀── event: presence ────────│  (push: alice joined)
-  │◀── event: typing ──────────│  (push: bob is typing)
-  │◀── : keepalive ────────────│  (comment every 30s)
-  │◀── event: typing ──────────│  (push: bob stopped)
-  │◀── event: presence ────────│  (push: charlie left)
-```
+![SSE](./public/sse.png)
 
 ### Wire Format
 
@@ -307,19 +252,7 @@ WebSocket is a **full-duplex** persistent connection. After an HTTP upgrade hand
 - Built-in reconnection logic
 - Event-based API
 
-```
-Client                         Server
-  │──── HTTP GET /socket.io ──▶│  (upgrade handshake)
-  │◀─── 101 Switching Protocols│
-  │                            │  (WebSocket tunnel open)
-  │────── join_room ──────────▶│
-  │◀───── room_presence ───────│
-  │────── send_message ───────▶│
-  │◀───── message_received ────│  (broadcast to all in room)
-  │◀───── message_received ────│  (other clients receive too)
-  │────── typing_start ───────▶│  → triggers SSEManager.broadcast
-  │────── leave_room ─────────▶│
-```
+![Socket](./public/web-socket.png)
 
 ### Core Socket.io Concepts
 
@@ -485,26 +418,7 @@ This project deliberately uses both technologies to demonstrate their different 
 
 ### 7.2. Socket.io + SSE Integration Flow
 
-```
-Client A types a message
-  │
-  ├──── typing_start ─────────▶ Socket.io Server
-  │                                    │
-  │                             sseManager.broadcast(roomId, 'typing', {...})
-  │                                    │
-  │                            SSE stream ─────▶ Client B (browser EventSource)
-  │                            SSE stream ─────▶ Client C (browser EventSource)
-  │
-  ├──── send_message ─────────▶ Socket.io Server
-  │                                    │
-  │                             saveMessage() → SQLite
-  │                                    │
-  │                             io.to(roomId).emit('message_received')
-  │                                    │
-  │◀──── message_received ─────────────│  (WebSocket, back to Client A)
-  │                            ────────▶ Client B (WebSocket)
-  │                            ────────▶ Client C (WebSocket)
-```
+![Integration flow](./public/integration-flow.png)
 
 ### 7.3. Folder Structure
 
